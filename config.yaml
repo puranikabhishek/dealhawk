@@ -27,10 +27,7 @@ feeds:
   - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
   - {name: Slickdeals price mistake, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+mistake"}
   - {name: Slickdeals price error, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+error"}
-  - {name: r/PriceErrors, url: "https://www.reddit.com/r/PriceErrors/new/.rss"}
-  - {name: r/pricemistakes, url: "https://www.reddit.com/r/pricemistakes/new/.rss"}
   - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies}
-  - {name: r/freebies, url: "https://www.reddit.com/r/freebies/new/.rss", category: freebies}
   - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
