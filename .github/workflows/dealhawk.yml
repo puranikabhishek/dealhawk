@@ -40,7 +40,6 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RECHECK: ${{ inputs.recheck }}
-          DEBUG_FEED: ${{ inputs.recheck }}
         run: python dealhawk.py
 
       - name: Save state
