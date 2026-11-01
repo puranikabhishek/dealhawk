@@ -2,11 +2,8 @@ name: DealHawk
 
 on:
   schedule:
-    # Times are UTC. Hourly normally.
-    - cron: "7 * * * *"
-    # Black Friday week → Cyber Monday (Nov 26 – Dec 2): every 30 min
-    - cron: "*/30 * 26-30 11 *"
-    - cron: "*/30 * 1-2 12 *"
+    # Every 30 min (price mistakes vanish fast). ~1,440 of the 2,000 free private-repo minutes/month.
+    - cron: "7,37 * * * *"
   workflow_dispatch:      # "Run workflow" button for manual runs
     inputs:
       recheck:

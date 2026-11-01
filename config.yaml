@@ -24,6 +24,11 @@ feeds:
   - {name: DealNews Staff Picks, url: "https://www.dealnews.com/f1682/Staff-Pick/?rss=1"}
   - {name: DealNews Electronics, url: "https://www.dealnews.com/c142/Electronics/?rss=1"}
   - {name: DealNews Home & Garden, url: "https://www.dealnews.com/c196/Home-Garden/?rss=1"}
+  - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
+  - {name: Slickdeals price mistake, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+mistake"}
+  - {name: Slickdeals price error, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+error"}
+  - {name: r/PriceErrors, url: "https://www.reddit.com/r/PriceErrors/new/.rss"}
+  - {name: r/pricemistakes, url: "https://www.reddit.com/r/pricemistakes/new/.rss"}
   - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies}
   - {name: r/freebies, url: "https://www.reddit.com/r/freebies/new/.rss", category: freebies}
   - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways}
@@ -33,11 +38,20 @@ blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 # Sections, in digest order. Keywords match the deal TITLE (whole words).
 # relaxed: true = skip price/discount/vote filters (freebies, coupons…). feed_only = filled by feeds above.
 categories:
+  price_mistake:
+    title: Price Mistake
+    emoji: "🚨"
+    instant: true                # own message the moment it's found, even overnight (silent)
+    relaxed: true                # new posts have few votes — don't wait for them
+    max_age_hours: 12            # older ones are almost always dead
+    patterns: ['price (?:mistake|error|glitch)', 'pricing (?:mistake|error|glitch)', 'mis-?priced?',
+               '\b(?:possible|potential|likely)\s+(?:pm|price)\b', '\bpm\s*\?', '\bprice glitch\b',
+               '\bglitch(?:ed)? price\b', '\berror price\b', '\bpe\s*\?']
   ultra:
     title: Ultra Deals
     emoji: "🔥"
     min_pct: 65                  # any deal in your sections at 65%+ off lands here
-    keywords: [price mistake, price error, pricing error, glitch, up to 70% off, up to 75% off,
+    keywords: [up to 70% off, up to 75% off,
                up to 80% off, up to 85% off, up to 90% off, clearance]
   electronics:
     title: Electronics

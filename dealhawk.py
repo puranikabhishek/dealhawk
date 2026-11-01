@@ -138,7 +138,7 @@ HELP = """🦅 <b>DealHawk commands</b>
 /off tools — turn a category off
 /on clothing — turn one on
 /list — see everything
-<i>Commands apply on the next run (within the hour).</i>"""
+<i>Commands apply on the next run (within 30 min).</i>"""
 
 
 def apply_settings(cfg, st):
@@ -300,8 +300,10 @@ def categorize(d, cfg):
     if (f := d.get("forced")) in cats:  # freebies/giveaways feeds
         return f if cats[f].get("enabled", True) else None
     tl = SAFE_PHRASES.sub(" ", d["tl"])  # "dishwasher safe" isn't an appliance
+    if inst := next((n for n, c in cats.items() if c.get("instant") and c.get("enabled", True) and matches(c, tl)), None):
+        return inst
     interest = next((n for n, c in cats.items() if c.get("enabled", True) and not c.get("feed_only")
-                     and n != "ultra" and matches(c, tl)), None)
+                     and not c.get("instant") and n != "ultra" and matches(c, tl)), None)
     u = cats.get("ultra", {})
     if u and u.get("enabled", True):
         deep = interest and not cats[interest].get("relaxed") and (d["pct"] or 0) >= u.get("min_pct", 65)
@@ -326,6 +328,9 @@ def passes(d, cfg, relaxed=False):
         return False, "flagged expired"
     if (mx := cfg.get("max_age_hours")) and d["age_h"] and d["age_h"] > mx:
         return False, "too old"
+    cat_max = cfg["categories"].get(d.get("cat"), {}).get("max_age_hours")
+    if cat_max and d["age_h"] and d["age_h"] > cat_max:
+        return False, "stale price mistake"
     if relaxed:
         return True, ""
     if d["price"] is not None and d["price"] < cfg.get("min_price", 0):
@@ -446,6 +451,30 @@ def send_text(text, dry, buttons=None, preview=None):
     return tg("sendMessage", **p).ok
 
 
+def instant_alert(d, cfg, dry, silent=False):
+    """Price mistakes: own message, right away, Buy button + Slickdeals/Reddit thread for proof."""
+    c = cfg["categories"][d["cat"]]
+    price = f"<b>${d['price']:,.2f}</b>" if d["price"] else ""
+    if d["reg"]:
+        price += f" <s>${d['reg']:,.0f}</s>"
+    if d["pct"]:
+        price += f" −{d['pct']}%"
+    age = f"posted {d['age_h'] * 60:.0f} min ago" if d["age_h"] is not None and d["age_h"] < 1 else \
+          (f"posted {d['age_h']:.0f}h ago" if d["age_h"] is not None else "")
+    stock = "✅ store shows in stock" if d["status"] == "in_stock" else "⚡ move fast — may already be gone"
+    text = "\n".join(x for x in [f"{c.get('emoji', '🚨')} <b>{c.get('title', 'PRICE MISTAKE').upper()}</b>",
+                                  html.escape(short(d["title"], 120)), price,
+                                  " · ".join(x for x in [age, stock] if x)] if x)
+    btn = [{"text": "🛒 Buy now", "url": d["buy"]}]
+    if d["thread"].startswith("http") and d["thread"] != d["buy"]:
+        btn.append({"text": "💬 Proof / comments", "url": d["thread"]})
+    if dry:
+        return send_text(text, True, buttons=btn)
+    return tg("sendMessage", chat_id=TG_CHAT, text=text, parse_mode="HTML", disable_notification=silent,
+              link_preview_options={"url": d["buy"], "prefer_small_media": True},
+              reply_markup={"inline_keyboard": [btn]}).ok
+
+
 def watch_alert(d, dry):
     """Only watchlist hits get their own message (photo + Buy button)."""
     price = f"${d['price']:,.0f}" if d["price"] else ""
@@ -496,8 +525,9 @@ def load_seen():
 def run(args):
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
     st = load_json(SETTINGS_FILE, {})
-    if in_quiet_hours(cfg) and not args.dry_run:
-        return log("Quiet hours — skipping.")
+    quiet = in_quiet_hours(cfg) and not args.dry_run
+    if quiet:
+        log("Quiet hours — price mistakes only, silent.")
     if not args.dry_run and not args.feed:
         if not st.get("welcomed_v4"):
             send_text("🦅 <b>DealHawk v4</b>: shorter digest · 🔥 Ultra deals · 🆓 Freebies · 🎁 Giveaways · "
@@ -524,6 +554,8 @@ def run(args):
             d["forced"] = feed_cat.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
+            if quiet and not cfg["categories"].get(d["cat"], {}).get("instant"):
+                continue  # leave it unseen for the morning
             if ok and (d["watch"] or d["cat"]):
                 d["cat"] = d["cat"] or next(iter(cfg["categories"]))
                 cands.append(d)
@@ -534,7 +566,8 @@ def run(args):
                     log(f"  skip: {d['title'][:70]} — {k}")
     log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
 
-    cands.sort(key=lambda d: (not d.get("watch"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
+    cands.sort(key=lambda d: (not cfg["categories"].get(d["cat"], {}).get("instant"), not d.get("watch"),
+                              -(d["pct"] or 0), -(d["thumbs"] or 0)))
     cands = cands[: cap * 2]
     if args.feed:
         results = [("in_stock", "offline")] * len(cands)
@@ -553,6 +586,11 @@ def run(args):
             d["hist"] = history_note(d, prices)
             keep.append(d)
 
+    instant = [d for d in keep if cfg["categories"].get(d["cat"], {}).get("instant")]
+    for d in instant:
+        instant_alert(d, cfg, args.dry_run, silent=quiet)
+        seen[d["id"]] = now + SENT_TTL
+    keep = [d for d in keep if d not in instant]
     for d in (d for d in keep if d.get("watch")):
         watch_alert(d, args.dry_run)
     keep.sort(key=lambda d: (d["status"] != "in_stock", -(d["pct"] or 0), -(d["thumbs"] or 0)))
@@ -560,7 +598,7 @@ def run(args):
     for d in sent:  # deals that didn't fit stay eligible for the next run
         seen[d["id"]] = now + SENT_TTL
 
-    log(f"Checked {len(cands)}: {tally}. Sent {len(sent)}.")
+    log(f"Checked {len(cands)}: {tally}. Sent {len(instant)} price mistakes + {len(sent)} in digest.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
