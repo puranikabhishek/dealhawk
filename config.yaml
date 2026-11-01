@@ -5,7 +5,8 @@
 
 timezone: America/Chicago
 quiet_hours: [23, 7]           # no pings 11pm–7am
-max_deals_per_run: 25          # per digest
+max_deals_per_run: 20          # total per digest
+per_category: 4                # lines per section (keeps it short)
 min_price: 25                  # skip $5 junk
 min_discount_pct: 20           # only when the % is known
 min_thumbs: 5                  # Slickdeals votes, when shown
@@ -15,111 +16,123 @@ max_age_hours: 0               # 0 = no age limit (feeds below only carry live d
 # balanced = send ✅ + ⚠️ (sold-out/expired always dropped) · strict = ✅ only
 stock_policy: balanced
 
-# 🔥 Hot deals get their own message with photo + Buy button; the rest go in the digest.
-hot: {min_pct: 60, min_thumbs: 100, max: 3}
-
-# Fresh, curated sources (tested from GitHub's servers).
+# Fresh, curated sources (tested from GitHub's servers). `category` forces every item into that section.
 feeds:
-  - name: Slickdeals Frontpage
-    url: https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1
-  - name: Slickdeals Popular
-    url: https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1
-  - name: DealNews
-    url: https://www.dealnews.com/?rss=1
-  - name: DealNews Home & Garden
-    url: https://www.dealnews.com/c196/Home-Garden/?rss=1
+  - {name: Slickdeals Frontpage, url: "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1"}
+  - {name: Slickdeals Popular, url: "https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1"}
+  - {name: DealNews, url: "https://www.dealnews.com/?rss=1"}
+  - {name: DealNews Staff Picks, url: "https://www.dealnews.com/f1682/Staff-Pick/?rss=1"}
+  - {name: DealNews Electronics, url: "https://www.dealnews.com/c142/Electronics/?rss=1"}
+  - {name: DealNews Home & Garden, url: "https://www.dealnews.com/c196/Home-Garden/?rss=1"}
+  - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies}
+  - {name: r/freebies, url: "https://www.reddit.com/r/freebies/new/.rss", category: freebies}
+  - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 
-# Categories (order = order in the digest). Matched against the deal TITLE, whole words.
+# Sections, in digest order. Keywords match the deal TITLE (whole words).
+# relaxed: true = skip price/discount/vote filters (freebies, coupons…). feed_only = filled by feeds above.
 categories:
-  patio:
-    title: Patio & Outdoor
-    emoji: "🌿"
-    keywords: [patio, outdoor furniture, outdoor sectional, outdoor sofa, conversation set, bistro set,
-               adirondack, fire pit, patio umbrella, cantilever umbrella, gazebo, pergola, porch swing,
-               outdoor dining, lounge chair, chaise, outdoor loveseat, deck box, wicker, hammock]
-  bedroom:
-    title: Bedroom
-    emoji: "🛏️"
-    keywords: [bed frame, platform bed, headboard, nightstand, dresser, chest of drawers, wardrobe,
-               armoire, bedroom set, mattress, box spring, adjustable base, storage bed, upholstered bed,
-               sheet set, comforter, duvet, pillow, mattress topper]
-  furniture:
-    title: Furniture
-    emoji: "🛋️"
-    keywords: [standing desk, office chair, gaming chair, herman miller, steelcase, sofa, sectional,
-               couch, bookshelf, recliner, accent chair, coffee table, dining table, bar stool]
-  home_security:
-    title: Home Security
-    emoji: "🔒"
-    keywords: [security camera, video doorbell, doorbell, ring, arlo, eufy, wyze, blink, simplisafe,
-               smart lock, deadbolt, august, yale, schlage, floodlight cam, nvr, gun safe, fireproof safe, alarm system]
-  smart_home:
-    title: Smart Home
-    emoji: "🏠"
-    keywords: [ecobee, nest, thermostat, lutron, philips hue, smart plug, smart switch, kasa, echo,
-               alexa, google home, homepod, smart bulb, mesh wifi, eero, orbi, deco, rachio]
-  appliances:
-    title: Appliances
-    emoji: "🧺"
-    keywords: [refrigerator, fridge, freezer, washer, dryer, dishwasher, microwave, gas range, electric range, wall oven,
-               air purifier, dehumidifier, humidifier, space heater, air conditioner, window ac, fan,
-               robot vacuum, roborock, roomba, shark, dyson, vacuum, carpet cleaner, water heater,
-               water filter, ice maker, generator]
-  kitchen:
-    title: Kitchen
-    emoji: "🍳"
-    keywords: [air fryer, instant pot, pressure cooker, ninja, kitchenaid, stand mixer, blender,
-               vitamix, espresso, coffee maker, breville, keurig, nespresso, toaster oven, cookware,
-               cast iron, knife set, dutch oven, sous vide, food processor, rice cooker]
-  grill:
-    title: Grills & BBQ
+  ultra:
+    title: Ultra Deals
     emoji: "🔥"
-    keywords: [grill, smoker, traeger, weber, blackstone, griddle, pit boss, kamado, pellet grill,
-               pizza oven, ooni, solo stove]
-  tools:
-    title: Tools & Home Improvement
-    emoji: "🛠️"
-    keywords: [dewalt, milwaukee, makita, ryobi, ego, kobalt, ridgid, bosch, craftsman, metabo,
-               drill, impact driver, circular saw, miter saw, table saw, oscillating, sander, router table,
-               pressure washer, leaf blower, lawn mower, string trimmer, chainsaw, snow blower, shop vac,
-               tool set, tool chest, ladder, battery kit, socket set, workbench, air compressor,
-               stud finder, laser level, ceiling fan, faucet, toilet, led bulbs, paint sprayer]
+    min_pct: 65                  # any deal in your sections at 65%+ off lands here
+    keywords: [price mistake, price error, pricing error, glitch, up to 70% off, up to 75% off,
+               up to 80% off, up to 85% off, up to 90% off, clearance]
   electronics:
     title: Electronics
     emoji: "🔌"
     keywords: [monitor, ssd, nvme, gpu, rtx, radeon, ryzen, headphones, earbuds, airpods, sony wh, bose,
-               ipad, tablet, pixel, galaxy, iphone, apple watch, kindle, router, nas, soundbar, speaker,
-               steam deck, playstation, ps5, xbox, nintendo, switch 2, camera, gopro, dji, drone,
-               power bank, power station, ecoflow, jackery, anker, keyboard, mouse, projector, printer]
-  automotive:
-    title: Automotive & Garage
-    emoji: "🚗"
-    keywords: [dash cam, jump starter, tire inflator, car vacuum, obd2, floor mats, garage storage,
-               garage door opener, car charger, roof rack, hitch]
-  personal:
-    title: Personal Care
-    emoji: "🪒"
-    keywords: [trimmer, shaver, electric toothbrush, sonicare, oral-b, waterpik, philips norelco,
-               massage gun, theragun, smart scale]
+               ipad, tablet, pixel, galaxy, iphone, apple watch, smartwatch, kindle, router, mesh wifi,
+               eero, nas, soundbar, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
+               camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
+               projector, printer, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
+               blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo, homepod,
+               microphone, webcam, desktop, gaming pc]
+  appliances:
+    title: Home Appliances
+    emoji: "🧺"
+    keywords: [refrigerator, fridge, freezer, washer, dryer, dishwasher, microwave, gas range,
+               electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
+               air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
+               vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
+               pressure cooker, ninja, kitchenaid, stand mixer, blender, vitamix, espresso, coffee maker,
+               breville, keurig, nespresso, toaster oven, food processor, rice cooker, sous vide]
+  decor:
+    title: Home & Room Decor
+    emoji: "🖼️"
+    keywords: [wall art, canvas, poster, framed art, area rug, rug, runner rug, floor lamp, table lamp,
+               desk lamp, lamp, mirror, curtains, blackout curtains, throw pillow, throw blanket,
+               candle, candles, vase, artificial plant, faux plant, wall shelf, floating shelves,
+               led strip, led lights, neon sign, light bar, picture frame, wall clock, bookends,
+               decanter, whiskey glasses, bar cart, globe, record player, turntable, sconce,
+               chandelier, pendant light, string lights, christmas tree, wreath, holiday decor,
+               desk mat, desk organizer, shoe rack, coat rack, wall decor, home decor]
+  patio:
+    title: Patio
+    emoji: "🌿"
+    keywords: [patio, outdoor furniture, outdoor sectional, outdoor sofa, conversation set, bistro set,
+               adirondack, fire pit, patio umbrella, cantilever umbrella, gazebo, pergola, porch swing,
+               outdoor dining, lounge chair, chaise, outdoor loveseat, deck box, wicker, hammock,
+               outdoor chair, solar lights]
+  furniture:
+    title: Furniture
+    emoji: "🛋️"
+    keywords: [standing desk, office chair, gaming chair, herman miller, steelcase, sofa, sectional,
+               couch, loveseat, bookshelf, bookcase, recliner, accent chair, coffee table, side table,
+               end table, dining table, dining set, bar stool, tv stand, media console, cabinet,
+               bed frame, platform bed, headboard, nightstand, dresser, chest of drawers, wardrobe,
+               armoire, bedroom set, mattress, storage bed, ottoman, futon]
+  coupons:
+    title: Coupons & Promo Codes
+    emoji: "🏷️"
+    relaxed: true
+    patterns: ['\bsitewide\b', '\bstorewide\b', 'promo code', 'coupon code', '\bcoupons?\b',
+               'off (?:your|orders?|purchases?)\b', '\$\d+ off \$\d+', 'extra \d+% off', '\bbogo\b',
+               '\brebate\b', 'friends (?:&|and) family']
+  freebies:
+    title: Freebies
+    emoji: "🆓"
+    relaxed: true
+    feed_only: true
+    keywords: []
+  giveaways:
+    title: Giveaways & Sweepstakes
+    emoji: "🎁"
+    relaxed: true
+    feed_only: true
+    keywords: []
+
+  # ── off (turn on from Telegram: /on tools) ──
+  tools:
+    title: Tools
+    emoji: "🛠️"
+    enabled: false
+    keywords: [dewalt, milwaukee, makita, ryobi, ego, kobalt, ridgid, bosch, craftsman, drill,
+               impact driver, miter saw, pressure washer, leaf blower, lawn mower, air compressor]
+  grill:
+    title: Grills
+    emoji: "🍖"
+    enabled: false
+    keywords: [grill, smoker, traeger, weber, blackstone, griddle, pellet grill, pizza oven]
   fitness:
     title: Fitness
     emoji: "🏋️"
-    keywords: [treadmill, exercise bike, rowing machine, dumbbells, kettlebell, bowflex, power rack,
-               weight bench, walking pad, garmin, whoop, fitness tracker]
+    enabled: false
+    keywords: [treadmill, exercise bike, rowing machine, dumbbells, kettlebell, walking pad, garmin]
   clothing:
     title: Clothing
     emoji: "👕"
-    enabled: false               # send /on clothing to turn back on
-    keywords: [jacket, boots, sneakers, "levi's", jeans, patagonia, "arc'teryx", north face, carhartt,
-               adidas, new balance, uniqlo, merino, chinos]
+    enabled: false
+    keywords: [jacket, boots, sneakers, jeans, patagonia, north face, carhartt, new balance]
 
 # Never show deals with these words in the title. Add more with /block in Telegram.
 exclude_keywords: [
   laptop, laptops, notebook, chromebook, macbook, tv, tvs, television, oled tv, qled, smart tv,
   roku, fire tv, google tv,
-  refurbished, renewed, used, open box, "for parts", kids, "women's", case only, screen protector, case, phone case,
+  refurbished, renewed, used, open box, "for parts", kids, "women's", case only, screen protector, case, cases, phone case, iphone case, magsafe, protector, tempered glass, skin,
+  skins, holster, phone grip, phone holder, phone mount, popsocket, strap, band, bands, cable, cables,
+  thread, meeting of the minds,
   gift card, credit card, see thread, cushion, cushions, cover, covers, charger, charging, airbed,
   air mattress, replacement, lego, toy, toys, costume, ebook, subscription, membership]
 

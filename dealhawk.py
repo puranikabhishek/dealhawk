@@ -291,12 +291,23 @@ def to_deal(entry, source):
 SAFE_PHRASES = re.compile(r"\b(dishwasher|oven|microwave|freezer|dryer)[- ]safe\b|\bfor (?:the )?(?:dishwasher|oven|microwave)\b")
 
 
+def matches(c, tl):
+    return any(has(k, tl) for k in c.get("keywords", [])) or any(re.search(p, tl) for p in c.get("patterns", []))
+
+
 def categorize(d, cfg):
+    cats = cfg["categories"]
+    if (f := d.get("forced")) in cats:  # freebies/giveaways feeds
+        return f if cats[f].get("enabled", True) else None
     tl = SAFE_PHRASES.sub(" ", d["tl"])  # "dishwasher safe" isn't an appliance
-    for name, c in cfg["categories"].items():
-        if c.get("enabled", True) and any(has(k, tl) for k in c["keywords"]):
-            return name
-    return None
+    interest = next((n for n, c in cats.items() if c.get("enabled", True) and not c.get("feed_only")
+                     and n != "ultra" and matches(c, tl)), None)
+    u = cats.get("ultra", {})
+    if u and u.get("enabled", True):
+        deep = interest and not cats[interest].get("relaxed") and (d["pct"] or 0) >= u.get("min_pct", 65)
+        if matches(u, tl) or deep:
+            return "ultra"
+    return interest
 
 
 def watch_hit(d, cfg):
@@ -306,7 +317,7 @@ def watch_hit(d, cfg):
     return None
 
 
-def passes(d, cfg):
+def passes(d, cfg, relaxed=False):
     if hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, d["tl"])), None):
         return False, f"blocked '{hit}'"
     if hit := next((s for s in cfg.get("blocked_stores", []) if has(s, d["text"])), None):
@@ -315,6 +326,8 @@ def passes(d, cfg):
         return False, "flagged expired"
     if (mx := cfg.get("max_age_hours")) and d["age_h"] and d["age_h"] > mx:
         return False, "too old"
+    if relaxed:
+        return True, ""
     if d["price"] is not None and d["price"] < cfg.get("min_price", 0):
         return False, "under min price"
     if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
@@ -322,11 +335,6 @@ def passes(d, cfg):
     if d["thumbs"] is not None and d["thumbs"] < cfg.get("min_thumbs", -999):
         return False, "low votes"
     return True, ""
-
-
-def is_hot(d, cfg):
-    h = cfg.get("hot", {})
-    return bool(d.get("watch")) or (d["pct"] or 0) >= h.get("min_pct", 60) or (d["thumbs"] or 0) >= h.get("min_thumbs", 100)
 
 
 # ───────────────────────── verification ─────────────────────────
@@ -413,21 +421,18 @@ def tg(method, **payload):
     return r
 
 
-def price_bits(d):
-    s = f"<b>${d['price']:,.0f}</b>" if d["price"] else ""
-    if d["reg"]:
-        s += f" <s>${d['reg']:,.0f}</s>"
-    if d["pct"]:
-        s += f" −{d['pct']}%"
-    return s
+def short(t, n=46):
+    t = clean_title(t) or t
+    return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + "…"
 
 
 def deal_line(d):
     e = html.escape
-    flag = "✅" if d["status"] == "in_stock" else "⚠️"
-    title = e(clean_title(d["title"])[:80] or d["title"][:80])
-    store = f" · {e(d['store'])}" if d["store"] else ""
-    return f"{flag} {price_bits(d)} <a href=\"{e(d['buy'], quote=True)}\">{title}</a>{store}{d.get('hist', '')}"
+    link = f'<a href="{e(d["buy"], quote=True)}">{e(short(d["title"]))}</a>'
+    if d["cat"] in ("freebies", "giveaways") or not d["price"]:
+        return f"• {link}"
+    pct = f" <i>−{d['pct']}%</i>" if d["pct"] else ""
+    return f"<b>${d['price']:,.0f}</b>{pct} {link}"
 
 
 def send_text(text, dry, buttons=None, preview=None):
@@ -441,40 +446,36 @@ def send_text(text, dry, buttons=None, preview=None):
     return tg("sendMessage", **p).ok
 
 
-def rich_alert(d, cfg, dry):
-    e = html.escape
-    c = cfg["categories"].get(d["cat"], {})
-    lines = [f"🔥 {c.get('emoji', '')} <b>{e(clean_title(d['title'])[:140])}</b>",
-             " · ".join(x for x in [price_bits(d), e(d["store"]), f"👍{d['thumbs']}" if d["thumbs"] else ""] if x),
-             " · ".join(x for x in ["✅ In stock (verified)" if d["status"] == "in_stock" else "⚠️ Check stock",
-                                    "📉 Lowest seen" if d.get("hist") else "",
-                                    f"🎯 {e(d['watch'])}" if d.get("watch") else ""] if x)]
-    btn = [{"text": "🛒 Buy", "url": d["buy"]}]
-    if d["thread"].startswith("http") and d["thread"] != d["buy"]:
-        btn.append({"text": "💬 Details", "url": d["thread"]})
-    return send_text("\n".join(l for l in lines if l), dry, buttons=btn, preview=d["buy"])
+def watch_alert(d, dry):
+    """Only watchlist hits get their own message (photo + Buy button)."""
+    price = f"${d['price']:,.0f}" if d["price"] else ""
+    text = f"🎯 <b>{html.escape(d['watch'])}</b> — {price}\n{html.escape(short(d['title'], 90))}"
+    return send_text(text, dry, buttons=[{"text": "🛒 Buy", "url": d["buy"]}], preview=d["buy"])
 
 
 def digest(deals, cfg, dry):
+    """Short and scannable: one header, category sections, ≤ per_cat lines each."""
     if not deals:
-        return
+        return []
+    per_cat = cfg.get("per_category", 4)
     now = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).strftime("%-I:%M %p")
-    cur = (f"🦅 <b>{len(deals)} new deal{'s' * (len(deals) > 1)}</b> · {now}\n"
-           f"<i>tap a name to buy · ✅ stock verified · ⚠️ check stock · 📉 lowest seen</i>")
-    chunks = []
+    sent, blocks = [], []
     for cat, c in cfg["categories"].items():
-        group = [d for d in deals if d["cat"] == cat]
-        if not group:
-            continue
-        block = f"\n\n{c.get('emoji', '')} <b>{c.get('title', cat).upper()}</b>\n" + "\n".join(deal_line(d) for d in group)
-        if len(cur) + len(block) > TG_LIMIT:
+        group = [d for d in deals if d["cat"] == cat][:per_cat]
+        if group:
+            sent += group
+            blocks.append(f"{c.get('emoji', '')} <b>{c.get('title', cat)}</b>\n" + "\n".join(deal_line(d) for d in group))
+    chunks, cur = [], f"🦅 <b>{len(sent)} deals</b> · {now}"
+    for b in blocks:
+        if len(cur) + len(b) + 2 > TG_LIMIT:
             chunks.append(cur)
-            cur = block.strip()
+            cur = b
         else:
-            cur += block
+            cur += "\n\n" + b
     chunks.append(cur)
     for ch in chunks:
         send_text(ch, dry)
+    return sent
 
 
 # ───────────────────────── main ─────────────────────────
@@ -498,10 +499,10 @@ def run(args):
     if in_quiet_hours(cfg) and not args.dry_run:
         return log("Quiet hours — skipping.")
     if not args.dry_run and not args.feed:
-        if not st.get("welcomed_v3"):
-            send_text("🦅 <b>DealHawk upgraded</b>\n• Deals now come in one digest, grouped by category\n"
-                      "• 🔥 Hot deals still get their own message\n• More categories, clothing off\n\n" + HELP, False)
-            st["welcomed_v3"] = True
+        if not st.get("welcomed_v4"):
+            send_text("🦅 <b>DealHawk v4</b>: shorter digest · 🔥 Ultra deals · 🆓 Freebies · 🎁 Giveaways · "
+                      "🏷️ Coupons · 🖼️ Home decor. Send /list to see categories.", False)
+            st["welcomed_v4"] = True
         handle_commands(cfg, st)
     cfg = apply_settings(cfg, st)
     now, seen, prices = time.time(), load_seen(), load_json(PRICES_FILE, {})
@@ -510,6 +511,7 @@ def run(args):
 
     sources = [("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg)
     cands, ids, skips = [], set(), {}
+    feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         for e in entries:
@@ -519,8 +521,9 @@ def run(args):
             if d["id"] in ids or pk in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
                 continue
             ids.update((d["id"], pk))  # same deal from two feeds = one line
+            d["forced"] = feed_cat.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
-            ok, why = passes(d, cfg)
+            ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
             if ok and (d["watch"] or d["cat"]):
                 d["cat"] = d["cat"] or next(iter(cfg["categories"]))
                 cands.append(d)
@@ -531,7 +534,7 @@ def run(args):
                     log(f"  skip: {d['title'][:70]} — {k}")
     log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
 
-    cands.sort(key=lambda d: (not is_hot(d, cfg), -(d["pct"] or 0), -(d["thumbs"] or 0)))
+    cands.sort(key=lambda d: (not d.get("watch"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
     cands = cands[: cap * 2]
     if args.feed:
         results = [("in_stock", "offline")] * len(cands)
@@ -550,15 +553,14 @@ def run(args):
             d["hist"] = history_note(d, prices)
             keep.append(d)
 
-    hot = [d for d in keep if is_hot(d, cfg)][: cfg.get("hot", {}).get("max", 3)]
-    for d in hot:
-        rich_alert(d, cfg, args.dry_run)
-    rest = sorted((d for d in keep if d not in hot), key=lambda d: (d["status"] != "in_stock", -(d["pct"] or 0)))
-    digest(rest, cfg, args.dry_run)
-    for d in keep:
+    for d in (d for d in keep if d.get("watch")):
+        watch_alert(d, args.dry_run)
+    keep.sort(key=lambda d: (d["status"] != "in_stock", -(d["pct"] or 0), -(d["thumbs"] or 0)))
+    sent = digest(keep, cfg, args.dry_run)
+    for d in sent:  # deals that didn't fit stay eligible for the next run
         seen[d["id"]] = now + SENT_TTL
 
-    log(f"Checked {len(cands)}: {tally}. Sent {len(hot)} hot + {len(rest)} in digest.")
+    log(f"Checked {len(cands)}: {tally}. Sent {len(sent)}.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
