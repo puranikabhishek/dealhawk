@@ -120,13 +120,17 @@ def extract_links(summary):
 def fetch_feed(url, local=None):
     if local:
         return feedparser.parse(local).entries
-    try:
-        r = HTTP.get(url, timeout=20)
-        r.raise_for_status()
-        return feedparser.parse(r.content).entries
-    except Exception as e:
-        print(f"  ! feed failed {url}: {e}", file=sys.stderr)
-        return []
+    # Reddit rate-limits GitHub's servers; old.reddit + a retry usually gets through
+    urls = [url, url.replace("www.reddit.com", "old.reddit.com")] if "reddit.com" in url else [url]
+    for attempt, u in enumerate(urls * 2):
+        try:
+            r = HTTP.get(u, timeout=20)
+            r.raise_for_status()
+            return feedparser.parse(r.content).entries
+        except Exception as e:
+            print(f"  ! feed try {attempt + 1} failed {u}: {e}", file=sys.stderr)
+            time.sleep(4)
+    return []
 
 
 def to_deal(entry, source):
@@ -186,22 +190,25 @@ def passes(deal, cfg):
 # ───────────────────────── verify ─────────────────────────
 def verify(url):
     """Return 'ok' | 'dead' | 'unverified'. Follows redirects to the final page."""
+    """Only drop on hard proof (404/410, or the page TITLE says gone).
+    Anything fuzzy (bot blocks, 'unavailable' text buried in page JS) -> unverified,
+    so you still get the alert with a ⚠️ and decide yourself."""
     if not url:
-        return "dead", url
+        return "dead", url, "no link"
     try:
         r = HTTP.get(url, timeout=20, allow_redirects=True)
         final = r.url
         if r.status_code in (404, 410):
-            return "dead", final
+            return "dead", final, f"HTTP {r.status_code}"
         if r.status_code >= 400:
-            # big retailers block bots — not proof the deal is dead
-            return ("unverified" if any(b in final for b in BOT_BLOCKERS) else "dead"), final
-        body = r.text[:400_000].lower()
-        if any(m in body for m in DEAD_MARKERS):
-            return "dead", final
-        return "ok", final
-    except Exception:
-        return "unverified", url
+            return "unverified", final, f"HTTP {r.status_code}"
+        m = re.search(r"<title[^>]*>(.*?)</title>", r.text[:200_000], re.I | re.S)
+        title = (m.group(1) if m else "").lower()
+        if any(k in title for k in DEAD_MARKERS):
+            return "dead", final, f"title: {title.strip()[:60]}"
+        return "ok", final, ""
+    except Exception as e:
+        return "unverified", url, type(e).__name__
 
 
 def slickdeals_buy_link(thread_url):
@@ -301,6 +308,7 @@ def run(args):
     candidates = []
     for f in feeds:
         entries = fetch_feed(f["url"], local=args.feed)
+        time.sleep(0 if args.feed else 2)
         print(f"{f['name']}: {len(entries)} items")
         for e in entries:
             d = to_deal(e, f["name"])
@@ -325,9 +333,10 @@ def run(args):
         if not args.feed:
             if "slickdeals.net" in d["buy"]:
                 d["buy"] = slickdeals_buy_link(d["thread"])
-            d["status"], final = verify(d["buy"])
+            d["status"], final, why = verify(d["buy"])
+            if why:
+                print(f"  {d['status']} ({why}): {d['title'][:60]}")
             if d["status"] == "dead":
-                print(f"  dead link: {d['title'][:60]}")
                 seen[d["id"]] = time.time()
                 continue
             time.sleep(1)  # be polite
