@@ -13,6 +13,10 @@ on:
         description: "Re-check deals held as sold-out/unverified"
         type: boolean
         default: false
+      probe:
+        description: "Test candidate feeds (dev)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # lets the run save price history + seen deals back to the repo
@@ -35,7 +39,12 @@ jobs:
 
       - run: pip install -r requirements.txt
 
+      - name: Probe feeds
+        if: ${{ inputs.probe }}
+        run: python probe.py
+
       - name: Hunt deals
+        if: ${{ !inputs.probe }}
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
