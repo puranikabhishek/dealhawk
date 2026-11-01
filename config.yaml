@@ -8,9 +8,12 @@ max_alerts_per_run: 8          # anti-spam cap
 min_discount_pct: 30           # skip deals under this % off (when % is known)
 min_thumbs: 15                 # Slickdeals community score floor (when shown)
 
-# strict   = only send deals the store page CONFIRMS are in stock (fewer, safer)
-# balanced = also send ones a store wouldn't let us check, marked ⚠️
-stock_policy: strict
+# Stock check: ✅ = store page confirmed in stock. ⚠️ = store/Slickdeals blocks bots, couldn't check.
+# strict   = only send ✅ (very few — most big stores block bots)
+# balanced = send ✅ and ⚠️; sold-out/expired ones are always dropped
+stock_policy: balanced
+max_age_hours: 24             # only fresh deals (old ones are usually sold out)
+min_price: 25                 # skip $5 junk
 
 trusted_stores: [amazon, best buy, home depot, "lowe's", lowes, costco, "sam's club", walmart,
                  target, "b&h", newegg, woot, micro center, adorama, dell, samsung, ace hardware,
@@ -76,7 +79,8 @@ exclude_keywords: [
   smart tv, roku, fire tv, google tv,
   # junk
   refurbished, renewed, used, open box, "for parts", kids, "women's", case only,
-  screen protector, gift card, credit card]
+  screen protector, gift card, credit card, see thread,
+  cushion, cushions, cover, covers, charger, charging, airbed, air mattress, replacement]
 
 # Watchlist: alert when one appears at/under max_price (still must pass excludes + stock check).
 watchlist:

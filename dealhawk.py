@@ -14,6 +14,7 @@ Usage:
   python dealhawk.py --feed FILE   # parse a local RSS file (offline testing)
 """
 import argparse
+import calendar
 import hashlib
 import html
 import json
@@ -66,7 +67,7 @@ SD_EXPIRED = re.compile(r'"isExpired"\s*:\s*true|this deal (?:has|is) expired|de
                         r'class="[^"]*\bexpired\b', re.I)
 
 STATUS_LABEL = {"in_stock": "✅ In stock (verified)",
-                "unknown": "⚠️ Stock not confirmed — check before buying"}
+                "unknown": "⚠️ Stock not auto-verified"}
 
 
 # ───────────────────────── helpers ─────────────────────────
@@ -175,7 +176,11 @@ def to_deal(entry, source):
             break
     plain = re.sub(r"<[^>]+>", " ", html.unescape(summary))
     price, reg, pct = parse_prices(title + " " + plain)
+    pub = entry.get("published_parsed") or entry.get("updated_parsed")
+    age_h = (time.time() - calendar.timegm(pub)) / 3600 if pub else None
+    tags = " ".join(t.get("term", "") for t in entry.get("tags", [])).lower()
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
+            "age_h": age_h, "tags": tags,
             "title": title, "source": source, "thread": link, "buy": buy,
             "price": price, "reg": reg, "pct": pct, "thumbs": thumbs(plain),
             "store": store_of(title), "text": (title + " " + plain).lower()}
@@ -200,6 +205,12 @@ def passes(d, cfg):
     t = d["title"].lower()  # excludes check the TITLE so a passing mention in comments doesn't kill a deal
     if hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, t)), None):
         return False, f"excluded '{hit}'"
+    if re.search(r"expired|out of stock|\boos\b|sold out|dead deal", d["tags"] + " " + t):
+        return False, "flagged expired/OOS"
+    if d["age_h"] is not None and d["age_h"] > cfg.get("max_age_hours", 24):
+        return False, f"{d['age_h']:.0f}h old"
+    if d["price"] is not None and d["price"] < cfg.get("min_price", 0):
+        return False, f"under ${cfg.get('min_price')}"
     stores = cfg.get("trusted_stores") or []
     if stores and not any(has(s, d["text"]) for s in stores):
         return False, "untrusted store"
@@ -265,15 +276,8 @@ def direct_url(click):
 
 def resolve_and_verify(d):
     """Check 1 (source still live) + Check 2 (store says in stock)."""
-    if "slickdeals.net" in d["thread"] and "slickdeals.net" in d["buy"]:
-        try:
-            page = HTTP.get(d["thread"], timeout=20).text
-            if SD_EXPIRED.search(page[:300000]):
-                return "dead", "Slickdeals marked expired"
-            if m := re.search(r'href="(https://slickdeals\.net/click\?[^"]+)"', page):
-                d["buy"] = direct_url(html.unescape(m.group(1)))
-        except Exception:
-            pass
+    if "slickdeals.net" in d["buy"]:
+        return "unknown", "store link hidden by Slickdeals"
     if not str(d["buy"]).startswith("http"):
         d["buy"] = d["thread"]
     status, why = check_store(d["buy"])
