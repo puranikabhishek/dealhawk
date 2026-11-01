@@ -379,7 +379,7 @@ def run(args):
     strict = cfg.get("stock_policy", "strict") == "strict"
 
     sources = ([("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg))
-    cands, ids = [], set()
+    cands, ids, skips = [], set(), {}
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         debug_feed(entries)
@@ -395,9 +395,14 @@ def run(args):
             if ok and (d["watch"] or cat):
                 d["emoji"] = emoji or "🎯"
                 cands.append(d)
-            elif args.verbose:
-                log(f"  skip: {d['title'][:70]} — {why or 'no category'}")
+            else:
+                why = why or "no category"
+                k = re.sub(r"\d+", "N", why)
+                skips[k] = skips.get(k, 0) + 1
+                if args.verbose:
+                    log(f"  skip: {d['title'][:70]} — {why}")
 
+    log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
     cands.sort(key=lambda d: (not d["watch"], -(d["pct"] or 0), -(d["thumbs"] or 0)))
     cands = cands[: cfg["max_alerts_per_run"] * 3]  # verify only what could be sent
 
