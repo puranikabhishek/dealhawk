@@ -1,17 +1,15 @@
 #!/usr/bin/env python3
 """
-DealHawk 🦅 — free deal sniper that pings your phone on Telegram. Uses zero AI tokens.
+DealHawk 🦅 — free deal sniper for Telegram. $0, zero AI tokens.
 
-Flow: free deal feeds -> filter (categories, stores, discount, score, excludes)
-      -> DOUBLE VERIFY (1: deal not expired at source, 2: store page says in stock)
-      -> price memory -> compact Telegram alert with Buy button + product preview.
+Every run:
+  1. Reads your Telegram commands (/add, /block, /watch, /off …) and updates settings.
+  2. Pulls fresh, community/editor-curated deal feeds (Slickdeals, DealNews).
+  3. Filters by your categories, blocked words/stores, price.
+  4. Verifies: source not expired + store page stock check where the store allows it.
+  5. Sends ONE grouped digest (by category) + separate rich alerts for 🔥 hot deals.
 
-Usage:
-  python dealhawk.py               # normal run
-  python dealhawk.py --dry-run -v  # print alerts + why things were skipped; send/save nothing
-  python dealhawk.py --check URL   # run the stock check on one product page
-  python dealhawk.py --test        # send a test message
-  python dealhawk.py --feed FILE   # parse a local RSS file (offline testing)
+CLI: --dry-run  --test  --check URL  --feed FILE  -v
 """
 import argparse
 import calendar
@@ -25,7 +23,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import parse_qs, quote_plus, urlparse
+from urllib.parse import parse_qs, urlparse
 from zoneinfo import ZoneInfo
 
 import feedparser
@@ -34,15 +32,13 @@ import yaml
 
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
-SEEN_FILE = DATA / "seen.json"
-PRICES_FILE = DATA / "prices.json"
+SEEN_FILE, PRICES_FILE, SETTINGS_FILE = DATA / "seen.json", DATA / "prices.json", DATA / "settings.json"
 
 DAY = 86400
-SENT_TTL = 30 * DAY        # don't resend a deal for 30 days
-OOS_RECHECK = DAY // 2     # sold-out / unverified deals get re-checked after 12h
+SENT_TTL, OOS_RECHECK = 30 * DAY, DAY // 2
+TG_LIMIT = 3900
 
-UA = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-      "(KHTML, like Gecko) Chrome/131.0 Safari/537.36")
+UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0 Safari/537.36"
 HTTP = requests.Session()
 HTTP.headers.update({"User-Agent": UA, "Accept-Language": "en-US,en;q=0.9",
                      "Accept": "text/html,application/xhtml+xml,*/*;q=0.8"})
@@ -50,27 +46,30 @@ HTTP.mount("https://", requests.adapters.HTTPAdapter(pool_maxsize=16))
 
 TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TG_CHAT = os.getenv("TELEGRAM_CHAT_ID", "")
-FORCE = os.getenv("RECHECK") == "true"  # manual run option: re-check deals held as sold-out/unverified
+FORCE = os.getenv("RECHECK") == "true"
 
-# ── stock signals ──
+STORE_DOMAINS = r"amazon\.|walmart\.|bestbuy\.|homedepot\.|lowes\.|target\.|costco\.|samsclub\.|newegg\.|" \
+                r"bhphotovideo\.|woot\.|wayfair\.|ikea\.|overstock\.|dell\.|lenovo\.|ebay\.|acehardware\.|" \
+                r"microcenter\.|adorama\.|kohls\.|macys\.|apple\.|samsung\.|dyson\.|staples\.|zoro\.|northerntool\."
 IN_STOCK = {"instock", "limitedavailability", "onlineonly", "preorder", "presale", "in stock"}
 OUT_STOCK = {"outofstock", "soldout", "discontinued", "out of stock", "oos", "backorder"}
-OOS_TEXT = re.compile(  # an element whose whole visible text says it's gone
-    r'>\s*(out of stock|sold out|temporarily out of stock|currently unavailable|'
-    r'no longer available|not available for delivery|delivery unavailable|unavailable)\s*<'
-    r'|value="(out of stock|sold out)"'
-    r'|"(?:inventoryStatus|stockStatus|buttonState|availabilityStatus)"\s*:\s*"(out_of_stock|sold_out|oos|unavailable|not_available)"',
+OOS_TEXT = re.compile(
+    r'>\s*(out of stock|sold out|temporarily out of stock|currently unavailable|no longer available|'
+    r'not available for delivery|delivery unavailable|unavailable)\s*<|value="(out of stock|sold out)"|'
+    r'"(?:inventoryStatus|stockStatus|buttonState|availabilityStatus)"\s*:\s*"(out_of_stock|sold_out|oos|unavailable|not_available)"',
     re.I)
-BLOCK_TEXT = re.compile(r"robot check|captcha|access denied|are you a human|pardon our interruption|"
-                        r"request blocked|enable javascript and cookies", re.I)
-SD_EXPIRED = re.compile(r'"isExpired"\s*:\s*true|this deal (?:has|is) expired|deal expired|'
-                        r'class="[^"]*\bexpired\b', re.I)
-
-STATUS_LABEL = {"in_stock": "✅ In stock (verified)",
-                "unknown": "⚠️ Stock not auto-verified"}
+BLOCK_TEXT = re.compile(r"robot check|captcha|access denied|are you a human|pardon our interruption|request blocked", re.I)
+PAGE_EXPIRED = re.compile(r'"isExpired"\s*:\s*true|this (?:deal|offer|sale) (?:has|is) (?:expired|ended|over)|'
+                          r'deal (?:has )?expired|no longer available|sold out', re.I)
+TITLE_NOISE = re.compile(r"\s*(?:\+\s*)?(?:free\s+(?:s&h|shipping|store pickup)[^,]*|w/\s*prime|"
+                         r"\b(?:at|@)\s+[A-Z][\w&'. -]{1,25}$|\bfor \$[\d,.]+|\$[\d,.]+(?:\s*-\s*\$[\d,.]+)?)", re.I)
 
 
-# ───────────────────────── helpers ─────────────────────────
+# ───────────────────────── small helpers ─────────────────────────
+def log(m):
+    print(m, flush=True)
+
+
 def load_json(p, default):
     try:
         return json.loads(p.read_text())
@@ -90,9 +89,12 @@ def money(s):
         return None
 
 
-def parse_prices(text):
-    """(price, regular_price, pct_off), best-effort from deal text."""
-    t = text.replace(" ", " ")
+def has(word, text):
+    return re.search(r"(?<![a-z0-9])" + re.escape(str(word).lower()) + r"(?![a-z0-9])", text) is not None
+
+
+def parse_prices(t):
+    t = t.replace(" ", " ")
     price = reg = pct = None
     if m := re.search(r"\$\s?([\d,]+(?:\.\d{2})?)", t):
         price = money(m.group(1))
@@ -105,32 +107,137 @@ def parse_prices(text):
     return price, reg, pct
 
 
-def thumbs(text):
-    m = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", text, re.I)
-    return int(m.group(1)) if m else None
+def store_of(title, plain):
+    if m := re.search(r"\b(?:at|@)\s+([A-Z][\w&'.\- ]{1,25}?)(?:\s*[\(\[|,]|$)", title):
+        return m.group(1).strip()
+    if m := re.match(r"\s*([A-Z][\w&'.!\- ]{1,25}?)\s+(?:\[[\w.]+\]\s+)?has\b", plain):  # "Woot! has …"
+        return m.group(1).strip()
+    return ""
 
 
-def store_of(title):
-    m = re.search(r"\b(?:at|@)\s+([A-Z&][\w&'.\- ]{1,25}?)(?:\s*[\(\[|,]|$)", title)
-    return m.group(1).strip() if m else ""
+def clean_title(t):
+    t = re.sub(r"^\s*\[[^\]]{1,30}\]\s*[-:]?\s*", "", t)  # leading [Costco Members] tags
+    t = re.sub(r"\((?:reg|was|list|orig|msrp)[^)]*\)|\(\s*\d+\s*%\s*off\s*\)", " ", t, flags=re.I)
+    t = re.sub(r"\(\s*\)", " ", TITLE_NOISE.sub(" ", t))
+    return re.sub(r"\s{2,}", " ", t).strip(" -–,:+")
 
 
 def product_key(title):
-    t = re.sub(r"\$[\d,.]+|\(.*?\)|\[.*?\]|\b(at|@)\s+\w.*$", " ", title, flags=re.I)
-    t = re.sub(r"[^a-z0-9 ]", " ", t.lower())
+    t = re.sub(r"[^a-z0-9 ]", " ", clean_title(title).lower())
     return " ".join([w for w in t.split() if w not in {"free", "shipping", "deal", "new", "w", "with", "and"}][:10])
 
 
-def has(word, text):
-    """Whole-word match ('ring' won't hit 'string', 'tv' won't hit 'tvoc')."""
-    return re.search(r"(?<![a-z0-9])" + re.escape(str(word).lower()) + r"(?![a-z0-9])", text) is not None
+# ───────────────────────── settings (Telegram commands) ─────────────────────────
+HELP = """🦅 <b>DealHawk commands</b>
+/add grill, dyson — want these (adds to 🎯 Your picks)
+/remove grill — stop wanting
+/block cushion — never show deals with this word
+/unblock cushion
+/watch dyson v15 400 — alert if under $400
+/unwatch dyson
+/off tools — turn a category off
+/on clothing — turn one on
+/list — see everything
+<i>Commands apply on the next run (within the hour).</i>"""
 
 
-def log(msg):
-    print(msg, flush=True)
+def apply_settings(cfg, st):
+    cats = cfg["categories"]
+    for c, on in st.get("toggles", {}).items():
+        if c in cats:
+            cats[c]["enabled"] = on
+    if st.get("custom"):
+        cats = {"custom": {"title": "Your picks", "emoji": "🎯", "keywords": st["custom"]}, **cats}
+    cfg["categories"] = cats
+    cfg["exclude_keywords"] = [w for w in cfg.get("exclude_keywords", []) if w not in st.get("unblocked", [])] \
+        + st.get("blocked", [])
+    cfg["watchlist"] = (cfg.get("watchlist") or []) + st.get("watch", [])
+    return cfg
 
 
-# ───────────────────────── fetch ─────────────────────────
+def find_cat(name, cfg):
+    n = name.strip().lower().replace(" ", "_").replace("&", "")
+    for c, v in cfg["categories"].items():
+        if c == n or c.startswith(n) or v.get("title", "").lower().startswith(name.strip().lower()):
+            return c
+    return None
+
+
+def words(arg):
+    return [w.strip().lower() for w in arg.split(",") if w.strip()]
+
+
+def command(text, cfg, st):
+    cmd, _, arg = text.strip().partition(" ")
+    cmd = cmd.lower().split("@")[0]
+    if cmd in ("/start", "/help"):
+        return HELP
+    if cmd == "/add" and arg:
+        st.setdefault("custom", [])
+        st["custom"] += [w for w in words(arg) if w not in st["custom"]]
+        return f"🎯 Added: {html.escape(', '.join(words(arg)))}"
+    if cmd == "/remove" and arg:
+        st["custom"] = [w for w in st.get("custom", []) if w not in words(arg)]
+        return f"Removed: {html.escape(', '.join(words(arg)))}"
+    if cmd == "/block" and arg:
+        st.setdefault("blocked", [])
+        st["blocked"] += [w for w in words(arg) if w not in st["blocked"]]
+        st["unblocked"] = [w for w in st.get("unblocked", []) if w not in words(arg)]
+        return f"🚫 Blocked: {html.escape(', '.join(words(arg)))}"
+    if cmd == "/unblock" and arg:
+        st["blocked"] = [w for w in st.get("blocked", []) if w not in words(arg)]
+        st.setdefault("unblocked", []).extend(words(arg))
+        return f"✅ Unblocked: {html.escape(', '.join(words(arg)))}"
+    if cmd == "/watch" and arg:
+        parts = arg.replace("$", "").split()
+        if len(parts) < 2 or not re.fullmatch(r"\d+(\.\d+)?", parts[-1]):
+            return "Format: /watch dyson v15 400"
+        kw, price = [p.lower() for p in parts[:-1]], float(parts[-1])
+        st.setdefault("watch", []).append({"name": " ".join(kw), "keywords": kw, "max_price": price})
+        return f"🎯 Watching <b>{html.escape(' '.join(kw))}</b> under ${price:,.0f}"
+    if cmd == "/unwatch" and arg:
+        before = len(st.get("watch", []))
+        st["watch"] = [w for w in st.get("watch", []) if arg.lower() not in w["name"].lower()]
+        return f"Removed {before - len(st['watch'])} watch(es)."
+    if cmd in ("/on", "/off") and arg:
+        c = find_cat(arg, cfg)
+        if not c:
+            return f"No category '{html.escape(arg)}'. Try /list"
+        st.setdefault("toggles", {})[c] = cmd == "/on"
+        return f"{'✅ On' if cmd == '/on' else '⏸️ Off'}: {cfg['categories'][c].get('title', c)}"
+    if cmd == "/list":
+        live = apply_settings(json.loads(json.dumps(cfg)), st)
+        cats = "\n".join(f"{'✅' if v.get('enabled', True) else '⏸️'} {v.get('emoji', '')} {v.get('title', c)}"
+                         f" — <code>{c}</code>" for c, v in live["categories"].items())
+        w = "\n".join(f"• {html.escape(x['name'])} ≤ ${x['max_price']:,.0f}" for x in live["watchlist"]) or "none"
+        b = ", ".join(st.get("blocked", [])) or "none"
+        return f"<b>Categories</b>\n{cats}\n\n<b>Watchlist</b>\n{w}\n\n<b>Your blocks</b>: {html.escape(b)}"
+    return "Didn't get that. /help"
+
+
+def handle_commands(cfg, st):
+    if not TG_TOKEN:
+        return
+    payload = {"timeout": 0, "allowed_updates": ["message"]}
+    if st.get("tg_offset"):
+        payload["offset"] = st["tg_offset"] + 1
+    try:
+        updates = tg("getUpdates", **payload).json().get("result", [])
+    except Exception:
+        return
+    for u in updates:
+        st["tg_offset"] = u["update_id"]
+        m = u.get("message") or {}
+        if str(m.get("chat", {}).get("id")) != str(TG_CHAT) or not m.get("text", "").startswith("/"):
+            continue  # only you can control the bot
+        reply = command(m["text"], cfg, st)
+        log(f"  cmd {m['text'][:40]!r} -> {reply[:60]!r}")
+        tg("sendMessage", chat_id=TG_CHAT, text=reply, parse_mode="HTML")
+    if updates:  # confirm so Telegram drops them
+        tg("getUpdates", offset=st["tg_offset"] + 1, timeout=0)
+
+
+# ───────────────────────── feeds ─────────────────────────
 def fetch_feed(url):
     urls = [url, url.replace("www.reddit.com", "old.reddit.com")] if "reddit.com" in url else [url]
     for i, u in enumerate(urls * 2):
@@ -140,152 +247,147 @@ def fetch_feed(url):
             return feedparser.parse(r.content).entries
         except Exception as e:
             log(f"  ! feed try {i + 1} {u[:70]}: {e.__class__.__name__}")
-            time.sleep(4)
+            time.sleep(3)
     return []
 
 
 def all_feeds(cfg):
-    feeds = list(cfg.get("feeds", []))
-    for q in cfg.get("slickdeals_searches", []):
-        feeds.append({"name": f"Slickdeals · {q}",
-                      "url": f"https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q={quote_plus(q)}"})
-    reddit = [f for f in feeds if "reddit.com" in f["url"]]
-    other = [f for f in feeds if f not in reddit]
-    out = []
-    with ThreadPoolExecutor(6) as ex:  # non-Reddit feeds in parallel
-        for f, entries in zip(other, ex.map(lambda f: fetch_feed(f["url"]), other)):
-            out.append((f["name"], entries))
-    for f in reddit:  # Reddit one at a time (rate limits)
-        out.append((f["name"], fetch_feed(f["url"])))
-        time.sleep(2)
-    return out
+    feeds = cfg.get("feeds", [])
+    with ThreadPoolExecutor(6) as ex:
+        return [(f["name"], es) for f, es in zip(feeds, ex.map(lambda f: fetch_feed(f["url"]), feeds))]
+
+
+def direct_url(u):
+    q = parse_qs(urlparse(u).query)
+    for k in ("u2", "u", "url"):
+        if q.get(k) and q[k][0].startswith("http"):
+            return q[k][0]
+    return u
 
 
 def to_deal(entry, source):
     title = html.unescape(entry.get("title", "")).strip()
-    summary = entry.get("summary", "") or ""
-    if entry.get("content"):
-        summary += " " + " ".join(c.get("value", "") for c in entry["content"])
+    summary = (entry.get("summary") or "") + " ".join(c.get("value", "") for c in entry.get("content", []))
     link = entry.get("link", "")
     buy = link
-    hrefs = [html.unescape(l) for l in re.findall(r'href="([^"]+)"', summary)]
-    for l in hrefs:  # first real store link in the post (Reddit link post / Slickdeals RSS body)
-        l = direct_url(l) if "slickdeals.net/click" in l else l
-        if l.startswith("http") and not re.search(r"reddit\.com|redd\.it|slickdeals\.net|imgur|i\.sd", l):
+    for l in (html.unescape(x) for x in re.findall(r'href="([^"]+)"', summary)):
+        l = direct_url(l) if "/click" in l else l
+        if re.search(STORE_DOMAINS, l):
             buy = l
             break
-    plain = re.sub(r"<[^>]+>", " ", html.unescape(summary))
-    price, reg, pct = parse_prices(title + " " + plain)
+    plain = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.unescape(summary)))
+    price, reg, pct = parse_prices(title + " " + plain[:400])
     pub = entry.get("published_parsed") or entry.get("updated_parsed")
-    age_h = (time.time() - calendar.timegm(pub)) / 3600 if pub else None
-    tags = " ".join(t.get("term", "") for t in entry.get("tags", [])).lower()
+    th = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", plain, re.I)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
-            "age_h": age_h, "tags": tags,
             "title": title, "source": source, "thread": link, "buy": buy,
-            "price": price, "reg": reg, "pct": pct, "thumbs": thumbs(plain),
-            "store": store_of(title), "text": (title + " " + plain).lower()}
+            "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
+            "store": store_of(title, plain), "tl": title.lower(), "text": (title + " " + plain[:600]).lower(),
+            "tags": " ".join(t.get("term", "") for t in entry.get("tags", [])).lower(),
+            "age_h": (time.time() - calendar.timegm(pub)) / 3600 if pub else None}
 
 
-# ───────────────────────── filter ─────────────────────────
+# ───────────────────────── filtering ─────────────────────────
+SAFE_PHRASES = re.compile(r"\b(dishwasher|oven|microwave|freezer|dryer)[- ]safe\b|\bfor (?:the )?(?:dishwasher|oven|microwave)\b")
+
+
 def categorize(d, cfg):
+    tl = SAFE_PHRASES.sub(" ", d["tl"])  # "dishwasher safe" isn't an appliance
     for name, c in cfg["categories"].items():
-        if any(has(k, d["text"]) for k in c["keywords"]):
-            return name, c.get("emoji", "🔥")
-    return None, None
+        if c.get("enabled", True) and any(has(k, tl) for k in c["keywords"]):
+            return name
+    return None
 
 
 def watch_hit(d, cfg):
     for w in cfg.get("watchlist") or []:
-        if all(has(k, d["text"]) for k in w["keywords"]) and d["price"] and d["price"] <= w["max_price"]:
+        if all(has(k, d["tl"]) for k in w["keywords"]) and d["price"] and d["price"] <= w["max_price"]:
             return w["name"]
     return None
 
 
 def passes(d, cfg):
-    t = d["title"].lower()  # excludes check the TITLE so a passing mention in comments doesn't kill a deal
-    if hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, t)), None):
-        return False, f"excluded '{hit}'"
-    if re.search(r"expired|out of stock|\boos\b|sold out|dead deal", d["tags"] + " " + t):
-        return False, "flagged expired/OOS"
-    if d["age_h"] is not None and d["age_h"] > cfg.get("max_age_hours", 24):
-        return False, f"{d['age_h']:.0f}h old"
+    if hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, d["tl"])), None):
+        return False, f"blocked '{hit}'"
+    if hit := next((s for s in cfg.get("blocked_stores", []) if has(s, d["text"])), None):
+        return False, f"store '{hit}'"
+    if re.search(r"expired|out of stock|\boos\b|sold out|dead deal", d["tags"] + " " + d["tl"]):
+        return False, "flagged expired"
+    if (mx := cfg.get("max_age_hours")) and d["age_h"] and d["age_h"] > mx:
+        return False, "too old"
     if d["price"] is not None and d["price"] < cfg.get("min_price", 0):
-        return False, f"under ${cfg.get('min_price')}"
-    stores = cfg.get("trusted_stores") or []
-    if stores and not any(has(s, d["text"]) for s in stores):
-        return False, "untrusted store"
-    if d["pct"] is not None and d["pct"] < cfg["min_discount_pct"]:
-        return False, f"only {d['pct']}% off"
-    if d["thumbs"] is not None and d["thumbs"] < cfg["min_thumbs"]:
-        return False, f"thumbs {d['thumbs']}"
+        return False, "under min price"
+    if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
+        return False, "small discount"
+    if d["thumbs"] is not None and d["thumbs"] < cfg.get("min_thumbs", -999):
+        return False, "low votes"
     return True, ""
 
 
-# ───────────────────────── double verification ─────────────────────────
+def is_hot(d, cfg):
+    h = cfg.get("hot", {})
+    return bool(d.get("watch")) or (d["pct"] or 0) >= h.get("min_pct", 60) or (d["thumbs"] or 0) >= h.get("min_thumbs", 100)
+
+
+# ───────────────────────── verification ─────────────────────────
 def availability(body):
-    """Read the store's own stock signal. Returns in_stock | oos | None."""
-    # 1) schema.org JSON-LD / microdata — what Google Shopping reads, most reliable
-    found = [a.lower() for a in re.findall(
-        r'"?availability"?\s*[:=]\s*"(?:https?://schema\.org/)?([A-Za-z ]+)"', body)]
-    found += [a.lower() for a in re.findall(
-        r'<meta[^>]+(?:product:availability|og:availability)[^>]+content="([^"]+)"', body)]
+    found = [a.lower() for a in re.findall(r'"?availability"?\s*[:=]\s*"(?:https?://schema\.org/)?([A-Za-z ]+)"', body)]
+    found += [a.lower() for a in re.findall(r'<meta[^>]+(?:product:availability|og:availability)[^>]+content="([^"]+)"', body)]
     if found:
-        if any(a.replace(" ", "") in OUT_STOCK or a in OUT_STOCK for a in found[:3]):
+        top = [a.replace(" ", "") for a in found[:3]] + found[:3]
+        if any(a in OUT_STOCK for a in top):
             return "oos"
-        if any(a.replace(" ", "") in IN_STOCK or a in IN_STOCK for a in found[:3]):
+        if any(a in IN_STOCK for a in top):
             return "in_stock"
-    # 2) Amazon's availability box
     if m := re.search(r'id="availability"[^>]*>(.{0,600}?)</div>', body, re.S):
         txt = re.sub(r"<[^>]+>|\s+", " ", m.group(1)).lower()
-        if "in stock" in txt or "only" in txt and "left" in txt:
+        if "in stock" in txt or ("only" in txt and "left" in txt):
             return "in_stock"
         if "unavailable" in txt or "out of stock" in txt:
             return "oos"
-    # 3) a button/label whose entire text is "Out of Stock" / "Sold Out" etc.
-    if OOS_TEXT.search(body):
-        return "oos"
-    return None
+    return "oos" if OOS_TEXT.search(body) else None
 
 
 def check_store(url):
-    """Check 2: the store page itself. -> (in_stock|oos|dead|unknown, reason)"""
     try:
         r = HTTP.get(url, timeout=20, allow_redirects=True)
     except Exception as e:
         return "unknown", e.__class__.__name__
-    if r.status_code in (404, 410):
-        return "dead", f"HTTP {r.status_code}"
-    body = r.text[:1_500_000]
     host = urlparse(r.url).netloc.replace("www.", "")
+    if r.status_code in (404, 410):
+        return "dead", f"{host} HTTP {r.status_code}"
+    body = r.text[:1_500_000]
     if r.status_code >= 400 or BLOCK_TEXT.search(body[:20000]):
-        return "unknown", f"{host} blocked bot (HTTP {r.status_code})"
-    a = availability(body)
-    if a:
-        return a, f"{host} says " + ("in stock" if a == "in_stock" else "OUT OF STOCK")
-    return "unknown", f"{host}: no stock data on page"
-
-
-def direct_url(click):
-    """Slickdeals click links carry the real store URL in u2= — use it, skip the bot-blocking redirect."""
-    q = parse_qs(urlparse(click).query)
-    for k in ("u2", "u", "url"):
-        if q.get(k) and q[k][0].startswith("http"):
-            return q[k][0]
-    return click
+        return "unknown", f"{host} blocks bots ({r.status_code})"
+    if a := availability(body):
+        return a, f"{host} says {'in stock' if a == 'in_stock' else 'OUT OF STOCK'}"
+    return "unknown", f"{host}: no stock data"
 
 
 def resolve_and_verify(d):
-    """Check 1 (source still live) + Check 2 (store says in stock)."""
-    if "slickdeals.net" in d["buy"]:
-        return "unknown", "store link hidden by Slickdeals"
-    if not str(d["buy"]).startswith("http"):
-        d["buy"] = d["thread"]
+    # Check 1: the deal page itself (DealNews pages are reachable; Slickdeals blocks bots)
+    if "dealnews.com" in d["thread"]:
+        try:
+            page = HTTP.get(d["thread"], timeout=20).text
+            text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", page[:400000], flags=re.S))
+            if PAGE_EXPIRED.search(text[:20000]):
+                return "dead", "DealNews: expired"
+            for l in re.findall(r'href="([^"]+)"', page):
+                l = html.unescape(l)
+                if re.search(STORE_DOMAINS, l) or "/lw/click" in l:
+                    d["buy"] = ("https://www.dealnews.com" + l) if l.startswith("/") else l
+                    break
+        except Exception:
+            pass
+    if d["buy"] == d["thread"] or "slickdeals.net" in d["buy"]:
+        return "unknown", "store link hidden by source"
+    # Check 2: the store page, twice if it says in stock
     status, why = check_store(d["buy"])
-    if status == "in_stock":  # re-check once to dodge flaky/cached pages
+    if status == "in_stock":
         time.sleep(1.5)
-        status2, why2 = check_store(d["buy"])
-        if status2 != "in_stock":
-            return status2, f"2nd check: {why2}"
+        s2, w2 = check_store(d["buy"])
+        if s2 != "in_stock":
+            return s2, f"2nd check: {w2}"
     return status, why
 
 
@@ -295,11 +397,7 @@ def history_note(d, prices):
         return ""
     key = product_key(d["title"])
     hist = prices.setdefault(key, [])
-    note = ""
-    if hist:
-        low = min(p for _, p in hist)
-        note = ("📉 Lowest DealHawk has seen" if d["price"] < low else
-                "🟰 Ties lowest seen" if d["price"] == low else f"↗️ Was ${low:,.0f} before")
+    note = " 📉" if hist and d["price"] < min(p for _, p in hist) else ""
     hist.append([datetime.now(timezone.utc).date().isoformat(), d["price"]])
     prices[key] = hist[-50:]
     return note
@@ -315,44 +413,78 @@ def tg(method, **payload):
     return r
 
 
-def format_alert(d):
-    """Compact: everything you need to decide in 3 lines."""
-    e = html.escape
-    price = f"<b>${d['price']:,.2f}</b>" if d["price"] else ""
+def price_bits(d):
+    s = f"<b>${d['price']:,.0f}</b>" if d["price"] else ""
     if d["reg"]:
-        price += f" <s>${d['reg']:,.0f}</s>"
+        s += f" <s>${d['reg']:,.0f}</s>"
     if d["pct"]:
-        price += f" −{d['pct']}%"
-    l1 = f"{d['emoji']} <b>{e(d['title'][:150])}</b>"
-    l2 = " · ".join(x for x in [price, e(d["store"]) if d["store"] else "",
-                                f"👍{d['thumbs']}" if d["thumbs"] is not None else ""] if x)
-    l3 = " · ".join(x for x in [STATUS_LABEL.get(d["status"], ""), d.get("hist", ""),
-                                f"🎯 {e(d['watch'])}" if d.get("watch") else ""] if x)
-    return "\n".join(x for x in [l1, l2, l3] if x)
+        s += f" −{d['pct']}%"
+    return s
 
 
-def send(d, dry):
-    text = format_alert(d)
-    buttons = [{"text": "🛒 Buy", "url": d["buy"]}]
-    if d["thread"].startswith("http") and d["thread"] != d["buy"]:
-        buttons.append({"text": "💬 Details", "url": d["thread"]})
+def deal_line(d):
+    e = html.escape
+    flag = "✅" if d["status"] == "in_stock" else "⚠️"
+    title = e(clean_title(d["title"])[:80] or d["title"][:80])
+    store = f" · {e(d['store'])}" if d["store"] else ""
+    return f"{flag} {price_bits(d)} <a href=\"{e(d['buy'], quote=True)}\">{title}</a>{store}{d.get('hist', '')}"
+
+
+def send_text(text, dry, buttons=None, preview=None):
     if dry:
-        log("\n" + html.unescape(re.sub(r"<[^>]+>", "", text)) + f"\n  BUY: {d['buy']}")
+        log("\n" + html.unescape(re.sub(r"<[^>]+>", "", text)) + (f"\n  [BUY] {buttons[0]['url']}" if buttons else ""))
         return True
-    return tg("sendMessage", chat_id=TG_CHAT, text=text, parse_mode="HTML",
-              link_preview_options={"url": d["buy"], "prefer_small_media": True},
-              reply_markup={"inline_keyboard": [buttons]}).ok
+    p = {"chat_id": TG_CHAT, "text": text, "parse_mode": "HTML",
+         "link_preview_options": {"url": preview, "prefer_small_media": True} if preview else {"is_disabled": True}}
+    if buttons:
+        p["reply_markup"] = {"inline_keyboard": [buttons]}
+    return tg("sendMessage", **p).ok
+
+
+def rich_alert(d, cfg, dry):
+    e = html.escape
+    c = cfg["categories"].get(d["cat"], {})
+    lines = [f"🔥 {c.get('emoji', '')} <b>{e(clean_title(d['title'])[:140])}</b>",
+             " · ".join(x for x in [price_bits(d), e(d["store"]), f"👍{d['thumbs']}" if d["thumbs"] else ""] if x),
+             " · ".join(x for x in ["✅ In stock (verified)" if d["status"] == "in_stock" else "⚠️ Check stock",
+                                    "📉 Lowest seen" if d.get("hist") else "",
+                                    f"🎯 {e(d['watch'])}" if d.get("watch") else ""] if x)]
+    btn = [{"text": "🛒 Buy", "url": d["buy"]}]
+    if d["thread"].startswith("http") and d["thread"] != d["buy"]:
+        btn.append({"text": "💬 Details", "url": d["thread"]})
+    return send_text("\n".join(l for l in lines if l), dry, buttons=btn, preview=d["buy"])
+
+
+def digest(deals, cfg, dry):
+    if not deals:
+        return
+    now = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).strftime("%-I:%M %p")
+    cur = (f"🦅 <b>{len(deals)} new deal{'s' * (len(deals) > 1)}</b> · {now}\n"
+           f"<i>tap a name to buy · ✅ stock verified · ⚠️ check stock · 📉 lowest seen</i>")
+    chunks = []
+    for cat, c in cfg["categories"].items():
+        group = [d for d in deals if d["cat"] == cat]
+        if not group:
+            continue
+        block = f"\n\n{c.get('emoji', '')} <b>{c.get('title', cat).upper()}</b>\n" + "\n".join(deal_line(d) for d in group)
+        if len(cur) + len(block) > TG_LIMIT:
+            chunks.append(cur)
+            cur = block.strip()
+        else:
+            cur += block
+    chunks.append(cur)
+    for ch in chunks:
+        send_text(ch, dry)
 
 
 # ───────────────────────── main ─────────────────────────
 def in_quiet_hours(cfg):
-    start, end = cfg.get("quiet_hours", [23, 7])
+    a, b = cfg.get("quiet_hours", [23, 7])
     h = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).hour
-    return (h >= start or h < end) if start > end else (start <= h < end)
+    return (h >= a or h < b) if a > b else (a <= h < b)
 
 
 def load_seen():
-    """seen.json maps deal id -> 'skip until' timestamp (v2). Migrates v1 (sent-at)."""
     s = load_json(SEEN_FILE, {})
     if s.get("_v") != 2:
         s = {k: v + SENT_TTL for k, v in s.items() if isinstance(v, (int, float))}
@@ -360,79 +492,76 @@ def load_seen():
     return s
 
 
-def debug_feed(entries):
-    """One-time peek at what a feed item carries (links etc.)."""
-    if entries and os.getenv("DEBUG_FEED"):
-        e = entries[0]
-        log(f"    DEBUG published={e.get('published')} keys={list(e.keys())}")
-        body = (e.get("summary", "") or "") + "".join(c.get("value", "") for c in e.get("content", []))
-        log(f"    DEBUG hrefs={re.findall(r'href=\"([^\"]+)\"', body)[:8]}")
-        log(f"    DEBUG text={re.sub(r'<[^>]+>|\\s+', ' ', body)[:300]}")
-
-
 def run(args):
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
+    st = load_json(SETTINGS_FILE, {})
     if in_quiet_hours(cfg) and not args.dry_run:
         return log("Quiet hours — skipping.")
-    now = time.time()
-    seen, prices = load_seen(), load_json(PRICES_FILE, {})
-    strict = cfg.get("stock_policy", "strict") == "strict"
+    if not args.dry_run and not args.feed:
+        if not st.get("welcomed_v3"):
+            send_text("🦅 <b>DealHawk upgraded</b>\n• Deals now come in one digest, grouped by category\n"
+                      "• 🔥 Hot deals still get their own message\n• More categories, clothing off\n\n" + HELP, False)
+            st["welcomed_v3"] = True
+        handle_commands(cfg, st)
+    cfg = apply_settings(cfg, st)
+    now, seen, prices = time.time(), load_seen(), load_json(PRICES_FILE, {})
+    strict = cfg.get("stock_policy") == "strict"
+    cap = cfg.get("max_deals_per_run", 25)
 
-    sources = ([("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg))
+    sources = [("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg)
     cands, ids, skips = [], set(), {}
     for name, entries in sources:
-        ages = sorted(a for a in (to_deal(e, name)["age_h"] for e in entries) if a is not None)
-        span = f" · age {ages[0]:.0f}h–{ages[len(ages)//2]:.0f}h–{ages[-1]:.0f}h (min/med/max)" if ages else ""
-        log(f"{name}: {len(entries)} items{span}")
-        debug_feed(entries)
+        log(f"{name}: {len(entries)} items")
         for e in entries:
             d = to_deal(e, name)
             hold = seen.get(d["id"], 0)
-            if d["id"] in ids or hold > now and not (FORCE and hold < now + OOS_RECHECK + 60):
+            if d["id"] in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
                 continue
             ids.add(d["id"])
-            d["watch"] = watch_hit(d, cfg)
-            cat, emoji = categorize(d, cfg)
+            d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             ok, why = passes(d, cfg)
-            if ok and (d["watch"] or cat):
-                d["emoji"] = emoji or "🎯"
+            if ok and (d["watch"] or d["cat"]):
+                d["cat"] = d["cat"] or next(iter(cfg["categories"]))
                 cands.append(d)
             else:
-                why = why or "no category"
-                k = re.sub(r"\d+", "N", why)
+                k = why or "no category"
                 skips[k] = skips.get(k, 0) + 1
                 if args.verbose:
-                    log(f"  skip: {d['title'][:70]} — {why}")
-
+                    log(f"  skip: {d['title'][:70]} — {k}")
     log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
-    cands.sort(key=lambda d: (not d["watch"], -(d["pct"] or 0), -(d["thumbs"] or 0)))
-    cands = cands[: cfg["max_alerts_per_run"] * 3]  # verify only what could be sent
 
+    cands.sort(key=lambda d: (not is_hot(d, cfg), -(d["pct"] or 0), -(d["thumbs"] or 0)))
+    cands = cands[: cap * 2]
     if args.feed:
-        results = [("in_stock", "offline test")] * len(cands)
+        results = [("in_stock", "offline")] * len(cands)
     else:
-        with ThreadPoolExecutor(8) as ex:  # parallel double-check
+        with ThreadPoolExecutor(8) as ex:
             results = list(ex.map(resolve_and_verify, cands))
 
-    sent, tally = 0, {}
+    keep, tally = [], {}
     for d, (status, why) in zip(cands, results):
         tally[status] = tally.get(status, 0) + 1
         log(f"  [{status}] {why} — {d['title'][:60]}")
         d["status"] = status
         if status in ("oos", "dead") or (strict and status != "in_stock"):
-            seen[d["id"]] = now + OOS_RECHECK  # try again in 12h (could restock)
-            continue
-        if sent >= cfg["max_alerts_per_run"]:
-            break
-        d["hist"] = history_note(d, prices)
-        if send(d, args.dry_run):
-            seen[d["id"]] = now + SENT_TTL
-            sent += 1
+            seen[d["id"]] = now + OOS_RECHECK
+        elif len(keep) < cap:
+            d["hist"] = history_note(d, prices)
+            keep.append(d)
 
-    log(f"Checked {len(cands)}: {tally}. Sent {sent}. Policy: {'strict' if strict else 'balanced'}.")
+    hot = [d for d in keep if is_hot(d, cfg)][: cfg.get("hot", {}).get("max", 3)]
+    for d in hot:
+        rich_alert(d, cfg, args.dry_run)
+    rest = sorted((d for d in keep if d not in hot), key=lambda d: (d["status"] != "in_stock", -(d["pct"] or 0)))
+    digest(rest, cfg, args.dry_run)
+    for d in keep:
+        seen[d["id"]] = now + SENT_TTL
+
+    log(f"Checked {len(cands)}: {tally}. Sent {len(hot)} hot + {len(rest)} in digest.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
+        save_json(SETTINGS_FILE, st)
 
 
 def main():
@@ -446,8 +575,7 @@ def main():
     if a.check:
         return log(str(check_store(a.check)))
     if a.test:
-        return log("OK" if tg("sendMessage", chat_id=TG_CHAT, parse_mode="HTML",
-                              text="🦅 <b>DealHawk is live.</b>").ok else "FAILED")
+        return log("OK" if send_text("🦅 <b>DealHawk is live.</b> Send /help for commands.", False) else "FAILED")
     run(a)
 
 

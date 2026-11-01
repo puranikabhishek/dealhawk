@@ -1,92 +1,130 @@
-# ─────────────────────────────────────────────
-#  DealHawk config — edit this, push, done.
-# ─────────────────────────────────────────────
+# ─────────────────────────────────────────────────────────────
+#  DealHawk config. Easiest way to change things: message the bot
+#  /help  /add  /block  /watch  /on  /off  /list   (applies next run)
+# ─────────────────────────────────────────────────────────────
 
 timezone: America/Chicago
-quiet_hours: [23, 7]          # no pings 11pm–7am
-max_alerts_per_run: 8          # anti-spam cap
-min_discount_pct: 30           # skip deals under this % off (when % is known)
-min_thumbs: 15                 # Slickdeals community score floor (when shown)
+quiet_hours: [23, 7]           # no pings 11pm–7am
+max_deals_per_run: 25          # per digest
+min_price: 25                  # skip $5 junk
+min_discount_pct: 20           # only when the % is known
+min_thumbs: 5                  # Slickdeals votes, when shown
+max_age_hours: 0               # 0 = no age limit (feeds below only carry live deals)
 
-# Stock check: ✅ = store page confirmed in stock. ⚠️ = store/Slickdeals blocks bots, couldn't check.
-# strict   = only send ✅ (very few — most big stores block bots)
-# balanced = send ✅ and ⚠️; sold-out/expired ones are always dropped
+# ✅ = store page confirmed in stock. ⚠️ = store blocks bots, couldn't check.
+# balanced = send ✅ + ⚠️ (sold-out/expired always dropped) · strict = ✅ only
 stock_policy: balanced
-max_age_hours: 48             # only fresh deals (old ones are usually sold out)
-min_price: 25                 # skip $5 junk
 
-trusted_stores: [amazon, best buy, home depot, "lowe's", lowes, costco, "sam's club", walmart,
-                 target, "b&h", newegg, woot, micro center, adorama, dell, samsung, ace hardware,
-                 rei, nordstrom rack, "levi's", nike, wayfair, ikea, overstock, bed bath & beyond,
-                 ashley, article, west elm, pottery barn, crate & barrel, "kohl's", "macy's",
-                 hayneedle, christopher knight, frontgate]
+# 🔥 Hot deals get their own message with photo + Buy button; the rest go in the digest.
+hot: {min_pct: 60, min_thumbs: 100, max: 3}
 
+# Fresh, curated sources (tested from GitHub's servers).
 feeds:
   - name: Slickdeals Frontpage
     url: https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1
-  - name: r/buildapcsales
-    url: https://www.reddit.com/r/buildapcsales/new/.rss
-  - name: r/frugalmalefashion
-    url: https://www.reddit.com/r/frugalmalefashion/new/.rss
+  - name: Slickdeals Popular
+    url: https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1
+  - name: DealNews
+    url: https://www.dealnews.com/?rss=1
+  - name: DealNews Home & Garden
+    url: https://www.dealnews.com/c196/Home-Garden/?rss=1
 
-# Extra Slickdeals keyword searches (furniture rarely hits the frontpage)
-slickdeals_searches: [patio furniture, patio set, outdoor sectional, patio dining set,
-                      bed frame, dresser, nightstand, mattress, headboard, bedroom set]
+blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 
-# A deal must match at least one category keyword (whole-word match).
+# Categories (order = order in the digest). Matched against the deal TITLE, whole words.
 categories:
   patio:
+    title: Patio & Outdoor
     emoji: "🌿"
-    keywords: [patio, outdoor furniture, outdoor sectional, outdoor sofa, conversation set,
-               bistro set, adirondack, fire pit, patio umbrella, cantilever umbrella, gazebo,
-               pergola, porch swing, outdoor dining, outdoor rug, lounge chair, chaise,
-               outdoor loveseat, deck box, wicker]
+    keywords: [patio, outdoor furniture, outdoor sectional, outdoor sofa, conversation set, bistro set,
+               adirondack, fire pit, patio umbrella, cantilever umbrella, gazebo, pergola, porch swing,
+               outdoor dining, lounge chair, chaise, outdoor loveseat, deck box, wicker, hammock]
   bedroom:
+    title: Bedroom
     emoji: "🛏️"
-    keywords: [bed frame, platform bed, headboard, nightstand, dresser, chest of drawers,
-               wardrobe, armoire, bedroom set, mattress, box spring, adjustable base,
-               bunk bed, storage bed, upholstered bed, vanity]
+    keywords: [bed frame, platform bed, headboard, nightstand, dresser, chest of drawers, wardrobe,
+               armoire, bedroom set, mattress, box spring, adjustable base, storage bed, upholstered bed,
+               sheet set, comforter, duvet, pillow, mattress topper]
   furniture:
+    title: Furniture
     emoji: "🛋️"
-    keywords: [standing desk, office chair, herman miller, steelcase, sofa, sectional,
-               bookshelf, recliner, accent chair, coffee table]
-  electronics:
-    emoji: "🔌"
-    keywords: [monitor, ssd, nvme, gpu, rtx, radeon, ryzen, intel core, headphones, earbuds,
-               airpods, sony wh, bose, ipad, pixel, galaxy, iphone, apple watch, kindle,
-               router, mesh, wi-fi 7, nas, soundbar, steam deck, playstation, ps5, xbox,
-               nintendo, camera, gopro, dji, power bank, anker, ugreen, keyboard, mouse]
+    keywords: [standing desk, office chair, gaming chair, herman miller, steelcase, sofa, sectional,
+               couch, bookshelf, recliner, accent chair, coffee table, dining table, bar stool]
+  home_security:
+    title: Home Security
+    emoji: "🔒"
+    keywords: [security camera, video doorbell, doorbell, ring, arlo, eufy, wyze, blink, simplisafe,
+               smart lock, deadbolt, august, yale, schlage, floodlight cam, nvr, gun safe, fireproof safe, alarm system]
   smart_home:
+    title: Smart Home
     emoji: "🏠"
-    keywords: [ring, eufy, ecobee, nest, smart lock, august, yale, lutron, philips hue,
-               robot vacuum, roborock, roomba, security camera, video doorbell, echo,
-               smart plug, thermostat, arlo, wyze, kasa]
-  tools_home_improvement:
+    keywords: [ecobee, nest, thermostat, lutron, philips hue, smart plug, smart switch, kasa, echo,
+               alexa, google home, homepod, smart bulb, mesh wifi, eero, orbi, deco, rachio]
+  appliances:
+    title: Appliances
+    emoji: "🧺"
+    keywords: [refrigerator, fridge, freezer, washer, dryer, dishwasher, microwave, gas range, electric range, wall oven,
+               air purifier, dehumidifier, humidifier, space heater, air conditioner, window ac, fan,
+               robot vacuum, roborock, roomba, shark, dyson, vacuum, carpet cleaner, water heater,
+               water filter, ice maker, generator]
+  kitchen:
+    title: Kitchen
+    emoji: "🍳"
+    keywords: [air fryer, instant pot, pressure cooker, ninja, kitchenaid, stand mixer, blender,
+               vitamix, espresso, coffee maker, breville, keurig, nespresso, toaster oven, cookware,
+               cast iron, knife set, dutch oven, sous vide, food processor, rice cooker]
+  grill:
+    title: Grills & BBQ
+    emoji: "🔥"
+    keywords: [grill, smoker, traeger, weber, blackstone, griddle, pit boss, kamado, pellet grill,
+               pizza oven, ooni, solo stove]
+  tools:
+    title: Tools & Home Improvement
     emoji: "🛠️"
-    keywords: [dewalt, milwaukee, makita, ryobi, ego, kobalt, ridgid, bosch, craftsman,
-               drill, impact driver, circular saw, miter saw, pressure washer, leaf blower,
-               lawn mower, string trimmer, generator, shop vac, tool set, ladder,
-               battery kit, socket set, workbench, air compressor]
+    keywords: [dewalt, milwaukee, makita, ryobi, ego, kobalt, ridgid, bosch, craftsman, metabo,
+               drill, impact driver, circular saw, miter saw, table saw, oscillating, sander, router table,
+               pressure washer, leaf blower, lawn mower, string trimmer, chainsaw, snow blower, shop vac,
+               tool set, tool chest, ladder, battery kit, socket set, workbench, air compressor,
+               stud finder, laser level, ceiling fan, faucet, toilet, led bulbs, paint sprayer]
+  electronics:
+    title: Electronics
+    emoji: "🔌"
+    keywords: [monitor, ssd, nvme, gpu, rtx, radeon, ryzen, headphones, earbuds, airpods, sony wh, bose,
+               ipad, tablet, pixel, galaxy, iphone, apple watch, kindle, router, nas, soundbar, speaker,
+               steam deck, playstation, ps5, xbox, nintendo, switch 2, camera, gopro, dji, drone,
+               power bank, power station, ecoflow, jackery, anker, keyboard, mouse, projector, printer]
+  automotive:
+    title: Automotive & Garage
+    emoji: "🚗"
+    keywords: [dash cam, jump starter, tire inflator, car vacuum, obd2, floor mats, garage storage,
+               garage door opener, car charger, roof rack, hitch]
+  personal:
+    title: Personal Care
+    emoji: "🪒"
+    keywords: [trimmer, shaver, electric toothbrush, sonicare, oral-b, waterpik, philips norelco,
+               massage gun, theragun, smart scale]
+  fitness:
+    title: Fitness
+    emoji: "🏋️"
+    keywords: [treadmill, exercise bike, rowing machine, dumbbells, kettlebell, bowflex, power rack,
+               weight bench, walking pad, garmin, whoop, fitness tracker]
   clothing:
+    title: Clothing
     emoji: "👕"
-    keywords: [jacket, boots, sneakers, "levi's", jeans, patagonia, "arc'teryx", north face,
-               carhartt, adidas, new balance, uniqlo, merino, chinos]
+    enabled: false               # send /on clothing to turn back on
+    keywords: [jacket, boots, sneakers, "levi's", jeans, patagonia, "arc'teryx", north face, carhartt,
+               adidas, new balance, uniqlo, merino, chinos]
 
-# Words in the TITLE that kill a deal outright.
+# Never show deals with these words in the title. Add more with /block in Telegram.
 exclude_keywords: [
-  # not interested
-  laptop, laptops, notebook, chromebook, macbook, tv, tvs, television, oled tv, qled,
-  smart tv, roku, fire tv, google tv,
-  # junk
-  refurbished, renewed, used, open box, "for parts", kids, "women's", case only,
-  screen protector, gift card, credit card, see thread,
-  cushion, cushions, cover, covers, charger, charging, airbed, air mattress, replacement]
+  laptop, laptops, notebook, chromebook, macbook, tv, tvs, television, oled tv, qled, smart tv,
+  roku, fire tv, google tv,
+  refurbished, renewed, used, open box, "for parts", kids, "women's", case only, screen protector,
+  gift card, credit card, see thread, cushion, cushions, cover, covers, charger, charging, airbed,
+  air mattress, replacement, lego, toy, toys, costume, ebook, subscription, membership]
 
-# Watchlist: alert when one appears at/under max_price (still must pass excludes + stock check).
+# Built-in watchlist (add more from your phone: /watch dyson v15 400)
 watchlist:
   - name: Milwaukee M18 combo kit
     keywords: [milwaukee, m18, kit]
     max_price: 250
-  - name: 4TB NVMe SSD
-    keywords: [4tb, nvme]
-    max_price: 230
