@@ -10,7 +10,7 @@ per_category: 4                # lines per section (keeps it short)
 min_price: 25                  # skip $5 junk
 min_discount_pct: 20           # only when the % is known
 min_thumbs: 5                  # Slickdeals votes, when shown
-max_age_hours: 0               # 0 = no age limit (feeds below only carry live deals)
+max_age_hours: 48              # older deals are usually expired (Slickdeals won't let bots check)
 
 # ✅ = store page confirmed in stock. ⚠️ = store blocks bots, couldn't check.
 # balanced = send ✅ + ⚠️ (sold-out/expired always dropped) · strict = ✅ only
@@ -20,15 +20,13 @@ stock_policy: balanced
 feeds:
   - {name: Slickdeals Frontpage, url: "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1"}
   - {name: Slickdeals Popular, url: "https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1"}
-  - {name: DealNews, url: "https://www.dealnews.com/?rss=1"}
-  - {name: DealNews Staff Picks, url: "https://www.dealnews.com/f1682/Staff-Pick/?rss=1"}
-  - {name: DealNews Electronics, url: "https://www.dealnews.com/c142/Electronics/?rss=1"}
-  - {name: DealNews Home & Garden, url: "https://www.dealnews.com/c196/Home-Garden/?rss=1"}
+  - {name: DealNews, url: "https://www.dealnews.com/?rss=1", max_age_hours: 96}
+  - {name: DealNews Staff Picks, url: "https://www.dealnews.com/f1682/Staff-Pick/?rss=1", max_age_hours: 96}
+  - {name: DealNews Electronics, url: "https://www.dealnews.com/c142/Electronics/?rss=1", max_age_hours: 96}
+  - {name: DealNews Home & Garden, url: "https://www.dealnews.com/c196/Home-Garden/?rss=1", max_age_hours: 96}
   - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
-  - {name: Slickdeals price mistake, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+mistake"}
-  - {name: Slickdeals price error, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&q=price+error"}
-  - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies}
-  - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways}
+  - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies, max_age_hours: 24}
+  - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways, max_age_hours: 72}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 

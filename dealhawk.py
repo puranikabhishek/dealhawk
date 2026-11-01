@@ -332,8 +332,9 @@ def passes(d, cfg, relaxed=False):
         return False, f"store '{hit}'"
     if re.search(r"expired|out of stock|\boos\b|sold out|dead deal", d["tags"] + " " + d["tl"]):
         return False, "flagged expired"
-    if (mx := cfg.get("max_age_hours")) and d["age_h"] and d["age_h"] > mx:
-        return False, "too old"
+    mx = d.get("feed_max_age") or cfg.get("max_age_hours")
+    if mx and d["age_h"] and d["age_h"] > mx:
+        return False, "too old (likely expired)"
     cat_max = cfg["categories"].get(d.get("cat"), {}).get("max_age_hours")
     if cat_max and d["age_h"] and d["age_h"] > cat_max:
         return False, "stale price mistake"
@@ -548,6 +549,7 @@ def run(args):
     sources = [("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg)
     cands, ids, skips = [], set(), {}
     feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
+    feed_age = {f["name"]: f.get("max_age_hours") for f in cfg.get("feeds", [])}
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         for e in entries:
@@ -557,7 +559,7 @@ def run(args):
             if d["id"] in ids or pk in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
                 continue
             ids.update((d["id"], pk))  # same deal from two feeds = one line
-            d["forced"] = feed_cat.get(name)
+            d["forced"], d["feed_max_age"] = feed_cat.get(name), feed_age.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
             if quiet and not cfg["categories"].get(d["cat"], {}).get("instant"):
@@ -584,7 +586,8 @@ def run(args):
     keep, tally = [], {}
     for d, (status, why) in zip(cands, results):
         tally[status] = tally.get(status, 0) + 1
-        log(f"  [{status}] {why} — {d['title'][:60]}")
+        age = f"{d['age_h']:.0f}h" if d["age_h"] is not None else "?"
+        log(f"  [{status}] {age} old · {why} — {d['title'][:55]}")
         d["status"] = status
         if status in ("oos", "dead") or (strict and status != "in_stock"):
             seen[d["id"]] = now + OOS_RECHECK
