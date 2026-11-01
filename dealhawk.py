@@ -143,7 +143,7 @@ def to_deal(entry, source):
     # Reddit: the "[link]" anchor is the retailer URL
     if "reddit.com" in link:
         for l in extract_links(summary):
-            if "reddit.com" not in l and "redd.it" not in l:
+            if l.startswith("http") and "reddit.com" not in l and "redd.it" not in l:
                 buy = l
                 break
     plain = re.sub(r"<[^>]+>", " ", html.unescape(summary))
@@ -276,6 +276,8 @@ def format_alert(d):
 
 
 def send(d, dry):
+    if not str(d["buy"]).startswith("http"):
+        d["buy"] = d["thread"]
     text = format_alert(d)
     buttons = [[{"text": "🛒 Buy", "url": d["buy"]}]]
     if d["thread"] and d["thread"] != d["buy"]:
