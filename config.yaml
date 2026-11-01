@@ -12,7 +12,7 @@ min_thumbs: 15                 # Slickdeals community score floor (when shown)
 # strict   = only send ✅ (very few — most big stores block bots)
 # balanced = send ✅ and ⚠️; sold-out/expired ones are always dropped
 stock_policy: balanced
-max_age_hours: 24             # only fresh deals (old ones are usually sold out)
+max_age_hours: 48             # only fresh deals (old ones are usually sold out)
 min_price: 25                 # skip $5 junk
 
 trusted_stores: [amazon, best buy, home depot, "lowe's", lowes, costco, "sam's club", walmart,
