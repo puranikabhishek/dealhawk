@@ -167,11 +167,12 @@ def to_deal(entry, source):
         summary += " " + " ".join(c.get("value", "") for c in entry["content"])
     link = entry.get("link", "")
     buy = link
-    if "reddit.com" in link:
-        for l in re.findall(r'href="([^"]+)"', summary):
-            if l.startswith("http") and "reddit.com" not in l and "redd.it" not in l:
-                buy = html.unescape(l)
-                break
+    hrefs = [html.unescape(l) for l in re.findall(r'href="([^"]+)"', summary)]
+    for l in hrefs:  # first real store link in the post (Reddit link post / Slickdeals RSS body)
+        l = direct_url(l) if "slickdeals.net/click" in l else l
+        if l.startswith("http") and not re.search(r"reddit\.com|redd\.it|slickdeals\.net|imgur|i\.sd", l):
+            buy = l
+            break
     plain = re.sub(r"<[^>]+>", " ", html.unescape(summary))
     price, reg, pct = parse_prices(title + " " + plain)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
@@ -264,7 +265,7 @@ def direct_url(click):
 
 def resolve_and_verify(d):
     """Check 1 (source still live) + Check 2 (store says in stock)."""
-    if "slickdeals.net" in d["thread"]:
+    if "slickdeals.net" in d["thread"] and "slickdeals.net" in d["buy"]:
         try:
             page = HTTP.get(d["thread"], timeout=20).text
             if SD_EXPIRED.search(page[:300000]):
@@ -355,6 +356,16 @@ def load_seen():
     return s
 
 
+def debug_feed(entries):
+    """One-time peek at what a feed item carries (links etc.)."""
+    if entries and os.getenv("DEBUG_FEED"):
+        e = entries[0]
+        log(f"    DEBUG keys={list(e.keys())}")
+        body = (e.get("summary", "") or "") + "".join(c.get("value", "") for c in e.get("content", []))
+        log(f"    DEBUG hrefs={re.findall(r'href=\"([^\"]+)\"', body)[:8]}")
+        log(f"    DEBUG text={re.sub(r'<[^>]+>|\\s+', ' ', body)[:300]}")
+
+
 def run(args):
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
     if in_quiet_hours(cfg) and not args.dry_run:
@@ -367,6 +378,7 @@ def run(args):
     cands, ids = [], set()
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
+        debug_feed(entries)
         for e in entries:
             d = to_deal(e, name)
             hold = seen.get(d["id"], 0)
