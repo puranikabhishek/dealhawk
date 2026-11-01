@@ -253,8 +253,14 @@ def fetch_feed(url):
 
 def all_feeds(cfg):
     feeds = cfg.get("feeds", [])
-    with ThreadPoolExecutor(6) as ex:
-        return [(f["name"], es) for f, es in zip(feeds, ex.map(lambda f: fetch_feed(f["url"]), feeds))]
+    reddit = [f for f in feeds if "reddit.com" in f["url"]]
+    other = [f for f in feeds if f not in reddit]
+    with ThreadPoolExecutor(6) as ex:  # everything else in parallel
+        out = {f["name"]: es for f, es in zip(other, ex.map(lambda f: fetch_feed(f["url"]), other))}
+    for f in reddit:  # Reddit rate-limits hard: one at a time, spaced out
+        out[f["name"]] = fetch_feed(f["url"])
+        time.sleep(4)
+    return [(f["name"], out[f["name"]]) for f in feeds]
 
 
 def direct_url(u):
