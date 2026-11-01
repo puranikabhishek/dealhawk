@@ -515,9 +515,10 @@ def run(args):
         for e in entries:
             d = to_deal(e, name)
             hold = seen.get(d["id"], 0)
-            if d["id"] in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
+            pk = product_key(d["title"])
+            if d["id"] in ids or pk in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
                 continue
-            ids.add(d["id"])
+            ids.update((d["id"], pk))  # same deal from two feeds = one line
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             ok, why = passes(d, cfg)
             if ok and (d["watch"] or d["cat"]):
