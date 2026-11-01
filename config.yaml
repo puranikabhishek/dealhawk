@@ -1,0 +1,88 @@
+# ─────────────────────────────────────────────
+#  DealHawk config — edit this, push, done.
+# ─────────────────────────────────────────────
+
+timezone: America/Chicago
+quiet_hours: [23, 7]          # no pings 11pm–7am (deals queue for the morning run)
+max_alerts_per_run: 8          # anti-spam cap
+min_discount_pct: 30           # skip deals under this % off (when % is known)
+min_thumbs: 15                 # Slickdeals community score floor (when shown)
+
+# Only alert for these stores (lowercase, partial match). Empty list = any store.
+trusted_stores:
+  - amazon
+  - best buy
+  - home depot
+  - lowe's
+  - lowes
+  - costco
+  - walmart
+  - target
+  - b&h
+  - newegg
+  - woot
+  - micro center
+  - adorama
+  - dell
+  - apple
+  - samsung
+  - ace hardware
+  - rei
+  - nordstrom rack
+  - levi's
+  - nike
+
+# Free deal feeds. Slickdeals frontpage = community-vetted, the best free signal.
+feeds:
+  - name: Slickdeals Frontpage
+    url: https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1
+  - name: r/buildapcsales
+    url: https://www.reddit.com/r/buildapcsales/new/.rss
+  - name: r/frugalmalefashion
+    url: https://www.reddit.com/r/frugalmalefashion/new/.rss
+
+# A deal must match at least one category keyword (case-insensitive).
+categories:
+  electronics:
+    emoji: "🔌"
+    keywords: [oled, qled, 4k tv, monitor, ssd, nvme, gpu, rtx, radeon, ryzen, intel core,
+               headphones, earbuds, airpods, sony wh, bose, ipad, macbook, mac mini, imac,
+               pixel, galaxy, iphone, apple watch, kindle, router, mesh, wi-fi 7, nas,
+               soundbar, projector, steam deck, playstation, ps5, xbox, nintendo, camera,
+               gopro, dji, power bank, anker, ugreen, usb-c, keyboard, mouse, laptop]
+  smart_home:
+    emoji: "🏠"
+    keywords: [ring, eufy, ecobee, nest, smart lock, august, yale, lutron, philips hue,
+               robot vacuum, roborock, roomba, security camera, video doorbell, echo,
+               smart plug, thermostat, arlo, wyze, tp-link kasa]
+  tools_home_improvement:
+    emoji: "🛠️"
+    keywords: [dewalt, milwaukee, makita, ryobi, ego, kobalt, ridgid, bosch, craftsman,
+               drill, impact driver, circular saw, miter saw, pressure washer, leaf blower,
+               lawn mower, string trimmer, generator, shop vac, tool set, ladder, wet/dry,
+               battery kit, socket set, workbench, air compressor]
+  furniture:
+    emoji: "🛋️"
+    keywords: [standing desk, office chair, herman miller, steelcase, mattress, sofa,
+               bookshelf, dresser, bed frame, patio set, recliner]
+  clothing:
+    emoji: "👕"
+    keywords: [jacket, boots, sneakers, levi's, jeans, patagonia, arc'teryx, north face,
+               carhartt, nike, adidas, new balance, uniqlo, merino, chinos]
+
+# Words that kill a deal outright.
+exclude_keywords: [refurbished, renewed, used, open box, "for parts", kids, women's,
+                   case only, screen protector, gift card, credit card]
+
+# Watchlist: always alert when one of these appears at/under your max price,
+# even if it misses the filters above.
+watchlist:
+  - name: 65" OLED TV
+    keywords: [65, oled]
+    max_price: 1100
+  - name: Milwaukee M18 combo kit
+    keywords: [milwaukee, m18, kit]
+    max_price: 250
+  - name: 4TB NVMe SSD
+    keywords: [4tb, nvme]
+    max_price: 230

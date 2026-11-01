@@ -1,0 +1,45 @@
+name: DealHawk
+
+on:
+  schedule:
+    # Times are UTC. Every 2 hours normally.
+    - cron: "7 */2 * * *"
+    # Black Friday week → Cyber Monday (Nov 26 – Dec 2): every 30 min
+    - cron: "*/30 * 26-30 11 *"
+    - cron: "*/30 * 1-2 12 *"
+  workflow_dispatch: {}   # "Run workflow" button for manual runs
+
+permissions:
+  contents: write   # lets the run save price history + seen deals back to the repo
+
+concurrency:
+  group: dealhawk
+  cancel-in-progress: false
+
+jobs:
+  hunt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Hunt deals
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python dealhawk.py
+
+      - name: Save state
+        run: |
+          git config user.name "dealhawk-bot"
+          git config user.email "dealhawk-bot@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "state: $(date -u +%F_%H%M)"
+          git push
