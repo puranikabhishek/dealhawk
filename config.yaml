@@ -51,7 +51,7 @@ categories:
   electronics:
     title: Electronics
     emoji: "🔌"
-    keywords: [monitor, ssd, nvme, gpu, rtx, radeon, ryzen, bose,
+    keywords: [ssd, nvme, gpu, rtx, radeon, ryzen, bose,
                ipad, tablet, apple watch, smartwatch, kindle, router, mesh wifi,
                eero, nas, soundbar, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
                camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
@@ -137,7 +137,7 @@ categories:
 
 # Never show deals with these words in the title. Add more with /block in Telegram.
 exclude_keywords: [
-  headphone, headphones, earbuds, earphones, earbud, airpods, headset, headsets,
+  monitor, monitors, headphone, headphones, earbuds, earphones, earbud, airpods, headset, headsets,
   phone, phones, smartphone, smartphones, iphone, cell phone, unlocked,
   candy, candies, chocolate, chocolates, snack, snacks, soda, gum, cookies,
   laptop, laptops, notebook, chromebook, macbook, tv, tvs, television, oled tv, qled, smart tv,
