@@ -24,7 +24,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import quote_plus
+from urllib.parse import parse_qs, quote_plus, urlparse
 from zoneinfo import ZoneInfo
 
 import feedparser
@@ -49,6 +49,7 @@ HTTP.mount("https://", requests.adapters.HTTPAdapter(pool_maxsize=16))
 
 TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TG_CHAT = os.getenv("TELEGRAM_CHAT_ID", "")
+FORCE = os.getenv("RECHECK") == "true"  # manual run option: re-check deals held as sold-out/unverified
 
 # ── stock signals ──
 IN_STOCK = {"instock", "limitedavailability", "onlineonly", "preorder", "presale", "in stock"}
@@ -243,12 +244,22 @@ def check_store(url):
     if r.status_code in (404, 410):
         return "dead", f"HTTP {r.status_code}"
     body = r.text[:1_500_000]
+    host = urlparse(r.url).netloc.replace("www.", "")
     if r.status_code >= 400 or BLOCK_TEXT.search(body[:20000]):
-        return "unknown", f"store blocked bot (HTTP {r.status_code})"
+        return "unknown", f"{host} blocked bot (HTTP {r.status_code})"
     a = availability(body)
     if a:
-        return a, ("store says " + ("in stock" if a == "in_stock" else "OUT OF STOCK"))
-    return "unknown", "no stock data on page"
+        return a, f"{host} says " + ("in stock" if a == "in_stock" else "OUT OF STOCK")
+    return "unknown", f"{host}: no stock data on page"
+
+
+def direct_url(click):
+    """Slickdeals click links carry the real store URL in u2= — use it, skip the bot-blocking redirect."""
+    q = parse_qs(urlparse(click).query)
+    for k in ("u2", "u", "url"):
+        if q.get(k) and q[k][0].startswith("http"):
+            return q[k][0]
+    return click
 
 
 def resolve_and_verify(d):
@@ -259,7 +270,7 @@ def resolve_and_verify(d):
             if SD_EXPIRED.search(page[:300000]):
                 return "dead", "Slickdeals marked expired"
             if m := re.search(r'href="(https://slickdeals\.net/click\?[^"]+)"', page):
-                d["buy"] = html.unescape(m.group(1))
+                d["buy"] = direct_url(html.unescape(m.group(1)))
         except Exception:
             pass
     if not str(d["buy"]).startswith("http"):
@@ -358,7 +369,8 @@ def run(args):
         log(f"{name}: {len(entries)} items")
         for e in entries:
             d = to_deal(e, name)
-            if d["id"] in ids or seen.get(d["id"], 0) > now:
+            hold = seen.get(d["id"], 0)
+            if d["id"] in ids or hold > now and not (FORCE and hold < now + OOS_RECHECK + 60):
                 continue
             ids.add(d["id"])
             d["watch"] = watch_hit(d, cfg)
