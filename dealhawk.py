@@ -364,7 +364,7 @@ def debug_feed(entries):
     """One-time peek at what a feed item carries (links etc.)."""
     if entries and os.getenv("DEBUG_FEED"):
         e = entries[0]
-        log(f"    DEBUG keys={list(e.keys())}")
+        log(f"    DEBUG published={e.get('published')} keys={list(e.keys())}")
         body = (e.get("summary", "") or "") + "".join(c.get("value", "") for c in e.get("content", []))
         log(f"    DEBUG hrefs={re.findall(r'href=\"([^\"]+)\"', body)[:8]}")
         log(f"    DEBUG text={re.sub(r'<[^>]+>|\\s+', ' ', body)[:300]}")
@@ -381,7 +381,9 @@ def run(args):
     sources = ([("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg))
     cands, ids, skips = [], set(), {}
     for name, entries in sources:
-        log(f"{name}: {len(entries)} items")
+        ages = sorted(a for a in (to_deal(e, name)["age_h"] for e in entries) if a is not None)
+        span = f" · age {ages[0]:.0f}h–{ages[len(ages)//2]:.0f}h–{ages[-1]:.0f}h (min/med/max)" if ages else ""
+        log(f"{name}: {len(entries)} items{span}")
         debug_feed(entries)
         for e in entries:
             d = to_deal(e, name)
