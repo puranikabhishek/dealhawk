@@ -1,10 +1,9 @@
 name: DealHawk
 
 on:
-  schedule:
-    # Every 30 min (price mistakes vanish fast). ~1,440 of the 2,000 free private-repo minutes/month.
-    - cron: "7,37 * * * *"
-  workflow_dispatch:      # "Run workflow" button for manual runs
+  # Triggered every 30 min by cron-job.org (GitHub's own scheduler skips runs).
+  # ~1,440 of the 2,000 free private-repo minutes/month.
+  workflow_dispatch:      # also the "Run workflow" button for manual runs
     inputs:
       recheck:
         description: "Re-check deals held as sold-out/unverified"

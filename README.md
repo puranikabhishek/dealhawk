@@ -1,6 +1,6 @@
 # DealHawk 🦅
 
-Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions. **$0, no AI tokens.**
+Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered by a free cron-job.org timer (token expires 2027-11-02). **$0, no AI tokens.**
 
 ## What you get
 - **One short digest per run**: price, % off, product name (tap to buy). Max 4 per section.
