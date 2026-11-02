@@ -325,8 +325,20 @@ def watch_hit(d, cfg):
     return None
 
 
+def prize_ok(d, cfg, c):
+    """Giveaways: only prizes you'd want — your categories' items, or big cash / store gift cards."""
+    if any(re.search(p, d["tl"]) for p in c.get("prize_patterns", [])):
+        return True
+    return any(matches(v, d["tl"]) for n, v in cfg["categories"].items()
+               if v.get("enabled", True) and not v.get("relaxed") and not v.get("instant") and n != "ultra")
+
+
 def passes(d, cfg, relaxed=False):
-    if hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, d["tl"])), None):
+    c = cfg["categories"].get(d.get("cat"), {})
+    if c.get("prize_patterns") is not None:
+        if not prize_ok(d, cfg, c):
+            return False, "boring prize"
+    elif hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, d["tl"])), None):
         return False, f"blocked '{hit}'"
     if hit := next((s for s in cfg.get("blocked_stores", []) if has(s, d["text"])), None):
         return False, f"store '{hit}'"
