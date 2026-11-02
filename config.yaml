@@ -55,7 +55,7 @@ categories:
                ipad, tablet, apple watch, smartwatch, kindle, router, mesh wifi,
                eero, nas, soundbar, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
                camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
-               projector, printer, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
+               projector, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
                blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo, homepod,
                microphone, webcam, desktop, gaming pc]
   appliances:
@@ -65,8 +65,8 @@ categories:
                electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
                air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
                vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
-               pressure cooker, ninja, kitchenaid, stand mixer, blender, vitamix, espresso, coffee maker,
-               breville, keurig, nespresso, toaster oven, food processor, rice cooker, sous vide]
+               pressure cooker, ninja, kitchenaid, stand mixer, blender, vitamix,
+               breville, toaster oven, food processor, rice cooker, sous vide]
   decor:
     title: Home & Room Decor
     emoji: "🖼️"
@@ -143,6 +143,12 @@ categories:
 
 # Never show deals with these words in the title. Add more with /block in Telegram.
 exclude_keywords: [
+  treadmill, treadmills, walking pad,
+  game, games, video game, video games, remaster, remastered, dlc, season pass, "(switch", "(ps5", "(ps4",
+  "(xbox", "(pc", "(nintendo", "(steam", digital code,
+  printer, printers, 3d printer, bambu, ink, toner,
+  coffee, espresso, keurig, nespresso, coffee maker, coffee machine,
+  shredder, shredders, paper shredder,
   monitor, monitors, headphone, headphones, earbuds, earphones, earbud, airpods, headset, headsets,
   phone, phones, smartphone, smartphones, iphone, cell phone, unlocked,
   candy, candies, chocolate, chocolates, snack, snacks, soda, gum, cookies,
