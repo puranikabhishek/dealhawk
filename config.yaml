@@ -55,7 +55,7 @@ categories:
                patio conversation set, conversation set, outdoor sectional, bistro set, wicker set,
                robot vacuum, robot vac, robovac, robot vacuum mop, roomba, roborock, deebot, ecovacs,
                dreame, narwal, self-emptying, self emptying,
-               headphones, headphone, earbuds, earbud, airpods, airpods pro, airpods max,
+               headphones, headphone, earbuds, earbud,
                noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
                wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds]
   electronics:
@@ -75,7 +75,7 @@ categories:
   appliances:
     title: Home Appliances
     emoji: "🧺"
-    keywords: [refrigerator, fridge, freezer, dishwasher, microwave, gas range,
+    keywords: [freezer, dishwasher, microwave, gas range,
                electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
                air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
                vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
@@ -105,7 +105,7 @@ categories:
                couch, loveseat, bookshelf, bookcase, recliner, accent chair, coffee table, side table,
                end table, dining table, dining set, bar stool, tv stand, media console, cabinet,
                bed frame, platform bed, headboard, nightstand, dresser, chest of drawers, wardrobe,
-               armoire, bedroom set, mattress, storage bed, ottoman, futon]
+               armoire, bedroom set, storage bed, ottoman, futon]
   coupons:
     title: Coupons & Promo Codes
     emoji: "🏷️"
@@ -178,7 +178,8 @@ exclude_keywords: [
   washer, washers, dryer, dryers, washing machine, washing machines, washer dryer, laundry, laundry pair,
   pet, pets, dog, dogs, puppy, puppies, cat, cats, kitten, kittens, litter, litter box, cat tree,
   pet food, dog food, cat food, dog bed, pet bed, pet feeder, cat feeder, leash, aquarium, fish tank,
-  chewy, petco, petsmart, furbo]
+  chewy, petco, petsmart, furbo,
+  airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges]
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
 watchlist:
