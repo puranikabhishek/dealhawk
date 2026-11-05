@@ -48,6 +48,16 @@ categories:
     min_pct: 65                  # any deal in your sections at 65%+ off lands here
     keywords: [up to 70% off, up to 75% off,
                up to 80% off, up to 85% off, up to 90% off, clearance]
+  wishlist:
+    title: Wish List
+    emoji: "🎯"
+    keywords: [patio set, patio furniture, patio furniture set, outdoor furniture set, patio dining set,
+               patio conversation set, conversation set, outdoor sectional, bistro set, wicker set,
+               robot vacuum, robot vac, robovac, robot vacuum mop, roomba, roborock, deebot, ecovacs,
+               dreame, narwal, self-emptying, self emptying,
+               headphones, headphone, earbuds, earbud, airpods, airpods pro, airpods max,
+               noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
+               wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds]
   electronics:
     title: Electronics
     emoji: "🔌"
@@ -57,11 +67,15 @@ categories:
                camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
                projector, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
                blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo, homepod,
-               microphone, webcam, desktop, gaming pc]
+               microphone, webcam, desktop, gaming pc, headset, airtag, tracker, tile,
+               meta quest, vr headset, smart glasses, ray-ban meta, e-reader, kobo, remarkable,
+               smart display, echo show, nest hub, dash cam, dashcam, bluetooth speaker, jbl,
+               sonos, marshall, label maker, streaming deck, stream deck, gadget, gadgets,
+               mini pc, mac mini, smart ring, oura, fitbit, pixel watch, galaxy watch]
   appliances:
     title: Home Appliances
     emoji: "🧺"
-    keywords: [refrigerator, fridge, freezer, washer, dryer, dishwasher, microwave, gas range,
+    keywords: [refrigerator, fridge, freezer, dishwasher, microwave, gas range,
                electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
                air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
                vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
@@ -149,7 +163,7 @@ exclude_keywords: [
   printer, printers, 3d printer, bambu, ink, toner,
   coffee, espresso, keurig, nespresso, coffee maker, coffee machine,
   shredder, shredders, paper shredder,
-  monitor, monitors, headphone, headphones, earbuds, earphones, earbud, airpods, headset, headsets,
+  monitor, monitors,
   phone, phones, smartphone, smartphones, iphone, cell phone, unlocked,
   candy, candies, chocolate, chocolates, snack, snacks, soda, gum, cookies,
   laptop, laptops, notebook, chromebook, macbook, tv, tvs, television, oled tv, qled, smart tv,
@@ -160,7 +174,11 @@ exclude_keywords: [
   fashion, apparel, nike, adidas, jacket, jackets, shoes, sneakers, boots, jewelry, rolex, handbag,
   gummies, supplement, supplements, vitamins, cbd, makeup, perfume, fragrance,
   gift card, credit card, see thread, cushion, cushions, cover, covers, charger, charging, airbed,
-  air mattress, replacement, lego, toy, toys, costume, ebook, subscription, membership]
+  air mattress, replacement, lego, toy, toys, costume, ebook, subscription, membership,
+  washer, washers, dryer, dryers, washing machine, washing machines, washer dryer, laundry, laundry pair,
+  pet, pets, dog, dogs, puppy, puppies, cat, cats, kitten, kittens, litter, litter box, cat tree,
+  pet food, dog food, cat food, dog bed, pet bed, pet feeder, cat feeder, leash, aquarium, fish tank,
+  chewy, petco, petsmart, furbo]
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
 watchlist:

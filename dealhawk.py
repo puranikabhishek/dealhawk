@@ -297,6 +297,12 @@ def to_deal(entry, source):
 SAFE_PHRASES = re.compile(r"\b(dishwasher|oven|microwave|freezer|dryer)[- ]safe\b|\bfor (?:the )?(?:dishwasher|oven|microwave)\b")
 
 
+# Phrases that contain a blocked word but aren't what the block is for:
+# "robot vacuum for pet hair" isn't a pet product; "patio set with cushions" isn't a lone cushion.
+BLOCK_SAFE = re.compile(r"\bpet[- ]hair\b|\b(?:for|with) (?:pets?|dogs?|cats?)\b(?=.*\bvac)|\banimal\b"
+                        r"|\bwith (?:\w+ )?(?:cushions?|covers?)\b|\b(?:charging|wireless) case\b")
+
+
 def matches(c, tl):
     return any(has(k, tl) for k in c.get("keywords", [])) or any(re.search(p, tl) for p in c.get("patterns", []))
 
@@ -338,7 +344,7 @@ def passes(d, cfg, relaxed=False):
     if c.get("prize_patterns") is not None:
         if not prize_ok(d, cfg, c):
             return False, "boring prize"
-    elif hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, d["tl"])), None):
+    elif hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, BLOCK_SAFE.sub(" ", d["tl"]))), None):
         return False, f"blocked '{hit}'"
     if hit := next((s for s in cfg.get("blocked_stores", []) if has(s, d["text"])), None):
         return False, f"store '{hit}'"
