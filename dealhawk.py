@@ -303,6 +303,16 @@ BLOCK_SAFE = re.compile(r"\bpet[- ]hair\b|\b(?:for|with) (?:pets?|dogs?|cats?)\b
                         r"|\bwith (?:\w+ )?(?:cushions?|covers?)\b|\b(?:charging|wireless) case\b")
 
 
+# AI note-taker titles often say "w/ magnetic case" or "+ 1-yr subscription" — those aren't phone cases or subs.
+NOTE_TAKER = re.compile(r"\b(?:plaud|notepin|ticnote|soundcore work|(?:ai|voice) recorder|note ?taker)\b")
+NOTE_TAKER_SAFE = re.compile(r"\b(?:magnetic |charging |carrying |protective )?case\b|\bsubscription\b|\bmembership\b")
+
+
+def block_text(tl):
+    tl = BLOCK_SAFE.sub(" ", tl)
+    return NOTE_TAKER_SAFE.sub(" ", tl) if NOTE_TAKER.search(tl) else tl
+
+
 def matches(c, tl):
     return any(has(k, tl) for k in c.get("keywords", [])) or any(re.search(p, tl) for p in c.get("patterns", []))
 
@@ -344,7 +354,7 @@ def passes(d, cfg, relaxed=False):
     if c.get("prize_patterns") is not None:
         if not prize_ok(d, cfg, c):
             return False, "boring prize"
-    elif hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, BLOCK_SAFE.sub(" ", d["tl"]))), None):
+    elif hit := next((x for x in cfg.get("exclude_keywords", []) if has(x, block_text(d["tl"]))), None):
         return False, f"blocked '{hit}'"
     if hit := next((s for s in cfg.get("blocked_stores", []) if has(s, d["text"])), None):
         return False, f"store '{hit}'"

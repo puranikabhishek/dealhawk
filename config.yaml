@@ -57,7 +57,9 @@ categories:
                dreame, narwal, self-emptying, self emptying,
                headphones, headphone, earbuds, earbud,
                noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
-               wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds]
+               wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds,
+               plaud, notepin, plaud note, ai voice recorder, ai recorder, ai note taker, ai notetaker,
+               soundcore work, ticnote]
   electronics:
     title: Electronics
     emoji: "🔌"
@@ -183,6 +185,22 @@ exclude_keywords: [
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
 watchlist:
+  # AI note taker — own alert with photo + Buy button. Caps ≈ 25–35% under list price.
+  - name: Plaud Note Pro (AI note taker)
+    keywords: [plaud, note pro]
+    max_price: 145
+  - name: Plaud Note (AI note taker)
+    keywords: [plaud, note]
+    max_price: 119
+  - name: Plaud NotePin (AI note taker)
+    keywords: [plaud, notepin]
+    max_price: 119
+  - name: Soundcore Work (AI note taker)
+    keywords: [soundcore work]
+    max_price: 109
+  - name: AI voice recorder (other brands)
+    keywords: [ai, recorder]
+    max_price: 99
   - name: Milwaukee M18 combo kit
     keywords: [milwaukee, m18, kit]
     max_price: 250
