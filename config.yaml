@@ -65,7 +65,7 @@ categories:
     emoji: "🔌"
     keywords: [ssd, nvme, gpu, rtx, radeon, ryzen, bose,
                ipad, tablet, apple watch, smartwatch, kindle, router, mesh wifi,
-               eero, nas, soundbar, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
+               eero, nas, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
                camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
                projector, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
                blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo, homepod,
@@ -188,6 +188,7 @@ exclude_keywords: [
   hp spectre, hp omen, hp victus, elitebook, probook, acer aspire, acer swift, acer nitro, predator helios,
   msi katana, msi cyborg, msi stealth, razer blade, galaxy book, surface laptop, surface pro, framework 13,
   copilot+ pc, copilot pc, 2-in-1, touchscreen notebook,
+  soundbar, soundbars, sound bar, sound bars, sonos arc, sonos beam, sonos ray, home theater system,
   airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges]
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
