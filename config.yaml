@@ -81,7 +81,7 @@ categories:
                electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
                air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
                vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
-               pressure cooker, ninja, kitchenaid, stand mixer, blender, vitamix,
+               pressure cooker, ninja, kitchenaid, stand mixer,
                breville, toaster oven, food processor, rice cooker, sous vide]
   decor:
     title: Home & Room Decor
@@ -181,6 +181,13 @@ exclude_keywords: [
   pet, pets, dog, dogs, puppy, puppies, cat, cats, kitten, kittens, litter, litter box, cat tree,
   pet food, dog food, cat food, dog bed, pet bed, pet feeder, cat feeder, leash, aquarium, fish tank,
   chewy, petco, petsmart, furbo,
+  blender, blenders, vitamix, nutribullet, magic bullet, blendtec, smoothie maker, personal blender,
+  immersion blender, hand blender, ninja creami, blendsense, auto iq,
+  vivobook, zenbook, rog zephyrus, rog strix g, tuf gaming, thinkpad, ideapad, yoga slim, legion,
+  xps 13, xps 14, xps 16, dell inspiron, dell latitude, alienware m16, alienware m18, hp pavilion, hp envy,
+  hp spectre, hp omen, hp victus, elitebook, probook, acer aspire, acer swift, acer nitro, predator helios,
+  msi katana, msi cyborg, msi stealth, razer blade, galaxy book, surface laptop, surface pro, framework 13,
+  copilot+ pc, copilot pc, 2-in-1, touchscreen notebook,
   airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges]
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
