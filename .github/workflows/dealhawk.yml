@@ -36,12 +36,5 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RECHECK: ${{ inputs.recheck }}
-        run: python dealhawk.py
+        run: python probe.py
 
-      - name: Save state
-        run: |
-          git config user.name "dealhawk-bot"
-          git config user.email "dealhawk-bot@users.noreply.github.com"
-          git add data/
-          git diff --cached --quiet || git commit -m "state: $(date -u +%F_%H%M)"
-          git push
