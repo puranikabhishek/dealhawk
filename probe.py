@@ -1,36 +1,33 @@
-import re, html, json, feedparser, requests, yaml
+import re, html, json, feedparser
 import dealhawk as dh
-cfg = yaml.safe_load(open("config.yaml"))
-pat = re.compile(r"headphone|earbud|bose|robot vac|patio|plaud", re.I)
-n = 0
-for f in cfg["feeds"][:7]:
-    r = dh.HTTP.get(f["url"], timeout=20)
-    fp = feedparser.parse(r.content)
-    hits = [e for e in fp.entries if pat.search(e.get("title", ""))][:2] or fp.entries[:1]
-    for e in hits[:2]:
-        n += 1
-        print("=" * 30, f["name"])
-        print("KEYS", sorted(e.keys()))
-        print("TITLE", e.get("title")); print("LINK", e.get("link")); print("ID", e.get("id"))
-        print("TAGS", [t.get("term") for t in e.get("tags", [])])
-        for k in ("media_thumbnail", "media_content", "enclosures", "links"):
-            if e.get(k): print(k.upper(), json.dumps(e.get(k))[:500])
-        s = (e.get("summary") or "") + " ".join(c.get("value", "") for c in e.get("content", []))
-        print("SUMMARY", s[:1800])
-        print("IMGS", re.findall(r'<img[^>]+src="([^"]+)"', s)[:3])
-        print("HREFS", [html.unescape(x)[:160] for x in re.findall(r'href="([^"]+)"', s)][:6])
-        d = dh.to_deal(e, f["name"])
-        print("BUY", d["buy"], "| STORE", repr(d["store"]), "| price", d["price"], d["reg"], d["pct"], "thumbs", d["thumbs"])
-        try:
-            t = dh.HTTP.get(d["thread"], timeout=15, allow_redirects=True)
-            body = t.text
-            print("THREAD", t.status_code, t.url[:120], len(body))
-            print("  og:image", re.findall(r'property="og:image"[^>]+content="([^"]+)"', body)[:1])
-            outs = [html.unescape(x) for x in re.findall(r'href="([^"]+)"', body) if re.search(dh.STORE_DOMAINS + r"|/lw/click|/click\?|u2=", x)]
-            print("  OUTLINKS", [o[:200] for o in outs[:4]])
-            for o in outs[:1]:
-                o = ("https://www.dealnews.com" + o) if o.startswith("/") else o
-                rr = dh.HTTP.get(o, timeout=15, allow_redirects=True)
-                print("  FOLLOW", rr.status_code, rr.url[:200], [h.headers.get("location", "")[:150] for h in rr.history][:3])
-        except Exception as ex:
-            print("THREAD ERR", ex)
+def grab(u):
+    r = dh.HTTP.get(u, timeout=20); return r.status_code, r.text
+def ctx(body, pat, n=6, w=110):
+    out = []
+    for m in re.finditer(pat, body, re.I):
+        s = body[max(0, m.start()-w): m.end()+w].replace("\n", " ")
+        out.append(re.sub(r"\s+", " ", s))
+        if len(out) >= n: break
+    return out
+urls = {"OLD": "https://slickdeals.net/f/18814108", "LIVE": "https://slickdeals.net/f/20295609"}
+fp = feedparser.parse(dh.HTTP.get("https://slickdeals.net/newsearch.php?q=bose+quietcomfort&searcharea=deals&searchin=first&rss=1", timeout=20).content)
+for e in fp.entries[:8]:
+    print("SEARCH", e.get("published", "")[:22], "|", e.get("title", "")[:90], "|", e.get("link", "")[:70], "| tags", [t.get("term") for t in e.get("tags", [])])
+for i, e in enumerate([e for e in fp.entries if "124" in e.get("title", "")][:2]):
+    urls[f"BOSE{i}"] = e.link
+for k, u in urls.items():
+    sc, b = grab(u)
+    print("=" * 20, k, sc, len(b), u[:90])
+    print(" count 'xpired':", len(re.findall("xpired", b, re.I)), "| diavail:", set(re.findall(r"diavail-\w+", b)), "| dipgavail:", set(re.findall(r"dipgavail-\w+", b)))
+    for c in ctx(b, r"xpired"): print("  EXP>", c)
+    for c in ctx(b, r'"availability"|InStock|OutOfStock|SoldOut', 3): print("  AVAIL>", c)
+    for c in ctx(b, r'"(?:dealStatus|status|isLive|isDead|dealState)"\s*:', 4, 60): print("  STATUS>", c)
+    for c in ctx(b, r'og:(?:title|description)"', 2, 10): print("  OG>", c[:260])
+    lds = re.findall(r'<script type="application/ld\+json">(.*?)</script>', b, re.S)
+    for l in lds[:3]: print("  LD>", re.sub(r"\s+", " ", l)[:600])
+fp = feedparser.parse(dh.HTTP.get("https://www.dealnews.com/c142/Electronics/?rss=1", timeout=20).content)
+for e in fp.entries[:4]:
+    print("DN", {k: e.get(k) for k in e.keys() if k.startswith("dealnews_")}, e.get("published"))
+sc, b = grab("https://www.dealnews.com/lw/click.html?20,2,22383984")
+print("DNCLICK", sc, len(b), re.sub(r"\s+", " ", b[:700]))
+print(" urls:", [x[:200] for x in re.findall(r'https?://[^"\'<> ]+', b) if "dealnews" not in x and "dlnws" not in x][:8])
