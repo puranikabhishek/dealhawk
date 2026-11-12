@@ -273,9 +273,18 @@ def direct_url(u):
     return u
 
 
+def domain_store(dom):
+    """bestbuy -> Best Buy, homedepot -> Home Depot, else Capitalized."""
+    names = {"bestbuy": "Best Buy", "homedepot": "Home Depot", "lowes": "Lowe's", "samsclub": "Sam's Club", "ebay": "eBay",
+             "bhphotovideo": "B&H", "acehardware": "Ace Hardware", "microcenter": "Micro Center"}
+    return names.get(dom.lower(), dom.capitalize())
+
+
 def click_store(click):
     """Slickdeals click links carry the store name (trd=Amazon)."""
     t = (parse_qs(urlparse(click).query).get("trd") or [""])[0] if click else ""
+    if m := re.match(r"https?\W+(?:www\W+)?([a-z0-9-]+)\W+(?:com|net|org)\b", t, re.I):  # trd is sometimes the store URL
+        return domain_store(m.group(1))
     return t if 1 < len(t) <= 30 and not re.search(r"\d|deal|image|trial|coupon|here", t, re.I) else ""
 
 
@@ -302,7 +311,8 @@ def to_deal(entry, source):
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
             "title": title, "source": source, "thread": link, "buy": buy,
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
-            "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click),
+            "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
+            or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else ""),
             "image": html.unescape(img) if img else None, "pub": calendar.timegm(pub) if pub else None,
             "tl": title.lower(), "text": (title + " " + plain[:600]).lower(),
             "tags": " ".join(t.get("term", "") for t in entry.get("tags", [])).lower(),
@@ -400,7 +410,9 @@ def passes(d, cfg, relaxed=False):
     if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
         return False, "small discount"
     min_th = cfg.get("min_thumbs", -999)
-    if d.get("wish") or d.get("watch"):  # your wish list: don't wait for the crowd to vote it up
+    wl = cfg.get("wishlist_alerts") or {}
+    if (d.get("wish") or d.get("watch")) and (d["age_h"] if d["age_h"] is not None else 99) <= wl.get("fresh_hours", 3):
+        # fresh wish-list post: don't wait for the crowd to vote it up (older ones must have earned their votes)
         min_th = min(min_th, (cfg.get("wishlist_alerts") or {}).get("min_thumbs", min_th))
     if d["thumbs"] is not None and d["thumbs"] < min_th:
         return False, "low votes"
@@ -894,7 +906,7 @@ def demo(src):
             d = to_deal(e, name)
             d["forced"] = d["feed_max_age"] = None
             d["watch"], d["cat"], d["wish"] = watch_hit(d, cfg), categorize(d, cfg), wish_kw(d, cfg)
-            if not (d["wish"] or d["watch"]) or not passes(d, cfg)[0]:
+            if not (d["wish"] or d["watch"]) or not passes(d, cfg, relaxed=True)[0]:
                 continue
             d["status"], why = resolve_and_verify(d)
             log(f"  [{d['status']}] {why} — {d['title'][:70]}")

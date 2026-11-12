@@ -20,7 +20,8 @@ stock_policy: balanced
 # and the card rewrites itself to ❌ EXPIRED when the deal dies. Everything else stays in the digest.
 wishlist_alerts:
   cards_per_run: 4             # extra wish-list deals in one run ride in the digest instead
-  min_thumbs: 2                # wish-list deals don't wait for 5 votes — you hear sooner
+  min_thumbs: 2                # a FRESH wish-list post only needs 2 votes (not 5) — you hear sooner
+  fresh_hours: 3               # …"fresh" = posted within this many hours; older posts need the usual 5
   track_hours: 36              # how long a sent card keeps getting re-checked for expiry
 digest_silent: false           # true = digest arrives without a buzz, so only 🎯 cards and 🚨 mistakes ping
 
