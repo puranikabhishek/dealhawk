@@ -44,6 +44,8 @@ feeds:
   - {name: Radar bookcase, url: "https://slickdeals.net/newsearch.php?q=bookcase&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar office chair, url: "https://slickdeals.net/newsearch.php?q=ergonomic+chair&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar file cabinet, url: "https://slickdeals.net/newsearch.php?q=file+cabinet&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar keyboard, url: "https://slickdeals.net/newsearch.php?q=keyboard&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar mouse, url: "https://slickdeals.net/newsearch.php?q=mouse&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar AI note taker, url: "https://slickdeals.net/newsearch.php?q=plaud&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
@@ -84,7 +86,11 @@ categories:
                herman miller, steelcase, sihoo, hbada, branch ergonomic, secretlab, haworth,
                filing cabinet, file cabinet, rolling file cabinet, mobile file cabinet, office drawers,
                drawer unit, storage drawers, mobile pedestal, drawer cabinet, rolling drawers,
-               storage cabinet with drawers, desk drawer unit]
+               storage cabinet with drawers, desk drawer unit,
+               keyboard, keyboards, mechanical keyboard, wireless keyboard, keyboard and mouse, keyboard mouse combo,
+               keychron, nuphy, logitech mx keys, mx keys, k380, razer huntsman, corsair k70, akko, epomaker,
+               mouse, mice, wireless mouse, gaming mouse, ergonomic mouse, vertical mouse, mx master, mx anywhere,
+               logitech g502, g305, razer deathadder, razer basilisk]
   electronics:
     title: Electronics
     emoji: "🔌"
@@ -184,6 +190,7 @@ categories:
 
 # Never show deals with these words in the title. Add more with /block in Telegram.
 exclude_keywords: [
+  mouse trap, mouse traps, mousetrap, mousetraps, mouse pad, mousepad, piano keyboard, digital piano, keyboard piano,
   treadmill, treadmills, walking pad,
   game, games, video game, video games, remaster, remastered, dlc, season pass, "(switch", "(ps5", "(ps4",
   "(xbox", "(pc", "(nintendo", "(steam", digital code,
