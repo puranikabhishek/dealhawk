@@ -40,6 +40,10 @@ feeds:
   - {name: Radar headphones, url: "https://slickdeals.net/newsearch.php?q=noise+cancelling+headphones&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar robot vacuum, url: "https://slickdeals.net/newsearch.php?q=robot+vacuum&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar patio set, url: "https://slickdeals.net/newsearch.php?q=patio+set&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar air fryer, url: "https://slickdeals.net/newsearch.php?q=air+fryer&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar bookcase, url: "https://slickdeals.net/newsearch.php?q=bookcase&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar office chair, url: "https://slickdeals.net/newsearch.php?q=ergonomic+chair&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar file cabinet, url: "https://slickdeals.net/newsearch.php?q=file+cabinet&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar AI note taker, url: "https://slickdeals.net/newsearch.php?q=plaud&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
@@ -73,7 +77,14 @@ categories:
                noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
                wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds,
                plaud, notepin, plaud note, ai voice recorder, ai recorder, ai note taker, ai notetaker,
-               soundcore work, ticnote]
+               soundcore work, ticnote,
+               air fryer, air fryers, airfryer, air fryer oven, air fry oven, cosori, instant vortex,
+               bookcase, bookcases, bookshelf, bookshelves, book shelf, ladder shelf, etagere,
+               ergonomic chair, ergonomic office chair, office chair, mesh office chair, desk chair,
+               herman miller, steelcase, sihoo, hbada, branch ergonomic, secretlab, haworth,
+               filing cabinet, file cabinet, rolling file cabinet, mobile file cabinet, office drawers,
+               drawer unit, storage drawers, mobile pedestal, drawer cabinet, rolling drawers,
+               storage cabinet with drawers, desk drawer unit]
   electronics:
     title: Electronics
     emoji: "🔌"
