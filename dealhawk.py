@@ -134,6 +134,11 @@ def clean_title(t):
     t = re.sub(r"^\s*\[[^\]]{1,30}\]\s*[-:]?\s*", "", t)  # leading [Costco Members] tags
     t = re.sub(r"\((?:reg|was|list|orig|msrp)[^)]*\)|\(\s*\d+\s*%\s*off\s*\)", " ", t, flags=re.I)
     t = re.sub(r"\(\s*\)", " ", TITLE_NOISE.sub(" ", t))
+    # Hip2Save/9to5Toys style: "X Only $89 Shipped on Walmart.com", "… drops to new Amazon all-time low"
+    t = re.sub(r"\s+(?:only|just)\b(?=\s*(?:shipped|on\b|at\b|\+|$))", " ", t, flags=re.I)
+    t = re.sub(r"\s+(?:shipped\s+)?(?:on|at)\s+[a-z]+\.com\b.*$|\s+shipped\b", " ", t, flags=re.I)
+    t = re.sub(r"\(\s*reg\.?[^)]*$", " ", t, flags=re.I)
+    t = re.sub(r"\s+(?:on|at)\s+(?:amazon|walmart|target|best buy|home depot|costco|woot)\s*$|\s+(?:at|for|from)\s*$", " ", t, flags=re.I)
     return re.sub(r"\s{2,}", " ", t).strip(" -–,:+")
 
 
@@ -325,7 +330,9 @@ def to_deal(entry, source):
             "title": title, "source": source, "thread": link, "buy": buy,
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
             "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
-            or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else ""),
+            or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else "")
+            or (domain_store(m.group(1)) if (m := re.search(r"(?:^|\.)([a-z0-9-]+)\.com$", urlparse(buy).netloc))
+                and re.search(STORE_DOMAINS, urlparse(buy).netloc + ".") else ""),
             "image": html.unescape(img) if img else None, "pub": calendar.timegm(pub) if pub else None,
             "tl": title.lower(), "text": (title + " " + plain[:600]).lower(),
             "tags": " ".join(t.get("term", "") for t in entry.get("tags", [])).lower(),
@@ -690,7 +697,8 @@ def card_parts(d, cfg, expired=None):
 def fetch_image(d):
     """Download the product photo ourselves (bigger version first) so Telegram never fails to fetch it."""
     urls = [d.get("image_hd"), re.sub(r"/\d{2,3}x\d{2,3}/", "/450x450/", d["image"]) if d.get("image") else None,
-            re.sub(r"\?h=\d+&w=\d+$", "?h=500&w=500", d["image"]) if d.get("image") else None, d.get("image")]
+            re.sub(r"\?h=\d+&w=\d+$", "?h=500&w=500", d["image"]) if d.get("image") else None,
+            re.sub(r"size_\d+x\d+", "size_500x500", d["image"]) if d.get("image") else None, d.get("image")]
     for u in dict.fromkeys(u for u in urls if u):
         try:
             r = HTTP.get(u, timeout=15)
