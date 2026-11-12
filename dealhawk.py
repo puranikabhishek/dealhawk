@@ -7,9 +7,10 @@ Every run:
   2. Pulls fresh, community/editor-curated deal feeds (Slickdeals, DealNews).
   3. Filters by your categories, blocked words/stores, price.
   4. Verifies: source not expired + store page stock check where the store allows it.
-  5. Sends ONE grouped digest (by category) + separate rich alerts for 🔥 hot deals.
+  5. Sends 🎯 wish-list deals as their own photo cards (Buy button, marked ❌ EXPIRED when they die)
+     + ONE grouped digest (by category) for everything else.
 
-CLI: --dry-run  --test  --check URL  --feed FILE  -v
+CLI: --dry-run  --test  --demo [FEED_URL]  --check URL  --feed FILE  -v
 """
 import argparse
 import calendar
@@ -23,7 +24,7 @@ import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timezone
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, quote_plus, urlparse
 from zoneinfo import ZoneInfo
 
 import feedparser
@@ -33,6 +34,7 @@ import yaml
 ROOT = Path(__file__).parent
 DATA = ROOT / "data"
 SEEN_FILE, PRICES_FILE, SETTINGS_FILE = DATA / "seen.json", DATA / "prices.json", DATA / "settings.json"
+CARDS_FILE = DATA / "cards.json"  # wish-list cards we sent, so we can mark them EXPIRED later
 
 DAY = 86400
 SENT_TTL, OOS_RECHECK = 30 * DAY, DAY // 2
@@ -98,7 +100,7 @@ def parse_prices(t):
     price = reg = pct = None
     if m := re.search(r"\$\s?([\d,]+(?:\.\d{2})?)", t):
         price = money(m.group(1))
-    if m := re.search(r"(?:reg\.?|was|list|msrp|orig\.?)\s*:?\s*\$\s?([\d,]+(?:\.\d{2})?)", t, re.I):
+    if m := re.search(r"(?:reg\.?|was|list(?: price)?|msrp|orig\.?|originally|normally)\s*:?\s*\$\s?([\d,]+(?:\.\d{2})?)", t, re.I):
         reg = money(m.group(1))
     if m := re.search(r"(\d{1,2})\s?%\s?off", t, re.I):
         pct = int(m.group(1))
@@ -271,16 +273,37 @@ def direct_url(u):
     return u
 
 
+def domain_store(dom):
+    """bestbuy -> Best Buy, homedepot -> Home Depot, else Capitalized."""
+    names = {"bestbuy": "Best Buy", "homedepot": "Home Depot", "lowes": "Lowe's", "samsclub": "Sam's Club", "ebay": "eBay",
+             "bhphotovideo": "B&H", "acehardware": "Ace Hardware", "microcenter": "Micro Center"}
+    return names.get(dom.lower(), dom.capitalize())
+
+
+def click_store(click):
+    """Slickdeals click links carry the store name (trd=Amazon)."""
+    t = (parse_qs(urlparse(click).query).get("trd") or [""])[0] if click else ""
+    if m := re.match(r"https?\W+(?:www\W+)?([a-z0-9-]+)\W+(?:com|net|org)\b", t, re.I):  # trd is sometimes the store URL
+        return domain_store(m.group(1))
+    return t if 1 < len(t) <= 30 and not re.search(r"\d|deal|image|trial|coupon|here", t, re.I) else ""
+
+
 def to_deal(entry, source):
     title = html.unescape(entry.get("title", "")).strip()
     summary = (entry.get("summary") or "") + " ".join(c.get("value", "") for c in entry.get("content", []))
     link = entry.get("link", "")
     buy = link
-    for l in (html.unescape(x) for x in re.findall(r'href="([^"]+)"', summary)):
+    hrefs = [html.unescape(x) for x in re.findall(r'href="([^"]+)"', summary)]
+    for l in hrefs:
         l = direct_url(l) if "/click" in l else l
         if re.search(STORE_DOMAINS, l):
             buy = l
             break
+    # Slickdeals' own "go to store" link: bots get 403, but in your phone's browser it lands on the store page.
+    click = next((l for l in hrefs if "slickdeals.net/click" in l), None)
+    if buy == link and click:
+        buy = click
+    img = next(iter(re.findall(r'<img[^>]+src="([^"]+)"', summary)), None) or (entry.get("media_content") or [{}])[0].get("url")
     plain = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.unescape(summary)))
     price, reg, pct = parse_prices(title + " " + plain[:400])
     pub = entry.get("published_parsed") or entry.get("updated_parsed")
@@ -288,7 +311,10 @@ def to_deal(entry, source):
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
             "title": title, "source": source, "thread": link, "buy": buy,
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
-            "store": store_of(title, plain), "tl": title.lower(), "text": (title + " " + plain[:600]).lower(),
+            "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
+            or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else ""),
+            "image": html.unescape(img) if img else None, "pub": calendar.timegm(pub) if pub else None,
+            "tl": title.lower(), "text": (title + " " + plain[:600]).lower(),
             "tags": " ".join(t.get("term", "") for t in entry.get("tags", [])).lower(),
             "age_h": (time.time() - calendar.timegm(pub)) / 3600 if pub else None}
 
@@ -300,7 +326,7 @@ SAFE_PHRASES = re.compile(r"\b(dishwasher|oven|microwave|freezer|dryer)[- ]safe\
 # Phrases that contain a blocked word but aren't what the block is for:
 # "robot vacuum for pet hair" isn't a pet product; "patio set with cushions" isn't a lone cushion.
 BLOCK_SAFE = re.compile(r"\bpet[- ]hair\b|\b(?:for|with) (?:pets?|dogs?|cats?)\b(?=.*\bvac)|\banimal\b"
-                        r"|\bwith (?:\w+ )?(?:cushions?|covers?)\b|\b(?:charging|wireless) case\b")
+                        r"|(?:\bwith|\bw/)\s*(?:\w+ )?(?:cushions?|covers?)\b|\b(?:charging|wireless) case\b")
 
 
 # AI note-taker titles often say "w/ magnetic case" or "+ 1-yr subscription" — those aren't phone cases or subs.
@@ -341,6 +367,17 @@ def watch_hit(d, cfg):
     return None
 
 
+def wish_kw(d, cfg):
+    """The wish-list word this deal matched (your /add picks first), or None."""
+    tl = SAFE_PHRASES.sub(" ", d["tl"])
+    for name in ("custom", "wishlist"):
+        c = cfg["categories"].get(name)
+        if c and c.get("enabled", True):
+            if k := next((k for k in sorted(c.get("keywords", []), key=len, reverse=True) if has(k, tl)), None):
+                return k
+    return None
+
+
 def prize_ok(d, cfg, c):
     """Giveaways: only prizes you'd want — your categories' items, or big cash / store gift cards."""
     if any(re.search(p, d["tl"]) for p in c.get("prize_patterns", [])):
@@ -372,7 +409,12 @@ def passes(d, cfg, relaxed=False):
         return False, "under min price"
     if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
         return False, "small discount"
-    if d["thumbs"] is not None and d["thumbs"] < cfg.get("min_thumbs", -999):
+    min_th = cfg.get("min_thumbs", -999)
+    wl = cfg.get("wishlist_alerts") or {}
+    if (d.get("wish") or d.get("watch")) and (d["age_h"] if d["age_h"] is not None else 99) <= wl.get("fresh_hours", 3):
+        # fresh wish-list post: don't wait for the crowd to vote it up (older ones must have earned their votes)
+        min_th = min(min_th, (cfg.get("wishlist_alerts") or {}).get("min_thumbs", min_th))
+    if d["thumbs"] is not None and d["thumbs"] < min_th:
         return False, "low votes"
     return True, ""
 
@@ -412,31 +454,75 @@ def check_store(url):
     return "unknown", f"{host}: no stock data"
 
 
+def source_check(thread):
+    """What the deal site itself says about the deal: ('dead' | 'live' | None, page html)."""
+    try:
+        r = HTTP.get(thread, timeout=20)
+    except Exception:
+        return None, ""
+    if r.status_code in (404, 410):
+        return "dead", ""
+    if r.status_code != 200:
+        return None, ""
+    page = r.text[:1_500_000]
+    if "slickdeals.net" in thread:  # every thread page states isExpiredDeal Yes/No
+        tid = re.search(r"/f/(\d+)", thread)
+        m = (tid and re.search(r'"isExpiredDeal"\s*:\s*"(Yes|No)"\s*,\s*"threadId"\s*:\s*' + tid.group(1), page)) \
+            or re.search(r'"isExpiredDeal"\s*:\s*"(Yes|No)"', page)
+        return ({"Yes": "dead", "No": "live"}[m.group(1)] if m else None), page
+    if "dealnews.com" in thread:
+        text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", page[:400000], flags=re.S))
+        return ("dead" if PAGE_EXPIRED.search(text[:20000]) else "live"), page
+    return None, page
+
+
+def resolve_click(u):
+    """DealNews click pages hop through a JS redirect to the store. Follow it to the real product page."""
+    try:
+        m = re.search(r"location\.replace\('([^']+)'\)", HTTP.get(u, timeout=15).text[:3000])
+        if not m:
+            return None
+        r = HTTP.get(m.group(1), timeout=15, allow_redirects=True)
+        for final in [r.url] + [h.headers.get("location", "") for h in reversed(r.history)]:
+            if re.search(STORE_DOMAINS, urlparse(final).netloc + ".") and len(final) < 1500 \
+                    and not re.search(r"/blocked|captcha|/errors?/", final, re.I):
+                return final
+    except Exception:
+        pass
+    return None
+
+
 def resolve_and_verify(d):
-    # Check 1: the deal page itself (DealNews pages are reachable; Slickdeals blocks bots)
-    if "dealnews.com" in d["thread"]:
-        try:
-            page = HTTP.get(d["thread"], timeout=20).text
-            text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", page[:400000], flags=re.S))
-            if PAGE_EXPIRED.search(text[:20000]):
-                return "dead", "DealNews: expired"
-            for l in re.findall(r'href="([^"]+)"', page):
-                l = html.unescape(l)
-                if re.search(STORE_DOMAINS, l) or "/lw/click" in l:
-                    d["buy"] = ("https://www.dealnews.com" + l) if l.startswith("/") else l
-                    break
-        except Exception:
-            pass
-    if d["buy"] == d["thread"] or "slickdeals.net" in d["buy"]:
-        return "unknown", "store link hidden by source"
-    # Check 2: the store page, twice if it says in stock
-    status, why = check_store(d["buy"])
-    if status == "in_stock":
-        time.sleep(1.5)
-        s2, w2 = check_store(d["buy"])
-        if s2 != "in_stock":
-            return s2, f"2nd check: {w2}"
-    return status, why
+    site = "Slickdeals" if "slickdeals.net" in d["thread"] else "DealNews" if "dealnews.com" in d["thread"] else "source"
+    # Check 1: the deal site's own page — is the deal still marked active?
+    src, page = source_check(d["thread"]) if d["thread"].startswith("http") else (None, "")
+    if src == "dead":
+        return "dead", f"{site}: marked expired"
+    if page:
+        if m := re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', page[:200000]):
+            d["image_hd"] = html.unescape(m.group(1))
+    store_url = d["buy"] if re.search(STORE_DOMAINS, urlparse(d["buy"]).netloc + ".") else None
+    if site == "DealNews" and page:
+        for l in re.findall(r'href="([^"]+)"', page):
+            l = html.unescape(l)
+            if re.search(STORE_DOMAINS, l) or "/lw/click" in l:
+                d["buy"] = ("https://www.dealnews.com" + l) if l.startswith("/") else l
+                store_url = d["buy"] if "/lw/click" not in l else resolve_click(d["buy"])
+                break
+    # Check 2: the store page (where the store lets bots look), twice if it says in stock
+    if store_url:
+        status, why = check_store(store_url)
+        if status == "in_stock":
+            time.sleep(1.5)
+            status, why = check_store(store_url)
+            why = why if status == "in_stock" else f"2nd check: {why}"
+        if status == "in_stock":
+            d["buy"] = store_url  # proven product page: link straight to it
+        if status != "unknown":
+            return status, why
+    if src == "live":
+        return "live", f"{site}: still active"
+    return "unknown", "couldn't verify"
 
 
 # ───────────────────────── price memory ─────────────────────────
@@ -475,11 +561,11 @@ def deal_line(d):
     return f"<b>${d['price']:,.0f}</b>{pct} {link}"
 
 
-def send_text(text, dry, buttons=None, preview=None):
+def send_text(text, dry, buttons=None, preview=None, silent=False):
     if dry:
         log("\n" + html.unescape(re.sub(r"<[^>]+>", "", text)) + (f"\n  [BUY] {buttons[0]['url']}" if buttons else ""))
         return True
-    p = {"chat_id": TG_CHAT, "text": text, "parse_mode": "HTML",
+    p = {"chat_id": TG_CHAT, "text": text, "parse_mode": "HTML", "disable_notification": silent,
          "link_preview_options": {"url": preview, "prefer_small_media": True} if preview else {"is_disabled": True}}
     if buttons:
         p["reply_markup"] = {"inline_keyboard": [buttons]}
@@ -510,11 +596,151 @@ def instant_alert(d, cfg, dry, silent=False):
               reply_markup={"inline_keyboard": [btn]}).ok
 
 
-def watch_alert(d, dry):
-    """Only watchlist hits get their own message (photo + Buy button)."""
-    price = f"${d['price']:,.0f}" if d["price"] else ""
-    text = f"🎯 <b>{html.escape(d['watch'])}</b> — {price}\n{html.escape(short(d['title'], 90))}"
-    return send_text(text, dry, buttons=[{"text": "🛒 Buy", "url": d["buy"]}], preview=d["buy"])
+STORE_SEARCH = [
+    ("amazon", "Amazon", "https://www.amazon.com/s?k={q}"), ("walmart", "Walmart", "https://www.walmart.com/search?q={q}"),
+    ("best buy", "Best Buy", "https://www.bestbuy.com/site/searchpage.jsp?st={q}"),
+    ("bestbuy", "Best Buy", "https://www.bestbuy.com/site/searchpage.jsp?st={q}"),
+    ("target", "Target", "https://www.target.com/s?searchTerm={q}"),
+    ("costco", "Costco", "https://www.costco.com/CatalogSearch?keyword={q}"),
+    ("home depot", "Home Depot", "https://www.homedepot.com/s/{q}"), ("lowe", "Lowe's", "https://www.lowes.com/search?searchTerm={q}"),
+    ("ebay", "eBay", "https://www.ebay.com/sch/i.html?_nkw={q}"), ("newegg", "Newegg", "https://www.newegg.com/p/pl?d={q}"),
+    ("wayfair", "Wayfair", "https://www.wayfair.com/keyword.php?keyword={q}"),
+    ("sam's club", "Sam's Club", "https://www.samsclub.com/s/{q}"), ("b&h", "B&H", "https://www.bhphotovideo.com/c/search?q={q}"),
+]
+
+
+def store_search(title, store):
+    """A link that can't expire: search the store (or Google Shopping) for the product. -> (store label, url)"""
+    t = re.sub(r"\([^)]*\)|\[[^\]]*\]", " ", clean_title(title) or title)
+    t = re.sub(r"[,;:]", " ", re.split(r"\s(?:w/|\+|-)\s", t)[0])
+    q = quote_plus(" ".join(t.split()[:9]))
+    for key, label, url in STORE_SEARCH:
+        if key in (store or "").lower():
+            return label, url.format(q=q)
+    return (store or "")[:22], f"https://www.google.com/search?tbm=shop&q={q}"
+
+
+def usd(x):
+    return f"${x:,.0f}" if abs(x - round(x)) < 0.005 else f"${x:,.2f}"
+
+
+def ago(hours):
+    if hours is None:
+        return ""
+    if hours < 1:
+        return f"🟢 {max(1, round(hours * 60))} min ago"
+    return f"{'🟡' if hours < 4 else '🟠'} {hours:.0f}h ago"
+
+
+def card_parts(d, cfg, expired=None):
+    """Caption + buttons for a wish-list card. `expired` = hours the deal lasted, once it's dead."""
+    e = html.escape
+    label, search = store_search(d["title"], d.get("store"))
+    tag = e(d["watch"]) if d.get("watch") else e(d.get("wish") or "")
+    title = e(short(d["title"], 95))
+    price = usd(d["price"]) if d.get("price") else ""
+    if expired is not None:
+        last = f" · lasted ~{expired:.0f}h" if expired >= 1 else ""
+        lines = [f"❌ <b>EXPIRED</b> · {tag}", f"<s>{title}</s>",
+                 f"<s>{price}</s>{' at ' + e(d['store']) if d.get('store') else ''}{last}"]
+        rows = [[{"text": f"🔎 Check {label or 'price'} anyway", "url": search}]]
+    else:
+        money_line = f"💰 <b>{price}</b>" if price else ""
+        if d.get("reg") and d.get("price") and d["reg"] > d["price"]:
+            money_line += f"  <s>{usd(d['reg'])}</s>"
+        if d.get("pct"):
+            money_line += f"  <b>−{d['pct']}%</b>" + (" 🔥" if d["pct"] >= 50 else "")
+        where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
+        site = "Slickdeals" if "slickdeals.net" in d.get("thread", "") else "DealNews"
+        proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
+                 "live": f"✅ Still live on {site}"}.get(d.get("status"), "⚠️ Couldn't verify — tap soon")
+        if d.get("thumbs"):
+            proof += f" · 👍 {d['thumbs']}"
+        proof += f" · {cfg.get('_now', '')}" if cfg.get("_now") else ""
+        low = "📉 Lowest price I've tracked for this" if d.get("hist") else ""
+        head = "WATCH HIT" if d.get("watch") else "WISH LIST"
+        lines = [f"🎯 <b>{head}</b> · {tag}", f"<b>{title}</b>", "", money_line, where, proof, low]
+        rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]}],
+                [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
+    if d.get("thread", "").startswith("http") and d["thread"] != d.get("buy"):
+        rows[-1].append({"text": "💬 Thread", "url": d["thread"]})
+    cap = "\n".join(l for i, l in enumerate(lines) if l or i == 2)
+    return cap.strip(), {"inline_keyboard": rows}
+
+
+def fetch_image(d):
+    """Download the product photo ourselves (bigger version first) so Telegram never fails to fetch it."""
+    urls = [d.get("image_hd"), re.sub(r"/\d{2,3}x\d{2,3}/", "/450x450/", d["image"]) if d.get("image") else None,
+            re.sub(r"\?h=\d+&w=\d+$", "?h=500&w=500", d["image"]) if d.get("image") else None, d.get("image")]
+    for u in dict.fromkeys(u for u in urls if u):
+        try:
+            r = HTTP.get(u, timeout=15)
+            if r.ok and r.headers.get("content-type", "").startswith("image") and 1500 < len(r.content) < 9_000_000:
+                return r.content
+        except Exception:
+            pass
+    return None
+
+
+def send_card(d, cfg, dry, silent=False):
+    """Wish-list deal = its own photo card with Buy button. Returns {'mid', 'photo'} or None."""
+    cap, markup = card_parts(d, cfg)
+    if dry:
+        log("\n┌─ CARD " + "─" * 40 + "\n" + html.unescape(re.sub(r"<[^>]+>", "", cap)) + "\n" +
+            "\n".join("  ".join(f"[{b['text']}]" for b in row) for row in markup["inline_keyboard"]) +
+            f"\n  buy → {d['buy'][:110]}\n  photo → {d.get('image')}\n└" + "─" * 46)
+        return {"mid": 0, "photo": False}
+    try:
+        if img := fetch_image(d):
+            r = HTTP.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=30,
+                          data={"chat_id": TG_CHAT, "caption": cap, "parse_mode": "HTML",
+                                "reply_markup": json.dumps(markup), "disable_notification": "true" if silent else "false"},
+                          files={"photo": ("deal.jpg", img)})
+            if r.ok:
+                return {"mid": r.json()["result"]["message_id"], "photo": True}
+            log(f"  ! sendPhoto {r.status_code}: {r.text[:160]} — falling back to text")
+    except Exception as ex:
+        log(f"  ! photo card failed ({ex.__class__.__name__}) — falling back to text")
+    r = tg("sendMessage", chat_id=TG_CHAT, text=cap, parse_mode="HTML", reply_markup=markup, disable_notification=silent,
+           link_preview_options={"url": d.get("image") or d["buy"], "prefer_large_media": True, "show_above_text": True})
+    if not r.ok:  # last resort: plain text, no preview
+        r = tg("sendMessage", chat_id=TG_CHAT, text=cap, parse_mode="HTML", reply_markup=markup,
+               link_preview_options={"is_disabled": True})
+    try:
+        return {"mid": r.json()["result"]["message_id"], "photo": False} if r.ok else None
+    except Exception:
+        return None
+
+
+def sweep_cards(cards, cfg, dry):
+    """Re-check cards already on your phone; when a deal dies, rewrite its card as ❌ EXPIRED and pull the Buy button."""
+    now = time.time()
+    keep_s = (cfg.get("wishlist_alerts") or {}).get("track_hours", 36) * 3600
+    for k in [k for k, c in cards.items() if now - c["ts"] > keep_s]:
+        del cards[k]
+    live = sorted((c for c in cards.values() if not c.get("dead")), key=lambda c: -c["ts"])[:15]
+    if not live or dry:
+        return 0
+
+    def state(c):
+        src, _ = source_check(c["thread"]) if c.get("thread", "").startswith("http") else (None, "")
+        if src != "dead" and re.search(STORE_DOMAINS, urlparse(c["buy"]).netloc + "."):
+            src = "dead" if check_store(c["buy"])[0] in ("oos", "dead") else src
+        return src
+    with ThreadPoolExecutor(8) as ex:
+        states = list(ex.map(state, live))
+    n = 0
+    for c, s in zip(live, states):
+        if s != "dead":
+            continue
+        cap, markup = card_parts(c, cfg, expired=(now - (c.get("pub") or c["ts"])) / 3600)
+        r = tg("editMessageCaption" if c.get("photo") else "editMessageText", chat_id=TG_CHAT, message_id=c["mid"],
+               parse_mode="HTML", reply_markup=markup, **({"caption": cap} if c.get("photo") else
+                                                           {"text": cap, "link_preview_options": {"is_disabled": True}}))
+        c["dead"] = True  # even if the edit failed (message deleted): don't retry forever
+        n += r.ok
+        log(f"  ❌ marked expired: {c['title'][:60]}")
+    return n
 
 
 def digest(deals, cfg, dry):
@@ -538,7 +764,7 @@ def digest(deals, cfg, dry):
             cur += "\n\n" + b
     chunks.append(cur)
     for ch in chunks:
-        send_text(ch, dry)
+        send_text(ch, dry, silent=cfg.get("digest_silent", False))
     return sent
 
 
@@ -571,6 +797,14 @@ def run(args):
         handle_commands(cfg, st)
     cfg = apply_settings(cfg, st)
     now, seen, prices = time.time(), load_seen(), load_json(PRICES_FILE, {})
+    cards = load_json(CARDS_FILE, {})
+    wl = cfg.get("wishlist_alerts") or {}
+    cfg["_now"] = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).strftime("%-I:%M %p")
+    if not args.feed:
+        try:
+            sweep_cards(cards, cfg, args.dry_run)
+        except Exception as ex:  # never let housekeeping stop the hunt
+            log(f"  ! card sweep failed: {ex!r}")
     strict = cfg.get("stock_policy") == "strict"
     cap = cfg.get("max_deals_per_run", 25)
 
@@ -578,6 +812,7 @@ def run(args):
     cands, ids, skips = [], set(), {}
     feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
     feed_age = {f["name"]: f.get("max_age_hours") for f in cfg.get("feeds", [])}
+    wish_only = {f["name"] for f in cfg.get("feeds", []) if f.get("wish_only")}
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         for e in entries:
@@ -589,6 +824,9 @@ def run(args):
             ids.update((d["id"], pk))  # same deal from two feeds = one line
             d["forced"], d["feed_max_age"] = feed_cat.get(name), feed_age.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
+            d["wish"] = wish_kw(d, cfg)
+            if name in wish_only and not (d["wish"] or d["watch"]):
+                continue  # radar feeds only exist to catch wish-list items early
             ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
             if quiet and not cfg["categories"].get(d["cat"], {}).get("instant"):
                 continue  # leave it unseen for the morning
@@ -603,7 +841,7 @@ def run(args):
     log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
 
     cands.sort(key=lambda d: (not cfg["categories"].get(d["cat"], {}).get("instant"), not d.get("watch"),
-                              -(d["pct"] or 0), -(d["thumbs"] or 0)))
+                              not d.get("wish"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
     cands = cands[: cap * 2]
     if args.feed:
         results = [("in_stock", "offline")] * len(cands)
@@ -617,7 +855,7 @@ def run(args):
         age = f"{d['age_h']:.0f}h" if d["age_h"] is not None else "?"
         log(f"  [{status}] {age} old · {why} — {d['title'][:55]}")
         d["status"] = status
-        if status in ("oos", "dead") or (strict and status != "in_stock"):
+        if status in ("oos", "dead") or (strict and status not in ("in_stock", "live")):
             seen[d["id"]] = now + OOS_RECHECK
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
@@ -628,18 +866,56 @@ def run(args):
         instant_alert(d, cfg, args.dry_run, silent=quiet)
         seen[d["id"]] = now + SENT_TTL
     keep = [d for d in keep if d not in instant]
-    for d in (d for d in keep if d.get("watch")):
-        watch_alert(d, args.dry_run)
-    keep.sort(key=lambda d: (d["status"] != "in_stock", -(d["pct"] or 0), -(d["thumbs"] or 0)))
+    # Wish list + watchlist: each gets its own photo card, freshest first. Overflow rides in the digest.
+    wishes = sorted((d for d in keep if d.get("watch") or d.get("wish")),
+                    key=lambda d: (not d.get("watch"), d["age_h"] if d["age_h"] is not None else 99))
+    n_cards = 0
+    for d in wishes[: wl.get("cards_per_run", 4)]:
+        try:
+            res = send_card(d, cfg, args.dry_run)
+        except Exception as ex:
+            log(f"  ! card failed, leaving it for the digest: {ex!r}")
+            res = None
+        if not res:
+            continue
+        n_cards += 1
+        seen[d["id"]] = now + SENT_TTL
+        keep.remove(d)
+        cards[d["id"]] = {"mid": res["mid"], "photo": res["photo"], "ts": now, "pub": d.get("pub"),
+                          **{k: d.get(k) for k in ("title", "buy", "thread", "store", "price", "watch", "wish")}}
+    keep.sort(key=lambda d: (d["status"] not in ("in_stock", "live"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
     sent = digest(keep, cfg, args.dry_run)
     for d in sent:  # deals that didn't fit stay eligible for the next run
         seen[d["id"]] = now + SENT_TTL
 
-    log(f"Checked {len(cands)}: {tally}. Sent {len(instant)} price mistakes + {len(sent)} in digest.")
+    log(f"Checked {len(cands)}: {tally}. Sent {len(instant)} price mistakes + {n_cards} wish-list cards + {len(sent)} in digest.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
         save_json(SETTINGS_FILE, st)
+        save_json(CARDS_FILE, cards)
+
+
+def demo(src):
+    """Send one real wish-list card right now (newest live match), without touching saved state."""
+    cfg = apply_settings(yaml.safe_load((ROOT / "config.yaml").read_text()), load_json(SETTINGS_FILE, {}))
+    cfg["_now"] = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).strftime("%-I:%M %p")
+    feeds = [("demo", fetch_feed(src))] if src.startswith("http") else all_feeds(cfg)
+    for name, entries in feeds:
+        for e in entries:
+            d = to_deal(e, name)
+            d["forced"] = d["feed_max_age"] = None
+            d["watch"], d["cat"], d["wish"] = watch_hit(d, cfg), categorize(d, cfg), wish_kw(d, cfg)
+            if not (d["wish"] or d["watch"]) or not passes(d, cfg, relaxed=True)[0]:
+                continue
+            d["status"], why = resolve_and_verify(d)
+            log(f"  [{d['status']}] {why} — {d['title'][:70]}")
+            if d["status"] in ("oos", "dead"):
+                continue
+            d["hist"] = ""
+            res = send_card(d, cfg, False)
+            return log(f"Sample card sent: {res}")
+    send_text("🦅 No live wish-list deal right now to show as a sample. The next one will arrive as a card.", False)
 
 
 def main():
@@ -648,10 +924,13 @@ def main():
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--check", metavar="URL")
     ap.add_argument("--feed")
+    ap.add_argument("--demo", nargs="?", const="all", metavar="FEED_URL")
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args()
     if a.check:
         return log(str(check_store(a.check)))
+    if a.demo:
+        return demo(a.demo)
     if a.test:
         return log("OK" if send_text("🦅 <b>DealHawk is live.</b> Send /help for commands.", False) else "FAILED")
     run(a)

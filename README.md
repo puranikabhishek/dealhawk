@@ -7,7 +7,15 @@ Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered b
 - **Sections:** 🔥 Ultra Deals (65%+ off, clearance, price mistakes) · 🔌 Electronics · 🧺 Home Appliances ·
   🎯 Wish List · 🖼️ Home & Room Decor · 🌿 Patio · 🛋️ Furniture · 🏷️ Coupons & Promo Codes · 🆓 Freebies · 🎁 Giveaways
 - **🚨 Price mistakes** get their own instant message with a Buy button, even overnight (silently). Only ones posted in the last 12h.
-- **🎯 Watchlist hits** get their own message with photo + Buy button.
+- **🎯 Wish List + watchlist deals** each get their own **photo card**: price, list price, % off, store, how long ago it
+  was posted (🟢 under 1h · 🟡 under 4h · 🟠 older), and whether it's verified live. Buttons: **🛒 Buy** (straight to the store),
+  **🔎 Search** (store search for the product, a link that can't expire) and **💬 Thread**.
+- **Cards update themselves**: every run re-checks cards sent in the last 36h. When a deal dies the card turns into
+  **❌ EXPIRED** and loses its Buy button, so you never tap a dead link.
+- **Real expiry checks**: Slickdeals and DealNews pages are read on every run; anything marked expired is dropped.
+  DealNews links are followed to the store page for a stock check where the store allows it.
+- **Wish-list radar**: Slickdeals searches for your wish-list items catch new posts within minutes. A fresh wish-list
+  post needs only 2 votes instead of 5.
 - Sold-out/expired deals are dropped and re-checked after 12h.
 
 ## Control it from Telegram
@@ -28,10 +36,12 @@ Commands apply on the next run (within 30 min).
 Slickdeals Frontpage, Popular, Freebies and Sweepstakes; DealNews main, Staff Picks, Electronics, Home & Garden; r/freebies. Edit `feeds` in `config.yaml` to change.
 
 ## Settings
-`config.yaml`: categories, blocked words/stores, min price, quiet hours, `stock_policy` (`balanced` or `strict` = ✅ only).
+`config.yaml`: categories, blocked words/stores, min price, quiet hours, `stock_policy` (`balanced` or `strict` = ✅ only),
+`wishlist_alerts` (cards per run, vote bar, tracking window), `digest_silent` (`true` = only cards and price mistakes buzz).
 
 ## Limits
-Big stores (Amazon, Costco, Walmart, Target) block bots, and Slickdeals hides store links, so many deals show ⚠️. DealHawk drops anything flagged expired or confirmed sold out, but always glance at stock before buying.
+Big stores (Amazon, Costco, Walmart, Target) often block bots, so "✅ Still live" usually means the deal site says it's active, not that the store was checked. Checks happen once per run, so a deal can still die between runs.
 
 ## Manual run
 Actions → DealHawk → Run workflow. Tick "Re-check" to retest deals held as sold-out/unverified.
+Type `yes` in "demo" to get a sample wish-list card. Tick "Dry run" to log what would be sent without sending.
