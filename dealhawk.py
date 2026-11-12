@@ -510,14 +510,25 @@ NOT_STORE = re.compile(r"(?:^|\.)(?:slickdeals\.net|sdimg\.com|dealnews\.com|dln
                        r"tiktok\.com|youtube\.com|youtu\.be|linkedin\.com|google\.com|gstatic\.com|googleapis\.com|"
                        r"wp\.com|wordpress\.com|gravatar\.com|amazon-adsystem\.com|doubleclick\.net|ltk\.com|attn\.tv|"
                        r"bigcrunch\.com|pub\.network|btloader\.com|cloudfront\.net|cloudflare\.com|jsdelivr\.net|"
-                       r"apple\.com/app|podcasts\.apple\.com|t\.co|bsky\.app|threads\.net)$")
+                       r"apple\.com/app|podcasts\.apple\.com|t\.co|bsky\.app|threads\.net|slickdealscdn\.com|"
+                       r"confiant-integrations\.net|googletagmanager\.com|googlesyndication\.com|criteo\.com|"
+                       r"taboola\.com|outbrain\.com|adnxs\.com|rubiconproject\.com|pubmatic\.com|amazonaws\.com)$"
+                       r"|^(?:cdn|static|assets?|img|images|media|ads?|analytics|tags?|pixel|beacon)\d*\.")
 # Redirect/affiliate hosts: follow them to wherever they land.
 HOPS = re.compile(r"(?:^|\.)(?:link\.amazon|amzn\.to|amzn\.com|a\.co|amzlinks\.in|avantlink\.com|dpbolvw\.net|anrdoezrs\.net|"
                   r"jdoqocy\.com|kqzyfj\.com|tkqlhce\.com|emjcd\.com|linksynergy\.com|sjv\.io|pxf\.io|ojrq\.net|"
                   r"evyy\.net|howl\.me|howl\.link|go\.skimresources\.com|go\.redirectingat\.com|shop-links\.co|"
                   r"bit\.ly|tinyurl\.com|goto\.walmart\.com|goto\.target\.com|bestbuy\.7tiv\.net|"
                   r"click\.linksynergy\.com|prf\.hn|awin1\.com|shareasale\.com|rstyle\.me|mavely\.app|"
-                  r"joinhoney\.com|fave\.co|lvmv\.co|ztk5\.net|klarna\.com)$")
+                  r"joinhoney\.com|fave\.co|lvmv\.co|ztk5\.net|klarna\.com|7tiv\.net|bhpho\.to|ebay\.us|"
+                  r"rover\.ebay\.com|walmrt\.us|tgt\.biz|homedepot\.sjv\.io|lowes\.sjv\.io|imp\.i\d+\.net)$")
+# Pages that list many deals rather than THE product. Only OK when the deal itself is a store-wide sale.
+GENERIC_PAGE = re.compile(r"/gp/goldbox|/deals?(?:/|$|\?)|/shop/deals|/black-?friday|/cyber-?monday|/stores/page/|"
+                          r"/s\?|/search|/browse/|/cp/|/b/?\?|/sale/?$|/offers?/?$", re.I)
+SALE_TITLE = re.compile(r"\bsale\b|up to \d+%|\bdeals\b|sitewide|storewide|clearance|\bevent\b|% off (?:select|all|everything)", re.I)
+TITLE_STORES = {"amazon": "amazon.", "walmart": "walmart.", "target": "target.", "best buy": "bestbuy.",
+                "home depot": "homedepot.", "lowe's": "lowes.", "lowes": "lowes.", "costco": "costco.",
+                "sam's club": "samsclub.", "wayfair": "wayfair.", "kohl's": "kohls.", "woot": "woot.", "newegg": "newegg."}
 URL_PARAMS = ("u2", "u", "url", "murl", "destination", "dest", "ued", "ulp", "RD_PARM1", "redirect", "redirect_url", "r")
 REDIRECT_ONLY = re.compile(r"slickdeals\.net/click|dealnews\.com/lw/click")  # pure redirects: a tap goes straight to the store
 
@@ -540,6 +551,7 @@ def unwrap(u):
 def is_store(u):
     h = host(u)
     return u.startswith("http") and "." in h and not NOT_STORE.search(h) and not HOPS.search(h) \
+        and len(urlparse(u).path.strip("/")) > 1 \
         and not re.search(r"\.(?:js|css|png|jpe?g|gif|webp|svg|ico|json|xml)(?:\?|$)", urlparse(u).path, re.I)
 
 
@@ -588,45 +600,66 @@ def link_score(u, d):
     return sc
 
 
+def title_store(d):
+    """Store the deal title names ('… on Walmart.com', '… at Target'), as a domain stub."""
+    tl = d["tl"]
+    hits = [dom for name, dom in TITLE_STORES.items()
+            if re.search(r"\b(?:on|at|@|from|via)\s+" + re.escape(name) + r"(?:\.com)?\b|^" + re.escape(name) + r"\b", tl)]
+    return hits[0] if len(hits) == 1 else None
+
+
 def find_store_link(d, page):
     """Best direct store link for a deal, or None. Checks the feed text first, then the post itself."""
+    want = title_store(d)
+
+    def ok(u):  # right store (when the title names one) and not a page of many deals (unless it's a sale)
+        if want and re.search(STORE_DOMAINS, host(u) + ".") and want not in host(u) + ".":
+            return False
+        return not GENERIC_PAGE.search(urlparse(u).path + "?" + urlparse(u).query) or bool(SALE_TITLE.search(d["title"]))
+
     if is_store(d["buy"]) and not REDIRECT_ONLY.search(d["buy"]):
-        return d["buy"]
+        return d["buy"] if ok(d["buy"]) else None
     raw = list(d.get("hrefs") or [])
-    if page:
+    site = host(d["thread"])
+    if page and "slickdeals.net" in site:  # only the thread's own "See Deal" button
+        if sd := re.search(r'https?:\\?/\\?/slickdeals\.net\\?/click[^"\'\s<>]+', page[:600000]):
+            raw.append(html.unescape(sd.group(0).replace("\\/", "/")))
+    elif page and "dealnews.com" in site:  # only the deal's own buy button (first click-out on the page)
+        raw += [html.unescape(x) for x in re.findall(r'href="([^"]*?/lw/click[^"]*)"', page[:400000])][:1]
+    elif page:
         region, found = body_region(page)
         links = [html.unescape(x) for x in re.findall(r'(?:href|data-href|data-url)="([^"]+)"', region)]
-        if not found:  # whole page = other deals too: only trust the first few outbound links (the main Buy button)
-            links = [x for x in links if (x.startswith("/lw/click") or x.startswith("/click") or
-                                          (x.startswith("http") and (is_store(unwrap(x)) or HOPS.search(host(x))
-                                                                     or REDIRECT_ONLY.search(x))))][:3]
+        if not found:  # whole page = other deals too: only trust the first couple of known-store links
+            links = [x for x in links if x.startswith("http") and
+                     (re.search(STORE_DOMAINS, host(unwrap(x)) + ".") or HOPS.search(host(x)))][:2]
         raw += links
-        if sd := re.search(r'https?:\\?/\\?/slickdeals\.net\\?/click[^"\'\s<>]+', page[:600000]):
-            raw.append(html.unescape(sd.group(0).replace("\\/", "/")))  # the thread's own "See Deal" button
     seen, direct, hops, redirect_only = set(), [], [], []
     for u in raw:
         if not u.startswith("http"):
-            if u.startswith("/lw/click") or u.startswith("/click"):
-                u = urlparse(d["thread"])._replace(path=u.split("?")[0], query=u.split("?", 1)[1] if "?" in u else "").geturl()
+            if u.startswith("/"):
+                u = "https://" + site + u
             else:
                 continue
         u = unwrap(u)
         if u in seen:
             continue
         seen.add(u)
-        if is_store(u):
+        if REDIRECT_ONLY.search(u):
+            redirect_only.append(u)
+        elif is_store(u):
             direct.append(u)
         elif HOPS.search(host(u)):
             hops.append(u)
-        elif REDIRECT_ONLY.search(u):
-            redirect_only.append(u)
+    direct = [u for u in direct if ok(u)]
     if direct:
         return max(direct, key=lambda u: (link_score(u, d), -direct.index(u)))
-    for u in hops[:4] + [x for x in redirect_only if "dealnews" in x][:2]:
-        if final := follow(u):
+    for u in hops[:4] + [x for x in redirect_only if "dealnews" in x][:1]:
+        if (final := follow(u)) and ok(final):
             return final
-    # Slickdeals' own store redirect: bots can't follow it, but on your phone it opens the store page directly.
-    return next((u for u in redirect_only if "slickdeals.net/click" in u), None)
+    # Store redirects bots can't follow (Slickdeals' button, retailer short links): on your phone they
+    # open the store page directly, no deal-site page in between.
+    return next((u for u in redirect_only if "slickdeals.net/click" in u), None) \
+        or next((u for u in hops if not want or want.rstrip(".") in host(u).replace("bhpho", "bhphotovideo")), None)
 
 
 def resolve_and_verify(d):
