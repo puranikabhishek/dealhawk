@@ -64,6 +64,19 @@
   "watch": null,
   "wish": "headphone"
  },
+ "69bc1f0b34643a56": {
+  "buy": "https://www.dealnews.com/lw/click.html?20,2,22385082",
+  "mid": 345,
+  "photo": true,
+  "price": 180.0,
+  "pub": 1794520083,
+  "store": "Guitar Center",
+  "thread": "https://www.dealnews.com/Guitar-Center-Black-Friday-Headphone-Deals-Up-to-40-off-free-shipping/22385082.html?iref=rss-f1682",
+  "title": "Guitar Center Black Friday Headphone Deals: Up to 40% off + free shipping",
+  "ts": 1794522624.2350519,
+  "watch": null,
+  "wish": "headphone"
+ },
  "6fe636afd7e94786": {
   "buy": "https://slickdeals.net/f/20296983-sony-wh-1000xm5-wireless-noise-cancelling-over-the-ear-headphones-4-colors-best-buy-198?utm_source=rss&utm_content=def&utm_medium=RSS2",
   "mid": 327,
@@ -154,6 +167,19 @@
   "ts": 1794499225.1790552,
   "watch": null,
   "wish": "air fryer oven"
+ },
+ "e4e30cf28a89b08f": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=14&trd=Ninja%20Foodi%20Air%20Fryer%207%20Qt%20MegaZ&pv=&au=&u3=MkUpMlYB6s9c2wfw5SqgIo_eJB73GiZqls7N7JlhNcWMB_RHzISrmj1dN_jtzGk75SsmS25u2tc7VjFMc7SPJsM",
+  "mid": 346,
+  "photo": true,
+  "price": 159.99,
+  "pub": 1794352705,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20287011-ninja-foodi-air-fryer-7-qt-megazone-6-in-1-black-dz071-air-fry-roast-broil-bake-reheat-dehydrate-450f-max-2x3-5-qt-baskets-smart-finish-159-99?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "Ninja Foodi Air Fryer, 7 Qt MegaZone, 6-in-1, Black, DZ071 | Air fry, roast, broil, bake, reheat, dehydrate, 450F max, 2x3.5 Qt baskets, Smart Finish $159.99",
+  "ts": 1794522624.2350519,
+  "watch": null,
+  "wish": "air fryer"
  },
  "sample318": {
   "buy": "https://slickdeals.net/f/20293995",
