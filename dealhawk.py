@@ -512,7 +512,7 @@ NOT_STORE = re.compile(r"(?:^|\.)(?:slickdeals\.net|sdimg\.com|dealnews\.com|dln
                        r"bigcrunch\.com|pub\.network|btloader\.com|cloudfront\.net|cloudflare\.com|jsdelivr\.net|"
                        r"apple\.com/app|podcasts\.apple\.com|t\.co|bsky\.app|threads\.net|slickdealscdn\.com|"
                        r"confiant-integrations\.net|googletagmanager\.com|googlesyndication\.com|criteo\.com|"
-                       r"taboola\.com|outbrain\.com|adnxs\.com|rubiconproject\.com|pubmatic\.com|amazonaws\.com)$"
+                       r"taboola\.com|outbrain\.com|myklpages\.com|klaviyo\.com|mailchi\.mp|list-manage\.com|adnxs\.com|rubiconproject\.com|pubmatic\.com|amazonaws\.com)$"
                        r"|^(?:cdn|static|assets?|img|images|media|ads?|analytics|tags?|pixel|beacon)\d*\.")
 # Redirect/affiliate hosts: follow them to wherever they land.
 HOPS = re.compile(r"(?:^|\.)(?:link\.amazon|amzn\.to|amzn\.com|a\.co|amzlinks\.in|avantlink\.com|dpbolvw\.net|anrdoezrs\.net|"
@@ -520,10 +520,10 @@ HOPS = re.compile(r"(?:^|\.)(?:link\.amazon|amzn\.to|amzn\.com|a\.co|amzlinks\.i
                   r"evyy\.net|howl\.me|howl\.link|go\.skimresources\.com|go\.redirectingat\.com|shop-links\.co|"
                   r"bit\.ly|tinyurl\.com|goto\.walmart\.com|goto\.target\.com|bestbuy\.7tiv\.net|"
                   r"click\.linksynergy\.com|prf\.hn|awin1\.com|shareasale\.com|rstyle\.me|mavely\.app|"
-                  r"joinhoney\.com|fave\.co|lvmv\.co|ztk5\.net|klarna\.com|7tiv\.net|bhpho\.to|ebay\.us|"
+                  r"joinhoney\.com|go\.magik\.ly|magik\.ly|fave\.co|lvmv\.co|ztk5\.net|klarna\.com|7tiv\.net|bhpho\.to|ebay\.us|"
                   r"rover\.ebay\.com|walmrt\.us|tgt\.biz|homedepot\.sjv\.io|lowes\.sjv\.io|imp\.i\d+\.net)$")
 # Pages that list many deals rather than THE product. Only OK when the deal itself is a store-wide sale.
-GENERIC_PAGE = re.compile(r"/gp/goldbox|/deals?(?:/|$|\?)|/shop/deals|/black-?friday|/cyber-?monday|/stores/page/|"
+GENERIC_PAGE = re.compile(r"/gp/goldbox|/deals?(?:[-/]|$|\?)|/promotions?(?:[-/]|$)|/coupons?(?:[-/]|$)|/shop/deals|/black-?friday|/cyber-?monday|/stores/page/|"
                           r"/s\?|/search|/browse/|/cp/|/b/?\?|/sale/?$|/offers?/?$", re.I)
 SALE_TITLE = re.compile(r"\bsale\b|up to \d+%|\bdeals\b|sitewide|storewide|clearance|\bevent\b|% off (?:select|all|everything)", re.I)
 TITLE_STORES = {"amazon": "amazon.", "walmart": "walmart.", "target": "target.", "best buy": "bestbuy.",
@@ -613,7 +613,7 @@ def find_store_link(d, page):
     want = title_store(d)
 
     def ok(u):  # right store (when the title names one) and not a page of many deals (unless it's a sale)
-        if want and re.search(STORE_DOMAINS, host(u) + ".") and want not in host(u) + ".":
+        if want and want not in host(u) + ".":  # title says Walmart → only a Walmart link will do
             return False
         return not GENERIC_PAGE.search(urlparse(u).path + "?" + urlparse(u).query) or bool(SALE_TITLE.search(d["title"]))
 
@@ -625,7 +625,7 @@ def find_store_link(d, page):
         if sd := re.search(r'https?:\\?/\\?/slickdeals\.net\\?/click[^"\'\s<>]+', page[:600000]):
             raw.append(html.unescape(sd.group(0).replace("\\/", "/")))
     elif page and "dealnews.com" in site:  # only the deal's own buy button (first click-out on the page)
-        raw += [html.unescape(x) for x in re.findall(r'href="([^"]*?/lw/click[^"]*)"', page[:400000])][:1]
+        raw += [html.unescape(x) for x in re.findall(r'https?://www\.dealnews\.com/lw/click\.html\?[\d,]+', page[:900000])][:1]
     elif page:
         region, found = body_region(page)
         links = [html.unescape(x) for x in re.findall(r'(?:href|data-href|data-url)="([^"]+)"', region)]
