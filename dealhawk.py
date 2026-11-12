@@ -4,7 +4,8 @@ DealHawk 🦅 — free deal sniper for Telegram. $0, zero AI tokens.
 
 Every run:
   1. Reads your Telegram commands (/add, /block, /watch, /off …) and updates settings.
-  2. Pulls fresh, community/editor-curated deal feeds (Slickdeals, DealNews).
+  2. Pulls fresh, community/editor-curated deal feeds (Slickdeals, DealNews, TechBargains, 9to5Toys,
+     Hip2Save, DealCatcher, Reddit r/deals).
   3. Filters by your categories, blocked words/stores, price.
   4. Verifies: source not expired + store page stock check where the store allows it.
   5. Sends 🎯 wish-list deals as their own photo cards (Buy button, marked ❌ EXPIRED when they die)
@@ -68,6 +69,18 @@ TITLE_NOISE = re.compile(r"\s*(?:\+\s*)?(?:free\s+(?:s&h|shipping|store pickup)[
 
 
 # ───────────────────────── small helpers ─────────────────────────
+SITES = {"slickdeals.net": "Slickdeals", "dealnews.com": "DealNews", "9to5toys.com": "9to5Toys",
+         "techbargains.com": "TechBargains", "hip2save.com": "Hip2Save", "dealcatcher.com": "DealCatcher",
+         "reddit.com": "Reddit"}
+# Editor sites whose post pages say so when a deal dies (only ever used to DROP a deal, never to vouch for it).
+EXPIRY_TEXT_SITES = ("9to5toys.com", "hip2save.com", "dealcatcher.com")
+
+
+def site_of(url):
+    host = urlparse(url or "").netloc.lower()
+    return next((n for dom, n in SITES.items() if host == dom or host.endswith("." + dom)), "source")
+
+
 def log(m):
     print(m, flush=True)
 
@@ -473,6 +486,12 @@ def source_check(thread):
     if "dealnews.com" in thread:
         text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", page[:400000], flags=re.S))
         return ("dead" if PAGE_EXPIRED.search(text[:20000]) else "live"), page
+    if any(s in urlparse(thread).netloc for s in EXPIRY_TEXT_SITES):
+        body = page[:400000]
+        body = re.search(r"<article.*?</article>", body, re.S).group(0) if "<article" in body and "</article>" in body else body
+        text = re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>|<style.*?</style>", " ", body, flags=re.S))
+        if PAGE_EXPIRED.search(text[:6000]) or re.search(r'class="[^"]*\bexpired\b', body[:60000], re.I):
+            return "dead", page
     return None, page
 
 
@@ -493,7 +512,7 @@ def resolve_click(u):
 
 
 def resolve_and_verify(d):
-    site = "Slickdeals" if "slickdeals.net" in d["thread"] else "DealNews" if "dealnews.com" in d["thread"] else "source"
+    site = site_of(d["thread"])
     # Check 1: the deal site's own page — is the deal still marked active?
     src, page = source_check(d["thread"]) if d["thread"].startswith("http") else (None, "")
     if src == "dead":
@@ -651,7 +670,7 @@ def card_parts(d, cfg, expired=None):
         if d.get("pct"):
             money_line += f"  <b>−{d['pct']}%</b>" + (" 🔥" if d["pct"] >= 50 else "")
         where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
-        site = "Slickdeals" if "slickdeals.net" in d.get("thread", "") else "DealNews"
+        site = site_of(d.get("thread"))
         proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
                  "live": f"✅ Still live on {site}"}.get(d.get("status"), "⚠️ Couldn't verify — tap soon")
         if d.get("thumbs"):

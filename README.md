@@ -12,6 +12,8 @@ Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered b
   **🔎 Search** (store search for the product, a link that can't expire) and **💬 Thread**.
 - **Cards update themselves**: every run re-checks cards sent in the last 36h. When a deal dies the card turns into
   **❌ EXPIRED** and loses its Buy button, so you never tap a dead link.
+- **Sources:** Slickdeals, DealNews, TechBargains, 9to5Toys, Hip2Save, DealCatcher, Reddit r/deals. Same deal from two
+  sites shows once. Newer boards are capped at 24h old; 9to5Toys/Hip2Save/DealCatcher posts are dropped when marked expired.
 - **Real expiry checks**: Slickdeals and DealNews pages are read on every run; anything marked expired is dropped.
   DealNews links are followed to the store page for a stock check where the store allows it.
 - **Wish-list radar**: Slickdeals searches for your wish-list items catch new posts within minutes. A fresh wish-list

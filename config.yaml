@@ -36,6 +36,13 @@ feeds:
   - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
   - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies, max_age_hours: 24}
   - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways, max_age_hours: 72}
+  # More boards (Nov 2026) — all tested from GitHub's servers. 24h cap since these sites don't flag expiry as reliably.
+  - {name: TechBargains, url: "https://www.techbargains.com/rss.xml", max_age_hours: 24}   # links go straight to the store
+  - {name: 9to5Toys, url: "https://9to5toys.com/feed/", max_age_hours: 24}
+  - {name: 9to5Toys Home, url: "https://9to5toys.com/guides/home-goods/feed/", max_age_hours: 24}
+  - {name: Hip2Save, url: "https://hip2save.com/feed/", max_age_hours: 24}
+  - {name: DealCatcher, url: "https://www.dealcatcher.com/rss", max_age_hours: 24}
+  - {name: Reddit r/deals, url: "https://www.reddit.com/r/deals/new/.rss", max_age_hours: 24}
   # Wish-list radar: newest Slickdeals posts for these searches, minutes after they go up (wish-list matches only).
   - {name: Radar headphones, url: "https://slickdeals.net/newsearch.php?q=noise+cancelling+headphones&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar robot vacuum, url: "https://slickdeals.net/newsearch.php?q=robot+vacuum&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
