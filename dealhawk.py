@@ -5,7 +5,7 @@ DealHawk 🦅 — free deal sniper for Telegram. $0, zero AI tokens.
 Every run:
   1. Reads your Telegram commands (/add, /block, /watch, /off …) and updates settings.
   2. Pulls fresh, community/editor-curated deal feeds (Slickdeals, DealNews, TechBargains, 9to5Toys,
-     Hip2Save, DealCatcher, Reddit r/deals).
+     Hip2Save, Reddit r/deals).
   3. Filters by your categories, blocked words/stores, price.
   4. Verifies: source not expired + store page stock check where the store allows it.
   5. Sends 🎯 wish-list deals as their own photo cards (Buy button, marked ❌ EXPIRED when they die)
@@ -327,7 +327,7 @@ def to_deal(entry, source):
     pub = entry.get("published_parsed") or entry.get("updated_parsed")
     th = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", plain, re.I)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
-            "title": title, "source": source, "thread": link, "buy": buy,
+            "title": title, "source": source, "thread": link, "buy": buy, "hrefs": hrefs,
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
             "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
             or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else "")
@@ -502,48 +502,155 @@ def source_check(thread):
     return None, page
 
 
-def resolve_click(u):
-    """DealNews click pages hop through a JS redirect to the store. Follow it to the real product page."""
+# ───────────────────────── direct store links ─────────────────────────
+# Every Buy button must land on the STORE's page — never a blog post, forum thread or deal-site page.
+NOT_STORE = re.compile(r"(?:^|\.)(?:slickdeals\.net|sdimg\.com|dealnews\.com|dlnws\.com|9to5toys\.com|9to5mac\.com|"
+                       r"9to5google\.com|electrek\.co|hip2save\.com|dealcatcher\.com|techbargains\.com|reddit\.com|"
+                       r"redd\.it|redditmedia\.com|facebook\.com|twitter\.com|x\.com|instagram\.com|pinterest\.com|"
+                       r"tiktok\.com|youtube\.com|youtu\.be|linkedin\.com|google\.com|gstatic\.com|googleapis\.com|"
+                       r"wp\.com|wordpress\.com|gravatar\.com|amazon-adsystem\.com|doubleclick\.net|ltk\.com|attn\.tv|"
+                       r"bigcrunch\.com|pub\.network|btloader\.com|cloudfront\.net|cloudflare\.com|jsdelivr\.net|"
+                       r"apple\.com/app|podcasts\.apple\.com|t\.co|bsky\.app|threads\.net)$")
+# Redirect/affiliate hosts: follow them to wherever they land.
+HOPS = re.compile(r"(?:^|\.)(?:link\.amazon|amzn\.to|amzn\.com|a\.co|amzlinks\.in|avantlink\.com|dpbolvw\.net|anrdoezrs\.net|"
+                  r"jdoqocy\.com|kqzyfj\.com|tkqlhce\.com|emjcd\.com|linksynergy\.com|sjv\.io|pxf\.io|ojrq\.net|"
+                  r"evyy\.net|howl\.me|howl\.link|go\.skimresources\.com|go\.redirectingat\.com|shop-links\.co|"
+                  r"bit\.ly|tinyurl\.com|goto\.walmart\.com|goto\.target\.com|bestbuy\.7tiv\.net|"
+                  r"click\.linksynergy\.com|prf\.hn|awin1\.com|shareasale\.com|rstyle\.me|mavely\.app|"
+                  r"joinhoney\.com|fave\.co|lvmv\.co|ztk5\.net|klarna\.com)$")
+URL_PARAMS = ("u2", "u", "url", "murl", "destination", "dest", "ued", "ulp", "RD_PARM1", "redirect", "redirect_url", "r")
+REDIRECT_ONLY = re.compile(r"slickdeals\.net/click|dealnews\.com/lw/click")  # pure redirects: a tap goes straight to the store
+
+
+def host(u):
+    return urlparse(u).netloc.lower().split(":")[0].removeprefix("www.")
+
+
+def unwrap(u):
+    """Affiliate links often carry the real store URL in a query param (url=, u2=, murl=…)."""
+    for _ in range(3):
+        q = parse_qs(urlparse(u).query)
+        inner = next((q[k][0] for k in URL_PARAMS if q.get(k) and q[k][0].startswith("http")), None)
+        if not inner or host(inner) == host(u):
+            return u
+        u = inner
+    return u
+
+
+def is_store(u):
+    h = host(u)
+    return u.startswith("http") and "." in h and not NOT_STORE.search(h) and not HOPS.search(h) \
+        and not re.search(r"\.(?:js|css|png|jpe?g|gif|webp|svg|ico|json|xml)(?:\?|$)", urlparse(u).path, re.I)
+
+
+def follow(u, depth=0):
+    """Follow redirects (HTTP + the JS/meta kind) and return the store page it lands on, or None."""
+    if depth > 2:
+        return None
     try:
-        m = re.search(r"location\.replace\('([^']+)'\)", HTTP.get(u, timeout=15).text[:3000])
-        if not m:
-            return None
-        r = HTTP.get(m.group(1), timeout=15, allow_redirects=True)
-        for final in [r.url] + [h.headers.get("location", "") for h in reversed(r.history)]:
-            if re.search(STORE_DOMAINS, urlparse(final).netloc + ".") and len(final) < 1500 \
-                    and not re.search(r"/blocked|captcha|/errors?/", final, re.I):
-                return final
+        r = HTTP.get(u, timeout=15, allow_redirects=True)
     except Exception:
-        pass
-    return None
+        return None
+    chain = [r.url] + [h.headers.get("location", "") for h in reversed(r.history)]
+    for final in chain:
+        final = unwrap(final)
+        if is_store(final) and len(final) < 1500 and not re.search(r"/blocked|captcha|/errors?/", final, re.I):
+            return final
+    m = re.search(r"location\.(?:replace|href)\s*[=(]\s*['\"]([^'\"]+)|http-equiv=[\"']refresh[^>]+url=([^\"'>]+)",
+                  r.text[:5000], re.I)
+    return follow(html.unescape(m.group(1) or m.group(2)), depth + 1) if m else None
+
+
+def body_region(page):
+    """Just the post itself — not sidebars, ads or 'related deals'. Returns (html, found_it)."""
+    m = re.search(r'<(?:div|section)[^>]+class="[^"]*\b(?:entry-content|post-content|article-content|article-body|'
+                  r'post-body|content-body|deal-content|thread-content)\b', page)
+    if m:
+        return page[m.start(): m.start() + 80000], True
+    if (a := page.find("<article")) >= 0:
+        e = page.find("</article>", a)
+        return page[a: e if e > 0 else a + 80000], True
+    return page, False
+
+
+def link_score(u, d):
+    """Prefer real product pages, on the store the title names."""
+    p, h = urlparse(u).path.lower(), host(u)
+    sc = 0
+    if re.search(r"/dp/|/gp/product/|/gp/aw/d/|/ip/|/site/.+\.p\b|/p/|/product|/products/|/itm/|/a-|\.html?$|/sku", p):
+        sc += 3
+    if re.search(r"/stores/page/|/s\?|/search|/b/|/browse/|/cp/|/collections?/?$", p + "?" + urlparse(u).query[:3]):
+        sc -= 2
+    if (st := (d.get("store") or "").lower().replace(" ", "")) and st[:5] in h.replace("-", ""):
+        sc += 2
+    elif re.search(r"\b(" + re.escape(h.split(".")[-2]) + r")\b", d["tl"]):
+        sc += 2
+    return sc
+
+
+def find_store_link(d, page):
+    """Best direct store link for a deal, or None. Checks the feed text first, then the post itself."""
+    if is_store(d["buy"]) and not REDIRECT_ONLY.search(d["buy"]):
+        return d["buy"]
+    raw = list(d.get("hrefs") or [])
+    if page:
+        region, found = body_region(page)
+        links = [html.unescape(x) for x in re.findall(r'(?:href|data-href|data-url)="([^"]+)"', region)]
+        if not found:  # whole page = other deals too: only trust the first few outbound links (the main Buy button)
+            links = [x for x in links if (x.startswith("/lw/click") or x.startswith("/click") or
+                                          (x.startswith("http") and (is_store(unwrap(x)) or HOPS.search(host(x))
+                                                                     or REDIRECT_ONLY.search(x))))][:3]
+        raw += links
+        if sd := re.search(r'https?:\\?/\\?/slickdeals\.net\\?/click[^"\'\s<>]+', page[:600000]):
+            raw.append(html.unescape(sd.group(0).replace("\\/", "/")))  # the thread's own "See Deal" button
+    seen, direct, hops, redirect_only = set(), [], [], []
+    for u in raw:
+        if not u.startswith("http"):
+            if u.startswith("/lw/click") or u.startswith("/click"):
+                u = urlparse(d["thread"])._replace(path=u.split("?")[0], query=u.split("?", 1)[1] if "?" in u else "").geturl()
+            else:
+                continue
+        u = unwrap(u)
+        if u in seen:
+            continue
+        seen.add(u)
+        if is_store(u):
+            direct.append(u)
+        elif HOPS.search(host(u)):
+            hops.append(u)
+        elif REDIRECT_ONLY.search(u):
+            redirect_only.append(u)
+    if direct:
+        return max(direct, key=lambda u: (link_score(u, d), -direct.index(u)))
+    for u in hops[:4] + [x for x in redirect_only if "dealnews" in x][:2]:
+        if final := follow(u):
+            return final
+    # Slickdeals' own store redirect: bots can't follow it, but on your phone it opens the store page directly.
+    return next((u for u in redirect_only if "slickdeals.net/click" in u), None)
 
 
 def resolve_and_verify(d):
     site = site_of(d["thread"])
     # Check 1: the deal site's own page — is the deal still marked active?
-    src, page = source_check(d["thread"]) if d["thread"].startswith("http") else (None, "")
+    src, page = source_check(d["thread"]) if d["thread"].startswith("http") and not is_store(d["thread"]) else (None, "")
     if src == "dead":
         return "dead", f"{site}: marked expired"
     if page:
         if m := re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', page[:200000]):
             d["image_hd"] = html.unescape(m.group(1))
-    store_url = d["buy"] if re.search(STORE_DOMAINS, urlparse(d["buy"]).netloc + ".") else None
-    if site == "DealNews" and page:
-        for l in re.findall(r'href="([^"]+)"', page):
-            l = html.unescape(l)
-            if re.search(STORE_DOMAINS, l) or "/lw/click" in l:
-                d["buy"] = ("https://www.dealnews.com" + l) if l.startswith("/") else l
-                store_url = d["buy"] if "/lw/click" not in l else resolve_click(d["buy"])
-                break
+    link = find_store_link(d, page)
+    if not link:
+        return "nolink", f"{site}: no direct store link — not sending"
+    d["buy"] = link
+    if not d.get("store") and is_store(link) and (m := re.search(r"([a-z0-9-]+)\.(?:com|net|co|us)$", host(link))):
+        d["store"] = domain_store(m.group(1))
     # Check 2: the store page (where the store lets bots look), twice if it says in stock
-    if store_url:
-        status, why = check_store(store_url)
+    if is_store(link):
+        status, why = check_store(link)
         if status == "in_stock":
             time.sleep(1.5)
-            status, why = check_store(store_url)
+            status, why = check_store(link)
             why = why if status == "in_stock" else f"2nd check: {why}"
-        if status == "in_stock":
-            d["buy"] = store_url  # proven product page: link straight to it
         if status != "unknown":
             return status, why
     if src == "live":
@@ -688,8 +795,6 @@ def card_parts(d, cfg, expired=None):
         lines = [f"🎯 <b>{head}</b> · {tag}", f"<b>{title}</b>", "", money_line, where, proof, low]
         rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]}],
                 [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
-    if d.get("thread", "").startswith("http") and d["thread"] != d.get("buy"):
-        rows[-1].append({"text": "💬 Thread", "url": d["thread"]})
     cap = "\n".join(l for i, l in enumerate(lines) if l or i == 2)
     return cap.strip(), {"inline_keyboard": rows}
 
@@ -869,7 +974,7 @@ def run(args):
 
     cands.sort(key=lambda d: (not cfg["categories"].get(d["cat"], {}).get("instant"), not d.get("watch"),
                               not d.get("wish"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
-    cands = cands[: cap * 2]
+    cands = cands[: cap * 3]
     if args.feed:
         results = [("in_stock", "offline")] * len(cands)
     else:
@@ -880,9 +985,9 @@ def run(args):
     for d, (status, why) in zip(cands, results):
         tally[status] = tally.get(status, 0) + 1
         age = f"{d['age_h']:.0f}h" if d["age_h"] is not None else "?"
-        log(f"  [{status}] {age} old · {why} — {d['title'][:55]}")
+        log(f"  [{status}] {age} old · {why} — {d['title'][:55]} → {host(d['buy'])}{urlparse(d['buy']).path[:40]}")
         d["status"] = status
-        if status in ("oos", "dead") or (strict and status not in ("in_stock", "live")):
+        if status in ("oos", "dead", "nolink") or (strict and status not in ("in_stock", "live")):
             seen[d["id"]] = now + OOS_RECHECK
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
@@ -937,7 +1042,7 @@ def demo(src):
                 continue
             d["status"], why = resolve_and_verify(d)
             log(f"  [{d['status']}] {why} — {d['title'][:70]}")
-            if d["status"] in ("oos", "dead"):
+            if d["status"] in ("oos", "dead", "nolink"):
                 continue
             d["hist"] = ""
             res = send_card(d, cfg, False)

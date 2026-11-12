@@ -9,11 +9,13 @@ Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered b
 - **🚨 Price mistakes** get their own instant message with a Buy button, even overnight (silently). Only ones posted in the last 12h.
 - **🎯 Wish List + watchlist deals** each get their own **photo card**: price, list price, % off, store, how long ago it
   was posted (🟢 under 1h · 🟡 under 4h · 🟠 older), and whether it's verified live. Buttons: **🛒 Buy** (straight to the store),
-  **🔎 Search** (store search for the product, a link that can't expire) and **💬 Thread**.
+  **🔎 Search** (store search for the product, a link that can't expire).
 - **Cards update themselves**: every run re-checks cards sent in the last 36h. When a deal dies the card turns into
   **❌ EXPIRED** and loses its Buy button, so you never tap a dead link.
-- **Sources:** Slickdeals, DealNews, TechBargains, 9to5Toys, Hip2Save, DealCatcher, Reddit r/deals. Same deal from two
-  sites shows once. Newer boards are capped at 24h old; 9to5Toys/Hip2Save/DealCatcher posts are dropped when marked expired.
+- **Sources:** Slickdeals, DealNews, TechBargains, 9to5Toys, Hip2Save, Reddit r/deals. Same deal from two
+  sites shows once. Newer boards are capped at 24h old; 9to5Toys/Hip2Save posts are dropped when marked expired.
+- **Buy = straight to the store.** DealHawk digs the real store link out of each post (unwrapping affiliate/short links).
+  No direct store link → the deal isn't sent. Never a blog post or forum thread.
 - **Real expiry checks**: Slickdeals and DealNews pages are read on every run; anything marked expired is dropped.
   DealNews links are followed to the store page for a stock check where the store allows it.
 - **Wish-list radar**: Slickdeals searches for your wish-list items catch new posts within minutes. A fresh wish-list
