@@ -16,6 +16,14 @@ max_age_hours: 48              # older deals are usually expired (Slickdeals won
 # balanced = send ✅ + ⚠️ (sold-out/expired always dropped) · strict = ✅ only
 stock_policy: balanced
 
+# 🎯 Wish List + watchlist deals each arrive as their OWN photo card (price, store, age, Buy button),
+# and the card rewrites itself to ❌ EXPIRED when the deal dies. Everything else stays in the digest.
+wishlist_alerts:
+  cards_per_run: 4             # extra wish-list deals in one run ride in the digest instead
+  min_thumbs: 2                # wish-list deals don't wait for 5 votes — you hear sooner
+  track_hours: 36              # how long a sent card keeps getting re-checked for expiry
+digest_silent: false           # true = digest arrives without a buzz, so only 🎯 cards and 🚨 mistakes ping
+
 # Fresh, curated sources (tested from GitHub's servers). `category` forces every item into that section.
 feeds:
   - {name: Slickdeals Frontpage, url: "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1"}
@@ -27,6 +35,11 @@ feeds:
   - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
   - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies, max_age_hours: 24}
   - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways, max_age_hours: 72}
+  # Wish-list radar: newest Slickdeals posts for these searches, minutes after they go up (wish-list matches only).
+  - {name: Radar headphones, url: "https://slickdeals.net/newsearch.php?q=noise+cancelling+headphones&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar robot vacuum, url: "https://slickdeals.net/newsearch.php?q=robot+vacuum&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar patio set, url: "https://slickdeals.net/newsearch.php?q=patio+set&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar AI note taker, url: "https://slickdeals.net/newsearch.php?q=plaud&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 

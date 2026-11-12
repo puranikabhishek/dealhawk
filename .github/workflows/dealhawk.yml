@@ -9,6 +9,14 @@ on:
         description: "Re-check deals held as sold-out/unverified"
         type: boolean
         default: false
+      demo:
+        description: "Send a sample wish-list card (type: yes — or paste a feed URL)"
+        type: string
+        default: ""
+      dry:
+        description: "Dry run: log what would be sent, send nothing"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # lets the run save price history + seen deals back to the repo
@@ -36,5 +44,18 @@ jobs:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
           RECHECK: ${{ inputs.recheck }}
-        run: python probe.py
+          DEMO: ${{ inputs.demo }}
+          DRY: ${{ inputs.dry }}
+        run: |
+          if [ -n "$DEMO" ]; then python dealhawk.py --demo "$( [ "$DEMO" = yes ] && echo all || echo "$DEMO" )"
+          elif [ "$DRY" = "true" ]; then python dealhawk.py --dry-run
+          else python dealhawk.py; fi
 
+      - name: Save state
+        if: ${{ inputs.demo == '' && !inputs.dry }}
+        run: |
+          git config user.name "dealhawk-bot"
+          git config user.email "dealhawk-bot@users.noreply.github.com"
+          git add data/
+          git diff --cached --quiet || git commit -m "state: $(date -u +%F_%H%M)"
+          git push
