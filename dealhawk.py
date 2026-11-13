@@ -1122,7 +1122,8 @@ def run(args):
             f" · alert ${d.get('price') or 0:,.2f} (post ${d.get('title_price') or 0:,.2f})")
         d["status"] = status
         unchecked = d.get("price") and not d.get("price_ok")
-        if unchecked and (d["age_h"] if d["age_h"] is not None else 99) > cfg.get("unchecked_price_max_hours", 8):
+        limit = cfg.get("live_price_max_hours", 24) if status == "live" else cfg.get("unchecked_price_max_hours", 8)
+        if unchecked and (d["age_h"] if d["age_h"] is not None else 99) > limit:
             tally[status] -= 1
             status = d["status"] = "stale"  # store wouldn't show its price and the post is old: price has likely moved
             tally["stale"] = tally.get("stale", 0) + 1
