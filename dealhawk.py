@@ -473,11 +473,11 @@ def store_price(body, h):
     num = r"\$?\s?([\d,]+\.\d{2}|[\d,]+)"
     tries = []
     if "amazon." in h:
-        for anchor in ('id="corePriceDisplay_desktop_feature_div"', 'id="corePrice_feature_div"', 'id="corePrice_desktop"',
-                       'id="apex_desktop"', 'id="price_inside_buybox"', 'id="priceblock_ourprice"'):
-            if (i := body.find(anchor)) >= 0:
-                tries.append(re.search(r'class="a-offscreen">\s*\$\s?([\d,]+\.\d{2})', body[i:i + 6000]))
-        tries.append(re.search(r'"priceAmount"\s*:\s*([\d.]+)', body))
+        # Only the "price to pay" box. Never the struck-through list price, per-unit prices, or other sellers.
+        # If Amazon doesn't show it to us, we don't guess.
+        m = re.search(r'class="a-price[^"]*(?:\bpriceToPay\b|apexPriceToPay)[^"]*"[^>]*>\s*<span class="a-offscreen">\s*\$\s?([\d,]+\.\d{2})', body)
+        return money(m.group(1)) if m and not re.search(r"/\s*(?:count|ounce|oz|fl oz|lb|item|unit)",
+                                                       body[m.end(): m.end() + 400]) else None
     if "walmart." in h:
         tries.append(re.search(r'"priceInfo"\s*:\s*\{.{0,400}?"currentPrice"\s*:\s*\{[^}]*?"price"\s*:\s*([\d.]+)', body, re.S))
     for blob in re.findall(r'<script[^>]+application/ld\+json[^>]*>(.*?)</script>', body, re.S)[:8]:
@@ -698,8 +698,9 @@ def find_store_link(d, page):
         or next((u for u in hops if not want or want.rstrip(".") in host(u).replace("bhpho", "bhphotovideo")), None)
 
 
-COUPON_TITLE = re.compile(r"coupon|clip|\bcode\b|promo|s&s|subscribe ?& ?save|\bprime\b|member|w/ ?card|"
-                          r"in cart|at checkout|after rebate|rebate|bundle|\+ ?free|when you buy|\bbogo\b", re.I)
+COUPON_TITLE = re.compile(r"coupon|clip|\bcode\b|promo|s&s|subscribe ?& ?save|prime (?:exclusive|members?|only|day)|"
+                          r"for prime|member|w/ ?card|"
+                          r"in cart|at checkout|after rebate|rebate|bundle|\+ ?free (?!shipping)|when you buy|\bbogo\b", re.I)
 
 
 def price_verdict(d, sp):
