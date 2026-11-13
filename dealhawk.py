@@ -334,6 +334,8 @@ def to_deal(entry, source):
     img = next(iter(re.findall(r'<img[^>]+src="([^"]+)"', summary)), None) or (entry.get("media_content") or [{}])[0].get("url")
     plain = re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", html.unescape(summary)))
     price, reg, pct = parse_prices(title + " " + plain[:400])
+    if SALE_TITLE.search(title) and "$" not in title:
+        price = reg = None  # a storewide sale has no one price; the summary's $ is shipping/minimums
     pub = entry.get("published_parsed") or entry.get("updated_parsed")
     th = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", plain, re.I)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
@@ -427,6 +429,9 @@ def passes(d, cfg, relaxed=False):
         return False, f"store '{hit}'"
     if re.search(r"expired|out of stock|\boos\b|sold out|dead deal", d["tags"] + " " + d["tl"]):
         return False, "flagged expired"
+    if not d["price"] and not c.get("prize_patterns") and d.get("cat") != "freebies" and \
+            re.search(r"\breview\b|\?|\bhands[- ]on\b|\bfirst look\b|\bmeet the\b|\bannounc|\blaunch", d["tl"]):
+        return False, "article, not a deal"
     mx = d.get("feed_max_age") or cfg.get("max_age_hours")
     if mx and d["age_h"] and d["age_h"] > mx:
         return False, "too old (likely expired)"
@@ -703,10 +708,25 @@ COUPON_TITLE = re.compile(r"coupon|clip|\bcode\b|promo|s&s|subscribe ?& ?save|pr
                           r"in cart|at checkout|after rebate|rebate|bundle|\+ ?free (?!shipping)|when you buy|\bbogo\b", re.I)
 
 
+PRICE_FLAGS = [
+    (r"\bclip\b|\bcoupon\b", "clip coupon"), (r"\bcode\b|promo", "use code"),
+    (r"s&s|subscribe ?& ?save", "Subscribe & Save"), (r"prime (?:exclusive|members?|only)|for prime|\bprime\b price", "Prime price"),
+    (r"in cart|at checkout", "price drops in cart"), (r"rebate", "after rebate"),
+    (r"open[- ]box|renewed|refurb", "open-box/refurb"), (r"\bymmv\b|in[- ]store|select stores", "varies by store"),
+    (r"select (?:colors?|sizes?|styles?)|various colors|\d+ colors", "only some colors"),
+    (r"w/ ?(?:\w+ )?card|cardmember", "with store card"),
+]
+
+
+def price_flags(d):
+    t = d["title"] + " " + d.get("plain", "")[:300]
+    return [note for rx, note in PRICE_FLAGS if re.search(rx, t, re.I)][:2]
+
+
 def price_verdict(d, sp):
     """Make the alert show what the store actually charges. Returns a reason to DROP, or None."""
     tp = d.get("price")
-    d["title_price"] = tp
+    d["price_ok"] = True
     if not tp:
         d["price"] = sp
         return None
@@ -721,13 +741,15 @@ def price_verdict(d, sp):
         return None
     # Store is charging more than the post said.
     if COUPON_TITLE.search(d["title"] + " " + d.get("plain", "")[:300]):
-        d["price_note"] = f"${sp:,.2f} on page · deal price w/ coupon/code"
+        d["price_note"] = f"page shows ${sp:,.2f} before coupon/code"
         return None
+    d["price_ok"] = False
     return f"price went up: post said ${tp:,.2f}, store now ${sp:,.2f} — not sending"
 
 
 def resolve_and_verify(d):
     site = site_of(d["thread"])
+    d["title_price"], d["price_ok"], d["flags"] = d.get("price"), False, price_flags(d)
     # Check 1: the deal site's own page — is the deal still marked active?
     src, page = source_check(d["thread"]) if d["thread"].startswith("http") and not is_store(d["thread"]) else (None, "")
     if src == "dead":
@@ -793,7 +815,9 @@ def deal_line(d):
     if d["cat"] in ("freebies", "giveaways") or not d["price"]:
         return f"• {link}"
     pct = f" <i>−{d['pct']}%</i>" if d["pct"] else ""
-    return f"<b>${d['price']:,.0f}</b>{pct} {link}"
+    tilde = "" if d.get("price_ok") else "~"  # ~ = price from the post; store page didn't let me confirm
+    flag = f" <i>({e(d['flags'][0])})</i>" if d.get("flags") else ""
+    return f"<b>{tilde}${d['price']:,.0f}</b>{pct}{flag} {link}"
 
 
 def send_text(text, dry, buttons=None, preview=None, silent=False):
@@ -810,7 +834,9 @@ def send_text(text, dry, buttons=None, preview=None, silent=False):
 def instant_alert(d, cfg, dry, silent=False):
     """Price mistakes: own message, right away, Buy button + Slickdeals/Reddit thread for proof."""
     c = cfg["categories"][d["cat"]]
-    price = f"<b>${d['price']:,.2f}</b>" if d["price"] else ""
+    price = f"<b>{'' if d.get('price_ok') else '~'}${d['price']:,.2f}</b>" if d["price"] else ""
+    if d.get("flags"):
+        price += f" <i>({html.escape(', '.join(d['flags']))})</i>"
     if d["reg"]:
         price += f" <s>${d['reg']:,.0f}</s>"
     if d["pct"]:
@@ -885,8 +911,11 @@ def card_parts(d, cfg, expired=None):
             money_line += f"  <s>{usd(d['reg'])}</s>"
         if d.get("pct"):
             money_line += f"  <b>−{d['pct']}%</b>" + (" 🔥" if d["pct"] >= 50 else "")
-        if d.get("price_note") and money_line:
-            money_line += f"\n<i>{e(d['price_note'])}</i>"
+        notes = ([d["price_note"]] if d.get("price_note") else []) + list(d.get("flags") or [])
+        if money_line and not d.get("price_ok"):
+            notes.append("price from deal post, not confirmed on store page")
+        if notes and money_line:
+            money_line += f"\n<i>{e(' · '.join(dict.fromkeys(notes)))}</i>"
         where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
         site = site_of(d.get("thread"))
         proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
@@ -1092,7 +1121,13 @@ def run(args):
         log(f"  [{status}] {age} old · {why} — {d['title'][:55]} → {host(d['buy'])}{urlparse(d['buy']).path[:40]}"
             f" · alert ${d.get('price') or 0:,.2f} (post ${d.get('title_price') or 0:,.2f})")
         d["status"] = status
-        if status in ("oos", "dead", "nolink", "pricegone") or (strict and status not in ("in_stock", "live")):
+        unchecked = d.get("price") and not d.get("price_ok")
+        if unchecked and (d["age_h"] if d["age_h"] is not None else 99) > cfg.get("unchecked_price_max_hours", 8):
+            tally[status] -= 1
+            status = d["status"] = "stale"  # store wouldn't show its price and the post is old: price has likely moved
+            tally["stale"] = tally.get("stale", 0) + 1
+            log("     ↳ dropped: price not confirmable and post too old")
+        if status in ("oos", "dead", "nolink", "pricegone", "stale") or (strict and status not in ("in_stock", "live")):
             seen[d["id"]] = now + OOS_RECHECK
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)

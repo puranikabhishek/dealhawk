@@ -15,6 +15,7 @@ max_age_hours: 48              # older deals are usually expired (Slickdeals won
 # ✅ = store page confirmed in stock. ⚠️ = store blocks bots, couldn't check.
 # balanced = send ✅ + ⚠️ (sold-out/expired always dropped) · strict = ✅ only
 stock_policy: balanced
+unchecked_price_max_hours: 8   # store hid its price (Amazon does) → only send if the post is this fresh; '~$' marks it
 
 # 🎯 Wish List + watchlist deals each arrive as their OWN photo card (price, store, age, Buy button),
 # and the card rewrites itself to ❌ EXPIRED when the deal dies. Everything else stays in the digest.
