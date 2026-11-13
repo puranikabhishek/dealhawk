@@ -108,11 +108,21 @@ def has(word, text):
     return re.search(r"(?<![a-z0-9])" + re.escape(str(word).lower()) + r"(?![a-z0-9])", text) is not None
 
 
+NOT_PRICE_AFTER = re.compile(r"\s*(?:off\b|savings?\b|in (?:savings|rewards|credit)|credit|gift ?card|back\b|cash ?back|"
+                             r"rewards?\b|bonus|reward|e?gift|promo|bill credit|instant savings|discount)", re.I)
+NOT_PRICE_BEFORE = re.compile(r"(?:save|saving|savings of|up to|over|nearly|almost|extra|additional|get|earn|receive|"
+                              r"reg\.?|was|list(?: price)?|msrp|orig\.?|originally|normally|value|valued at|worth|"
+                              r"min(?:imum)?\.?|orders? (?:of|over)|spend|purchase of|\$\d+\s*-|w/)\s*:?\s*$", re.I)
+
+
 def parse_prices(t):
-    t = t.replace(" ", " ")
+    t = t.replace("\u00a0", " ")
     price = reg = pct = None
-    if m := re.search(r"\$\s?([\d,]+(?:\.\d{2})?)", t):
+    for m in re.finditer(r"\$\s?([\d,]+(?:\.\d{2})?)", t):
+        if NOT_PRICE_AFTER.match(t, m.end()) or NOT_PRICE_BEFORE.search(t[max(0, m.start() - 25): m.start()]):
+            continue
         price = money(m.group(1))
+        break
     if m := re.search(r"(?:reg\.?|was|list(?: price)?|msrp|orig\.?|originally|normally)\s*:?\s*\$\s?([\d,]+(?:\.\d{2})?)", t, re.I):
         reg = money(m.group(1))
     if m := re.search(r"(\d{1,2})\s?%\s?off", t, re.I):
@@ -327,7 +337,7 @@ def to_deal(entry, source):
     pub = entry.get("published_parsed") or entry.get("updated_parsed")
     th = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", plain, re.I)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
-            "title": title, "source": source, "thread": link, "buy": buy, "hrefs": hrefs,
+            "title": title, "source": source, "thread": link, "buy": buy, "hrefs": hrefs, "plain": plain[:400],
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
             "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
             or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else "")
@@ -458,20 +468,46 @@ def availability(body):
     return "oos" if OOS_TEXT.search(body) else None
 
 
-def check_store(url):
+def store_price(body, h):
+    """The price the STORE is charging right now (buy box), or None if we can't tell."""
+    num = r"\$?\s?([\d,]+\.\d{2}|[\d,]+)"
+    tries = []
+    if "amazon." in h:
+        for anchor in ('id="corePriceDisplay_desktop_feature_div"', 'id="corePrice_feature_div"', 'id="corePrice_desktop"',
+                       'id="apex_desktop"', 'id="price_inside_buybox"', 'id="priceblock_ourprice"'):
+            if (i := body.find(anchor)) >= 0:
+                tries.append(re.search(r'class="a-offscreen">\s*\$\s?([\d,]+\.\d{2})', body[i:i + 6000]))
+        tries.append(re.search(r'"priceAmount"\s*:\s*([\d.]+)', body))
+    if "walmart." in h:
+        tries.append(re.search(r'"priceInfo"\s*:\s*\{.{0,400}?"currentPrice"\s*:\s*\{[^}]*?"price"\s*:\s*([\d.]+)', body, re.S))
+    for blob in re.findall(r'<script[^>]+application/ld\+json[^>]*>(.*?)</script>', body, re.S)[:8]:
+        if re.search(r'"@type"\s*:\s*"(?:Product|Offer|AggregateOffer)"', blob):
+            tries.append(re.search(r'"(?:price|lowPrice)"\s*:\s*"?' + num, blob))
+    tries.append(re.search(r'<meta[^>]+(?:property|name)="(?:product:price:amount|og:price:amount|twitter:data1)"[^>]+content="\$?([\d,.]+)"', body))
+    tries.append(re.search(r'itemprop="price"[^>]+content="([\d,.]+)"', body))
+    for m in tries:
+        if m and (v := money(m.group(1))) and 0.5 < v < 50000:
+            return v
+    return None
+
+
+def check_store(url, want_price=False):
+    def out(status, why, price=None):
+        return (status, why, price) if want_price else (status, why)
     try:
         r = HTTP.get(url, timeout=20, allow_redirects=True)
     except Exception as e:
-        return "unknown", e.__class__.__name__
-    host = urlparse(r.url).netloc.replace("www.", "")
+        return out("unknown", e.__class__.__name__)
+    host_ = urlparse(r.url).netloc.replace("www.", "")
     if r.status_code in (404, 410):
-        return "dead", f"{host} HTTP {r.status_code}"
+        return out("dead", f"{host_} HTTP {r.status_code}")
     body = r.text[:1_500_000]
     if r.status_code >= 400 or BLOCK_TEXT.search(body[:20000]):
-        return "unknown", f"{host} blocks bots ({r.status_code})"
+        return out("unknown", f"{host_} blocks bots ({r.status_code})")
+    price = store_price(body, host_)
     if a := availability(body):
-        return a, f"{host} says {'in stock' if a == 'in_stock' else 'OUT OF STOCK'}"
-    return "unknown", f"{host}: no stock data"
+        return out(a, f"{host_} says {'in stock' if a == 'in_stock' else 'OUT OF STOCK'}", price)
+    return out("unknown", f"{host_}: no stock data", price)
 
 
 def source_check(thread):
@@ -662,6 +698,33 @@ def find_store_link(d, page):
         or next((u for u in hops if not want or want.rstrip(".") in host(u).replace("bhpho", "bhphotovideo")), None)
 
 
+COUPON_TITLE = re.compile(r"coupon|clip|\bcode\b|promo|s&s|subscribe ?& ?save|\bprime\b|member|w/ ?card|"
+                          r"in cart|at checkout|after rebate|rebate|bundle|\+ ?free|when you buy|\bbogo\b", re.I)
+
+
+def price_verdict(d, sp):
+    """Make the alert show what the store actually charges. Returns a reason to DROP, or None."""
+    tp = d.get("price")
+    d["title_price"] = tp
+    if not tp:
+        d["price"] = sp
+        return None
+    if abs(sp - tp) <= max(1.0, 0.03 * tp):
+        d["price"] = sp  # same deal; use the store's exact cents
+        return None
+    if sp < tp:  # even cheaper now
+        d["price"] = sp
+        d["price_note"] = "cheaper now"
+        if d.get("reg") and d["reg"] > sp:
+            d["pct"] = round(100 * (1 - sp / d["reg"]))
+        return None
+    # Store is charging more than the post said.
+    if COUPON_TITLE.search(d["title"] + " " + d.get("plain", "")[:300]):
+        d["price_note"] = f"${sp:,.2f} on page · deal price w/ coupon/code"
+        return None
+    return f"price went up: post said ${tp:,.2f}, store now ${sp:,.2f} — not sending"
+
+
 def resolve_and_verify(d):
     site = site_of(d["thread"])
     # Check 1: the deal site's own page — is the deal still marked active?
@@ -679,11 +742,16 @@ def resolve_and_verify(d):
         d["store"] = domain_store(m.group(1))
     # Check 2: the store page (where the store lets bots look), twice if it says in stock
     if is_store(link):
-        status, why = check_store(link)
+        status, why, sp = check_store(link, want_price=True)
         if status == "in_stock":
             time.sleep(1.5)
-            status, why = check_store(link)
+            status, why, sp2 = check_store(link, want_price=True)
+            sp = sp2 or sp
             why = why if status == "in_stock" else f"2nd check: {why}"
+        if sp and status != "oos" and not SALE_TITLE.search(d["title"]):
+            verdict = price_verdict(d, sp)
+            if verdict:
+                return "pricegone", verdict
         if status != "unknown":
             return status, why
     if src == "live":
@@ -816,6 +884,8 @@ def card_parts(d, cfg, expired=None):
             money_line += f"  <s>{usd(d['reg'])}</s>"
         if d.get("pct"):
             money_line += f"  <b>−{d['pct']}%</b>" + (" 🔥" if d["pct"] >= 50 else "")
+        if d.get("price_note") and money_line:
+            money_line += f"\n<i>{e(d['price_note'])}</i>"
         where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
         site = site_of(d.get("thread"))
         proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
@@ -1018,9 +1088,10 @@ def run(args):
     for d, (status, why) in zip(cands, results):
         tally[status] = tally.get(status, 0) + 1
         age = f"{d['age_h']:.0f}h" if d["age_h"] is not None else "?"
-        log(f"  [{status}] {age} old · {why} — {d['title'][:55]} → {host(d['buy'])}{urlparse(d['buy']).path[:40]}")
+        log(f"  [{status}] {age} old · {why} — {d['title'][:55]} → {host(d['buy'])}{urlparse(d['buy']).path[:40]}"
+            f" · alert ${d.get('price') or 0:,.2f} (post ${d.get('title_price') or 0:,.2f})")
         d["status"] = status
-        if status in ("oos", "dead", "nolink") or (strict and status not in ("in_stock", "live")):
+        if status in ("oos", "dead", "nolink", "pricegone") or (strict and status not in ("in_stock", "live")):
             seen[d["id"]] = now + OOS_RECHECK
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
@@ -1075,7 +1146,7 @@ def demo(src):
                 continue
             d["status"], why = resolve_and_verify(d)
             log(f"  [{d['status']}] {why} — {d['title'][:70]}")
-            if d["status"] in ("oos", "dead", "nolink"):
+            if d["status"] in ("oos", "dead", "nolink", "pricegone"):
                 continue
             d["hist"] = ""
             res = send_card(d, cfg, False)
