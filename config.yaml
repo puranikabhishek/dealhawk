@@ -53,6 +53,9 @@ feeds:
   - {name: Radar file cabinet, url: "https://slickdeals.net/newsearch.php?q=file+cabinet&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar keyboard, url: "https://slickdeals.net/newsearch.php?q=keyboard&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar mouse, url: "https://slickdeals.net/newsearch.php?q=mouse&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar Pixel Tag, url: "https://slickdeals.net/newsearch.php?q=pixel+tag&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar Nest Hub, url: "https://slickdeals.net/newsearch.php?q=nest+hub&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar thermostat, url: "https://slickdeals.net/newsearch.php?q=thermostat&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar AI note taker, url: "https://slickdeals.net/newsearch.php?q=plaud&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
@@ -97,7 +100,11 @@ categories:
                keyboard, keyboards, mechanical keyboard, wireless keyboard, keyboard and mouse, keyboard mouse combo,
                keychron, nuphy, logitech mx keys, mx keys, k380, razer huntsman, corsair k70, akko, epomaker,
                mouse, mice, wireless mouse, gaming mouse, ergonomic mouse, vertical mouse, mx master, mx anywhere,
-               logitech g502, g305, razer deathadder, razer basilisk]
+               logitech g502, g305, razer deathadder, razer basilisk,
+               pixel tag, google pixel tag, find hub tag, find hub tracker, moto tag, chipolo, pebblebee,
+               nest hub, nest hub max, google home display, google home view, google smart display,
+               smart thermostat, nest thermostat, nest learning thermostat, ecobee, ecobee3, thermostat,
+               honeywell t9, honeywell t6, sensi thermostat, amazon smart thermostat]
   electronics:
     title: Electronics
     emoji: "🔌"
