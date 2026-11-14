@@ -5,7 +5,7 @@ Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered b
 ## What you get
 - **One short digest per run**: price, % off, product name (tap to buy). Max 4 per section.
 - **Sections:** 🔥 Ultra Deals (65%+ off, clearance, price mistakes) · 🔌 Electronics · 🧺 Home Appliances ·
-  🎯 Wish List · 🖼️ Home & Room Decor · 🌿 Patio · 🛋️ Furniture · 🏷️ Coupons & Promo Codes · 🆓 Freebies · 🎁 Giveaways
+  🎯 Wish List · 🪴 Room Revamp (budget office makeover: frames, LED strips, puck lights, planter, cable tidy; own $8 price floor) · 🖼️ Home & Room Decor · 🌿 Patio · 🛋️ Furniture · 🏷️ Coupons & Promo Codes · 🆓 Freebies · 🎁 Giveaways
 - **🚨 Price mistakes** get their own instant message with a Buy button, even overnight (silently). Only ones posted in the last 12h.
 - **🎯 Wish List + watchlist deals** each get their own **photo card**: price, list price, % off, store, how long ago it
   was posted (🟢 under 1h · 🟡 under 4h · 🟠 older), and whether it's verified live. Buttons: **🛒 Buy** (straight to the store),

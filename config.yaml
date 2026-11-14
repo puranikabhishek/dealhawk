@@ -57,6 +57,10 @@ feeds:
   - {name: Radar Pixel Tag, url: "https://slickdeals.net/newsearch.php?q=pixel+tag&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar Nest Hub, url: "https://slickdeals.net/newsearch.php?q=nest+hub&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar thermostat, url: "https://slickdeals.net/newsearch.php?q=thermostat&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  # Room Revamp radar (office makeover list) — feeds the 🛠️ Room Revamp section only.
+  - {name: Radar LED strip, url: "https://slickdeals.net/newsearch.php?q=led+strip+lights&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar picture frames, url: "https://slickdeals.net/newsearch.php?q=picture+frames&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar puck lights, url: "https://slickdeals.net/newsearch.php?q=puck+lights&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar AI note taker, url: "https://slickdeals.net/newsearch.php?q=plaud&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
 
 blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
@@ -106,6 +110,24 @@ categories:
                nest hub, nest hub max, google home display, google home view, google smart display,
                smart thermostat, nest thermostat, nest learning thermostat, ecobee, ecobee3, thermostat,
                honeywell t9, honeywell t6, sensi thermostat, amazon smart thermostat]
+  room_revamp:
+    title: Room Revamp
+    emoji: "🪴"
+    radar: true                  # the Room Revamp radar feeds above fill this section
+    min_price: 8                 # these are cheap items — the usual $25 floor would hide them all
+    min_thumbs: 2
+    # Office makeover on a budget (Nov 2026): same paint, same furniture — frames, lights, planter, tidy cables.
+    keywords: [picture frame, picture frames, frame set, gallery wall, gallery frames, gallery wall frames,
+               poster frame, poster frames, photo frame, photo frames, wall art, framed wall art, canvas wall art,
+               led strip, led strip lights, led light strip, light strip, strip lights, strip light,
+               monitor backlight, tv backlight, bias lighting, bias light, monitor light bar, govee,
+               puck lights, puck light, under cabinet lights, under cabinet lighting, cabinet lights,
+               closet lights, shelf lights, display lights,
+               planter, planters, plant pot, plant pots, plant stand, woven basket planter,
+               command strips, picture hanging strips, picture hanging kit, picture hangers,
+               cable management, cable organizer, cable raceway, cable tray, cable clips, cable sleeve,
+               cord organizer, cord hider, wire organizer,
+               bat display, bat wall mount, bat holder, bat rack]
   electronics:
     title: Electronics
     emoji: "🔌"

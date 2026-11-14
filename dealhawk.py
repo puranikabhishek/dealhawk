@@ -366,8 +366,17 @@ NOTE_TAKER = re.compile(r"\b(?:plaud|notepin|ticnote|soundcore work|(?:ai|voice)
 NOTE_TAKER_SAFE = re.compile(r"\b(?:magnetic |charging |carrying |protective )?case\b|\bsubscription\b|\bmembership\b")
 
 
+# Room-revamp items trip the 'cable' / 'monitor' / 'tv' blocks: "cable management tray", "LED strip for TV / monitor".
+ROOM_SAFE = re.compile(r"\bcables?(?= (?:management|organi[sz]er|raceway|tray|clips?|sleeves?|ties|hider|box)\b)")
+ROOM_LIGHT = re.compile(r"\b(?:backlights?|bias light\w*|light ?bar|led strip|strip lights?|light strip)\b")
+ROOM_LIGHT_SAFE = re.compile(r"\b(?:tvs?|monitors?)\b")
+
+
 def block_text(tl):
     tl = BLOCK_SAFE.sub(" ", tl)
+    tl = ROOM_SAFE.sub(" ", tl)
+    if ROOM_LIGHT.search(tl):
+        tl = ROOM_LIGHT_SAFE.sub(" ", tl)
     return NOTE_TAKER_SAFE.sub(" ", tl) if NOTE_TAKER.search(tl) else tl
 
 
@@ -440,11 +449,11 @@ def passes(d, cfg, relaxed=False):
         return False, "stale price mistake"
     if relaxed:
         return True, ""
-    if d["price"] is not None and d["price"] < cfg.get("min_price", 0):
-        return False, "under min price"
+    if d["price"] is not None and d["price"] < c.get("min_price", cfg.get("min_price", 0)):
+        return False, "under min price"  # a section can set its own floor (Room Revamp items are cheap)
     if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
         return False, "small discount"
-    min_th = cfg.get("min_thumbs", -999)
+    min_th = c.get("min_thumbs", cfg.get("min_thumbs", -999))
     wl = cfg.get("wishlist_alerts") or {}
     if (d.get("wish") or d.get("watch")) and (d["age_h"] if d["age_h"] is not None else 99) <= wl.get("fresh_hours", 3):
         # fresh wish-list post: don't wait for the crowd to vote it up (older ones must have earned their votes)
@@ -1090,8 +1099,9 @@ def run(args):
             d["forced"], d["feed_max_age"] = feed_cat.get(name), feed_age.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             d["wish"] = wish_kw(d, cfg)
-            if name in wish_only and not (d["wish"] or d["watch"]):
-                continue  # radar feeds only exist to catch wish-list items early
+            if name in wish_only and not (d["wish"] or d["watch"]
+                                          or cfg["categories"].get(d["cat"], {}).get("radar")):
+                continue  # radar feeds only exist to catch wish-list (and `radar: true` section) items early
             ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
             if quiet and not cfg["categories"].get(d["cat"], {}).get("instant"):
                 continue  # leave it unseen for the morning
