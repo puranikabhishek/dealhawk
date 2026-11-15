@@ -69,7 +69,7 @@ blocked_stores: [aliexpress, temu, shein, wish, dhgate, banggood]
 # relaxed: true = skip price/discount/vote filters (freebies, coupons…). feed_only = filled by feeds above.
 categories:
   price_mistake:
-    title: Price Mistake
+    title: "Price Error: Buy Fast"
     emoji: "🚨"
     instant: true                # own message the moment it's found, even overnight (silent)
     relaxed: true                # new posts have few votes — don't wait for them
@@ -78,13 +78,13 @@ categories:
                '\b(?:possible|potential|likely)\s+(?:pm|price)\b', '\bpm\s*\?', '\bprice glitch\b',
                '\bglitch(?:ed)? price\b', '\berror price\b', '\bpe\s*\?']
   ultra:
-    title: Ultra Deals
+    title: "65%+ Off"
     emoji: "🔥"
     min_pct: 65                  # any deal in your sections at 65%+ off lands here
     keywords: [up to 70% off, up to 75% off,
                up to 80% off, up to 85% off, up to 90% off, clearance]
   wishlist:
-    title: Wish List
+    title: On Your Wish List
     emoji: "🎯"
     keywords: [patio set, patio furniture, patio furniture set, outdoor furniture set, patio dining set,
                patio conversation set, conversation set, outdoor sectional, bistro set, wicker set,
@@ -111,7 +111,7 @@ categories:
                smart thermostat, nest thermostat, nest learning thermostat, ecobee, ecobee3, thermostat,
                honeywell t9, honeywell t6, sensi thermostat, amazon smart thermostat]
   room_revamp:
-    title: Room Revamp
+    title: Office Makeover Picks
     emoji: "🪴"
     radar: true                  # the Room Revamp radar feeds above fill this section
     min_price: 8                 # these are cheap items — the usual $25 floor would hide them all
@@ -129,7 +129,7 @@ categories:
                cord organizer, cord hider, wire organizer,
                bat display, bat wall mount, bat holder, bat rack]
   electronics:
-    title: Electronics
+    title: Tech & Gadgets
     emoji: "🔌"
     keywords: [ssd, nvme, gpu, rtx, radeon, ryzen, bose,
                ipad, tablet, apple watch, smartwatch, kindle, router, mesh wifi,
@@ -143,7 +143,7 @@ categories:
                sonos, marshall, label maker, streaming deck, stream deck, gadget, gadgets,
                mini pc, mac mini, smart ring, oura, fitbit, pixel watch, galaxy watch]
   appliances:
-    title: Home Appliances
+    title: Kitchen & Home Appliances
     emoji: "🧺"
     keywords: [freezer, dishwasher, microwave, gas range,
                electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
@@ -162,14 +162,14 @@ categories:
                chandelier, pendant light, string lights, christmas tree, wreath, holiday decor,
                desk mat, desk organizer, shoe rack, coat rack, wall decor, home decor]
   patio:
-    title: Patio
+    title: Patio & Outdoor
     emoji: "🌿"
     keywords: [patio, outdoor furniture, outdoor sectional, outdoor sofa, conversation set, bistro set,
                adirondack, fire pit, patio umbrella, cantilever umbrella, gazebo, pergola, porch swing,
                outdoor dining, lounge chair, chaise, outdoor loveseat, deck box, wicker, hammock,
                outdoor chair, solar lights]
   furniture:
-    title: Furniture
+    title: Indoor Furniture
     emoji: "🛋️"
     keywords: [standing desk, office chair, gaming chair, herman miller, steelcase, sofa, sectional,
                couch, loveseat, bookshelf, bookcase, recliner, accent chair, coffee table, side table,
@@ -184,13 +184,13 @@ categories:
                'off (?:your|orders?|purchases?)\b', '\$\d+ off \$\d+', 'extra \d+% off', '\bbogo\b',
                '\brebate\b', 'friends (?:&|and) family']
   freebies:
-    title: Freebies
+    title: Free Stuff
     emoji: "🆓"
     relaxed: true
     feed_only: true
     keywords: []
   giveaways:
-    title: Giveaways & Sweepstakes
+    title: Win Prizes
     emoji: "🎁"
     relaxed: true
     feed_only: true

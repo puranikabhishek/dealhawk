@@ -152,6 +152,47 @@ def clean_title(t):
     return re.sub(r"\s{2,}", " ", t).strip(" -–,:+")
 
 
+# Readable product name for links: brand + model + what it is (no prices, colors, specs, store tags).
+TYPES = ["robot vacuum & mop", "robot vacuum and mop", "robot vacuum", "wet dry vacuum mop", "wet dry vacuum",
+         "stick vacuum", "vacuum mop", "vacuum", "over-ear headphones", "over-the-ear headphones", "headphones",
+         "headphone", "earbuds", "air fryer oven", "air fryer", "toaster oven", "mechanical keyboard", "gaming keyboard",
+         "keyboard", "gaming mouse", "wireless mouse", "mouse", "office chair", "office chairs", "desk chair", "chair",
+         "bookcase", "bookshelf", "file cabinet", "filing cabinet", "drawers", "thermostat", "smart display",
+         "voice recorder", "note taker", "patio set", "sectional", "sofa", "speakers", "string lights",
+         "strip lights", "lights", "frames", "tracker", "tv", "monitor", "computer", "controller"]
+
+def product_name(t, n=48):
+    s = t.replace("’", "'")
+    s = re.sub(r"^\s*(?:\[[^\]]{1,30}\]\s*)+", "", s)                        # [Prime] [Open-Box]
+    s = re.sub(r"^\s*\$[\d,.]+\*?\s*[:|\-]\s*", "", s)                      # "$94: " / "$69* | "
+    s = re.sub(r"^\s*[A-Z][\w'&. ]{1,25}?\s+members\s*:\s*", "", s, flags=re.I)  # "Sam's Club Members:"
+    s = re.sub(r"^\s*(?:\[[^\]]{1,30}\]\s*)+", "", s)
+    s = re.sub(r"\s*(?:\+|,)?\s*(?:with\s+)?free\s+(?:s&h|s/h|shipping|store pickup|ship).*$", "", s, flags=re.I)
+    s = re.sub(r"\s+(?:for\s+)?\$[\d,.]+\*?.*$", "", s)                     # price and everything after
+    s = re.sub(r"\s+(?:at|on|from)\s+(?:[A-Z][\w&'.]*\.com|amazon|walmart|target|best buy|home depot|costco|woot|lowe's)\b.*$", "", s, flags=re.I)
+    s = re.sub(r"\b\d[\d,]*\s?(?:pa|db|mah)\b|\b20\d\d\s+new\b", " ", s, flags=re.I)  # spec noise
+    s = re.sub(r"\((?!\w{1,3}\))[^)]*\)|\[[^\]]*\]", " ", s)   # drop (White) (4 Colors), keep model tags like (3a)
+    s = re.sub(r"\s+(?:w/|with)\s.*$|\s*[,;|].*$|\s+-\s+(?=[A-Z][a-z]+(?:/[A-Z][a-z]+)?\s*$).*$", "", s, flags=re.I)  # extras, trailing "- Black"
+    s = re.sub(r"^([A-Z][\w&.']+)\s+-\s+", r"\1 ", s)                       # "Shokz - OpenRun" → "Shokz OpenRun"
+    s = re.sub(r"\b\d[\d,]*\s?(?:pa|db|mah)\b|\b20\d\d\s+new\b", " ", s, flags=re.I)  # spec noise
+    s = re.sub(r"\s{2,}", " ", s).strip(" -–:+*")
+    if len(s) > n:  # keep brand + model, then the product type
+        low = s.lower()
+        typ = next((x for x in TYPES if re.search(rf"\b{re.escape(x)}\b", low)), "")
+        if typ:
+            i = low.find(typ)
+            head = s[:i].split()
+            ty = s[i:i + len(typ)]
+            keep = []
+            for w in head:
+                if len(" ".join(keep + [w, ty])) > n: break
+                keep.append(w)
+            s = " ".join(keep + [ty]) if keep else ty
+        if len(s) > n:
+            s = s[:n].rsplit(" ", 1)[0] + "…"
+    return s[:1].upper() + s[1:] if s else t[:n]
+
+
 def product_key(title):
     t = re.sub(r"[^a-z0-9 ]", " ", clean_title(title).lower())
     return " ".join([w for w in t.split() if w not in {"free", "shipping", "deal", "new", "w", "with", "and"}][:10])
@@ -177,7 +218,7 @@ def apply_settings(cfg, st):
         if c in cats:
             cats[c]["enabled"] = on
     if st.get("custom"):
-        cats = {"custom": {"title": "Your picks", "emoji": "🎯", "keywords": st["custom"]}, **cats}
+        cats = {"custom": {"title": "Your Added Keywords", "emoji": "🎯", "keywords": st["custom"]}, **cats}
     cfg["categories"] = cats
     cfg["exclude_keywords"] = [w for w in cfg.get("exclude_keywords", []) if w not in st.get("unblocked", [])] \
         + st.get("blocked", [])
@@ -813,9 +854,8 @@ def tg(method, **payload):
     return r
 
 
-def short(t, n=46):
-    t = clean_title(t) or t
-    return t if len(t) <= n else t[:n].rsplit(" ", 1)[0] + "…"
+def short(t, n=48):
+    return product_name(t, n)
 
 
 def deal_line(d):
@@ -853,7 +893,7 @@ def instant_alert(d, cfg, dry, silent=False):
     age = f"posted {d['age_h'] * 60:.0f} min ago" if d["age_h"] is not None and d["age_h"] < 1 else \
           (f"posted {d['age_h']:.0f}h ago" if d["age_h"] is not None else "")
     stock = "✅ store shows in stock" if d["status"] == "in_stock" else "⚡ move fast — may already be gone"
-    text = "\n".join(x for x in [f"{c.get('emoji', '🚨')} <b>{c.get('title', 'PRICE MISTAKE').upper()}</b>",
+    text = "\n".join(x for x in [f"{c.get('emoji', '🚨')} <b>{c.get('title', 'Price Error: Buy Fast').upper()}</b>",
                                   html.escape(short(d["title"], 120)), price,
                                   " · ".join(x for x in [age, stock] if x)] if x)
     btn = [{"text": "🛒 Buy now", "url": d["buy"]}]
@@ -907,7 +947,7 @@ def card_parts(d, cfg, expired=None):
     e = html.escape
     label, search = store_search(d["title"], d.get("store"))
     tag = e(d["watch"]) if d.get("watch") else e(d.get("wish") or "")
-    title = e(short(d["title"], 95))
+    title = e(short(d["title"], 60))
     price = usd(d["price"]) if d.get("price") else ""
     if expired is not None:
         last = f" · lasted ~{expired:.0f}h" if expired >= 1 else ""
@@ -933,7 +973,7 @@ def card_parts(d, cfg, expired=None):
             proof += f" · 👍 {d['thumbs']}"
         proof += f" · {cfg.get('_now', '')}" if cfg.get("_now") else ""
         low = "📉 Lowest price I've tracked for this" if d.get("hist") else ""
-        head = "WATCH HIT" if d.get("watch") else "WISH LIST"
+        head = "YOUR TARGET PRICE HIT" if d.get("watch") else "ON YOUR WISH LIST"
         lines = [f"🎯 <b>{head}</b> · {tag}", f"<b>{title}</b>", "", money_line, where, proof, low]
         rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]}],
                 [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
@@ -1029,7 +1069,7 @@ def digest(deals, cfg, dry):
         if group:
             sent += group
             blocks.append(f"{c.get('emoji', '')} <b>{c.get('title', cat)}</b>\n" + "\n".join(deal_line(d) for d in group))
-    chunks, cur = [], f"🦅 <b>{len(sent)} deals</b> · {now}"
+    chunks, cur = [], f"🦅 <b>{len(sent)} checked deals</b> · {now}"
     for b in blocks:
         if len(cur) + len(b) + 2 > TG_LIMIT:
             chunks.append(cur)
