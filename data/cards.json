@@ -1,17 +1,4 @@
 {
- "030a839b197a4c79": {
-  "buy": "https://slickdeals.net/click?lno=13&trd=Sam%20s%20Club&pv=&au=&u3=MrzgNP3r_Q26mqqRDiabOS9xS1ghAFmZyzKPW-8V-vK83GFpo9Fky_k-aCjezzagiFN4rRBMRYFqaVDscJTjaxPGVHbfSCJAZ10",
-  "mid": 434,
-  "photo": true,
-  "price": 129.0,
-  "pub": 1794586460,
-  "store": "Sam's Club",
-  "thread": "https://slickdeals.net/f/20304282-sam-s-club-members-pioneer-karved-series-a70w-wireless-over-ear-headphones-w-hybrid-anc-4-colors-129-free-s-h-on-orders-50?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "Sam's Club Members: Pioneer Karved Series A70W Wireless Over-Ear Headphones w/ Hybrid ANC (4 Colors) $129 + Free S/H On orders $50+",
-  "ts": 1794621622.9187262,
-  "watch": null,
-  "wish": "headphones"
- },
  "1b600ff34483e952": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=22&trd=https%20www%20amazon%20com%20dp%20B0DK4QTR&pv=&au=&u3=MujphRG3LXpBoEt1MOXhBx1ktza-vbjMfSrvMkbCtrqayvYYaS1y5cg-8hBKRrnlOg8VgfPPVaN58H0XM5Bx4RA",
   "mid": 480,
@@ -155,6 +142,19 @@
   "watch": null,
   "wish": "keyboard"
  },
+ "a62ca2f512004447": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=17&trd=Amazon&pv=&au=&u3=Ml0brEoxCjB9Z9qEH9qe02ebNVWUBTF0OxR7VAwIcrvwPtgBHf_bOETK5OVZIJhTJMcUH8YmxLUpNnuqi6gjwWH608EUSZ4XW5vHHC71HOGHTf0",
+  "mid": 494,
+  "photo": true,
+  "price": 399.99,
+  "pub": 1794730410,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20312838-399-99-shark-powerdetect-nevertouch-robot-vacuum-mop-black-av2810ys-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "$399.99 | Shark PowerDetect NeverTouch Robot Vacuum & Mop, Black, AV2810YS at Amazon",
+  "ts": 1794751223.159389,
+  "watch": null,
+  "wish": "robot vacuum"
+ },
  "be9003308322c1f0": {
   "buy": "https://slickdeals.net/click?sdtid=20308671&sdfid=9&sdfib=1&lno=1&trd=Shark%20PowerDetect%20Self%20Empty%20Rob&pv=&au=&u3=MilPVGpiifolyH1TaS4BCb55pYK9RBqEMIrwfoy0mGruasDfbqfwygdnAz70lUZMKTvcJXtUcFYPb8Z_Z_3PQcU",
   "mid": 450,
@@ -222,6 +222,7 @@
  },
  "f5349af2e6f66f17": {
   "buy": "https://slickdeals.net/click?sdtid=20313408&sdfid=9&lno=1&trd=https%20www%20lowes%20com%20pd%20Honeywel%20&pv=&au=&u3=Mxjo88F01zpADyQ4A9q8PzZXvWhxLwdc3rN0kkts0X_4uHnsVohVCnRbzIbVMHiw7b2XVQAKBbe3d9jNHkkpgFRmrjYnlxIHnpm0_CVWaIq-u04lCIW5MF53EmQO1ArDkQv3G9KpIHJMB_D_LPJ7QXfibSWr-mP1u08KvoVT5X5KQdDrNA",
+  "dead": true,
   "mid": 487,
   "photo": true,
   "price": 79.99,
