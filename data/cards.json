@@ -38,19 +38,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "1759c9cfbae0017d": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=22&trd=Amazon&pv=&au=&u3=MlOptCSlRMsCUMXuDwtRvz7YYUdDTt3tM8vxz-Raz0iV4Onuof97Jwdup5_gSKoufpvN02EKKoXia7rCxTfGgNGTIeLjo2oiBbiYgpSTVCV4aJk",
-  "mid": 396,
-  "photo": true,
-  "price": 69.0,
-  "pub": 1794559407,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20302077-69-nothing-ear-3a-wireless-anc-earbuds-4-colors-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "$69* | Nothing Ear (3a) Wireless ANC Earbuds (4 Colors) at Amazon",
-  "ts": 1794587439.4355013,
-  "watch": null,
-  "wish": "earbuds"
- },
  "1b600ff34483e952": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=22&trd=https%20www%20amazon%20com%20dp%20B0DK4QTR&pv=&au=&u3=MujphRG3LXpBoEt1MOXhBx1ktza-vbjMfSrvMkbCtrqayvYYaS1y5cg-8hBKRrnlOg8VgfPPVaN58H0XM5Bx4RA",
   "mid": 480,
@@ -139,32 +126,6 @@
   "thread": "https://slickdeals.net/f/20307240-micro-center-raspberry-pi-400-4gb-all-in-one-keyboard-computer-34-99-free-store-pickup?utm_source=rss&utm_content=&utm_medium=RSS2",
   "title": "[Micro Center] Raspberry Pi 400 4GB All-in-One Keyboard Computer $34.99 + Free Store Pickup",
   "ts": 1794625222.4794338,
-  "watch": null,
-  "wish": "keyboard"
- },
- "501f233287031219": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=18&trd=Amazon&pv=&au=&u3=Mj-_1qyiUP7fbo02Cbx5qb9BoS7m68dq5vdD9Z5AvMBX6dd79pDNBC44Cg-WQQBgSp-7GVqOAkZ49Tpu8me6cpjsCbCxceXE1HZwKHCXSKk6_gc",
-  "mid": 395,
-  "photo": true,
-  "price": 49.0,
-  "pub": 1794559855,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20302134-49-cmf-by-nothing-headphone-pro-anc-wireless-headphones-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "$49* | CMF by Nothing Headphone Pro ANC Wireless Headphones at Amazon",
-  "ts": 1794587439.4355013,
-  "watch": null,
-  "wish": "headphones"
- },
- "5ed1f0edd1dcdf80": {
-  "buy": "https://slickdeals.net/click?lno=9&trd=https%20www%20newegg%20com%20p%20N82E1682%20&pv=&au=&u3=M_MFJWAX_MbmDLDmMLJsz7-N1pZ9iNGja6st1unT8U_gcJ1D7KsqY1mB6FO_XhMYiL8tU0WzkeAKjK9Kmjata5uzRphqPLynurroaVWMGFgEbTKgCA",
-  "mid": 398,
-  "photo": true,
-  "price": 35.99,
-  "pub": 1794588671,
-  "store": "Newegg",
-  "thread": "https://slickdeals.net/f/20304543-rosewill-neon-s75-wireless-mechanical-gaming-keyboard-80-key-layout-w-volume-knob-bluetooth-2-4ghz-usb-c-hot-swappable-brown-switches-rgb-backlit-6000mah-battery-35-99?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Rosewill Neon S75 Wireless Mechanical Gaming Keyboard, 80-Key Layout w/ Volume Knob, Bluetooth / 2.4GHz / USB-C, Hot-Swappable Brown Switches, RGB Backlit, 6000mAh Battery $35.99",
-  "ts": 1794589222.2358248,
   "watch": null,
   "wish": "keyboard"
  },
@@ -427,19 +388,6 @@
   "ts": 1794591029.2124531,
   "watch": null,
   "wish": "earbuds"
- },
- "e6294080a56286c3": {
-  "buy": "https://www.amazon.com/dp/B0DK4QTRF5?lv=shuf&ascsubtag=c06d07yffwe3rvmn2yMd17Y6Cfnz1eOp&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
-  "mid": 394,
-  "photo": true,
-  "price": 313.0,
-  "pub": 1794586469,
-  "store": "Amazon",
-  "thread": "https://www.dealnews.com/products/Roborock/Roborock-F25-Combo-Cordless-Wet-Dry-Vacuum-Cleaner/501531.html?iref=rss",
-  "title": "Roborock F25 Combo 5-in-1 Cordless Wet Dry Vacuum and Mop for $313 + free shipping",
-  "ts": 1794587439.4355013,
-  "watch": null,
-  "wish": "roborock"
  },
  "f2414673a3d994aa": {
   "buy": "https://www.guitarcenter.com/Akai-Professional/MPK-Mini-IV-25-Key-MIDI-Keyboard-Controller-Red-1500000465687.gc",
