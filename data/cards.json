@@ -51,19 +51,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "13b460f3d4d395aa": {
-  "buy": "https://www.amazon.com/dp/B0HNC5PQ65?maas=maas_adg_21274FD82434D118AEBDDA18624E40CA_afap_abs&ref_=aa_maas&tag=maas&ascsubtag=1k6d05vd2umdf5qcdpyCvuVVMRQKSv6X",
-  "mid": 370,
-  "photo": true,
-  "price": 55.0,
-  "pub": 1794568372,
-  "store": "Amazon",
-  "thread": "https://www.dealnews.com/Prouder-Mage-AI-Voice-Recorder-for-55-free-shipping/22389700.html?iref=rss-c142",
-  "title": "Prouder Mage AI Voice Recorder for $55 + free shipping",
-  "ts": 1794574826.3143854,
-  "watch": "AI voice recorder (other brands)",
-  "wish": "ai voice recorder"
- },
  "1759c9cfbae0017d": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=22&trd=Amazon&pv=&au=&u3=MlOptCSlRMsCUMXuDwtRvz7YYUdDTt3tM8vxz-Raz0iV4Onuof97Jwdup5_gSKoufpvN02EKKoXia7rCxTfGgNGTIeLjo2oiBbiYgpSTVCV4aJk",
   "mid": 396,
@@ -77,6 +64,19 @@
   "watch": null,
   "wish": "earbuds"
  },
+ "1b600ff34483e952": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=22&trd=https%20www%20amazon%20com%20dp%20B0DK4QTR&pv=&au=&u3=MujphRG3LXpBoEt1MOXhBx1ktza-vbjMfSrvMkbCtrqayvYYaS1y5cg-8hBKRrnlOg8VgfPPVaN58H0XM5Bx4RA",
+  "mid": 480,
+  "photo": true,
+  "price": 313.0,
+  "pub": 1794678510,
+  "store": "Roborock via Amazon",
+  "thread": "https://slickdeals.net/f/20310075-roborock-f25-combo-wet-dry-vacuum-cleaner-5-in-1-cordless-stick-vacuum-mop-313?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "roborock F25 Combo Wet Dry Vacuum Cleaner, 5-in-1 Cordless Stick Vacuum Mop $313",
+  "ts": 1794706221.4953558,
+  "watch": null,
+  "wish": "roborock"
+ },
  "203010a4733bde50": {
   "buy": "https://www.amazon.com/dp/B0DHV29N1N?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=lr6d06612l6e11bxa0jtHCifzvQanuAR",
   "mid": 379,
@@ -89,6 +89,19 @@
   "ts": 1794576623.3948395,
   "watch": null,
   "wish": "roborock"
+ },
+ "3335a154e7c7a421": {
+  "buy": "https://slickdeals.net/click?sdtid=20311224&sdfid=9&sdfib=1&lno=1&trd=Amazon%20com&pv=&au=&u3=Mg5zgQW3ZMav7EbsPtXoC3N1LX0zOYwAUbOnDOE_7dt0EakkSYNnhaifQehg-nmudN0BgN9CzetSBb_T9KzocLw",
+  "mid": 479,
+  "photo": true,
+  "price": 49.0,
+  "pub": 1794702481,
+  "store": "Amazon.com",
+  "thread": "https://slickdeals.net/f/20311224-49-00-cmf-by-nothing-headphone-pro-wireless-headphones-dark-grey?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "$49.00: CMF by Nothing Headphone Pro Wireless Headphones, Dark Grey",
+  "ts": 1794706221.4953558,
+  "watch": null,
+  "wish": "headphones"
  },
  "3433313d41554757": {
   "buy": "https://www.amazon.com/gp/product/B0GXF7ZQPY/ref=ox_sc_act_title_1?smid=A2NZXCP1D8DIIH&th=1",
@@ -246,19 +259,6 @@
   "watch": null,
   "wish": "earbuds"
  },
- "7a04cebe99c9b58b": {
-  "buy": "https://www.amazon.com/dp/B0F9XXHSCG?tag=toysj-20&psc=1",
-  "mid": 371,
-  "photo": true,
-  "price": 109.0,
-  "pub": 1794573290,
-  "store": "Amazon",
-  "thread": "https://9to5toys.com/2026/11/13/massive-early-black-friday-deal-nothing-headphone-a/",
-  "title": "Massive early Black Friday deal hits the wonderful Nothing Headphone (a) at $109 Amazon low (45% off)",
-  "ts": 1794574826.3143854,
-  "watch": null,
-  "wish": "headphone"
- },
  "7e4dfa4a675e35f8": {
   "buy": "https://www.amazon.com/dp/B0DWX69JVG?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=py6d066132g111bxa0jteu1dDhw7QMok",
   "mid": 378,
@@ -388,19 +388,6 @@
   "ts": 1794666621.5468147,
   "watch": null,
   "wish": "robot vacuum"
- },
- "9fa2d1c00575ee21": {
-  "buy": "https://www.amazon.com/dp/B0DQ7HD168?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=g76d05vd1ik145qcdpyIfralUe2RnwUL",
-  "mid": 373,
-  "photo": true,
-  "price": 150.0,
-  "pub": 1794572796,
-  "store": "Amazon",
-  "thread": "https://www.dealnews.com/products/Roborock/Roborock-F25-GT-Gen-2-Cordless-Wet-and-Dry-Vacuum-Mop/541118.html?iref=rss",
-  "title": "Roborock F25 GT Gen 2 Cordless Wet and Dry Vacuum Mop for $150 + free shipping",
-  "ts": 1794574826.3143854,
-  "watch": null,
-  "wish": "roborock"
  },
  "a3f2b16282f6c5ff": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=13&trd=Amazon&pv=&au=&u3=MiJmS7H2dDJmLsglpS_4uQSrplUK5hcFAdYOnJNAJbDyJdtyJpytbL41vt8ZjsSDyKToIH279lHbejAQ2AkG-g7HhVQLv-gl5hq3H7hHUyFa8-0",
@@ -570,19 +557,6 @@
   "ts": 1794591029.2124531,
   "watch": null,
   "wish": "earbuds"
- },
- "e23c959e2b7dfaef": {
-  "buy": "https://www.amazon.com/dp/B0GXF7ZQPY?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=3p6d05vd16hdl5qcdpyKRahIKuHmzIZg",
-  "mid": 372,
-  "photo": true,
-  "price": 450.0,
-  "pub": 1794572880,
-  "store": "Amazon",
-  "thread": "https://www.dealnews.com/products/Roborock/Roborock-Qrevo-2-Pro-Robot-Vacuum-and-Mop/541135.html?iref=rss",
-  "title": "Roborock Qrevo 2 Pro Robot Vacuum and Mop for $450 + free shipping",
-  "ts": 1794574826.3143854,
-  "watch": null,
-  "wish": "robot vacuum"
  },
  "e6294080a56286c3": {
   "buy": "https://www.amazon.com/dp/B0DK4QTRF5?lv=shuf&ascsubtag=c06d07yffwe3rvmn2yMd17Y6Cfnz1eOp&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
