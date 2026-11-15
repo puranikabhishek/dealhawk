@@ -51,19 +51,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "3e1887f3c223815e": {
-  "buy": "https://www.amazon.com/gp/product/B0DQ7HD168/ref=ox_sc_act_title_1?smid=A2NZXCP1D8DIIH&th=1",
-  "mid": 412,
-  "photo": true,
-  "price": 149.99,
-  "pub": 1794597000,
-  "store": "Amazon",
-  "thread": "https://www.amazon.com/gp/product/B0DQ7HD168/ref=ox_sc_act_title_1?smid=A2NZXCP1D8DIIH&th=1",
-  "title": "Roborock F25 Gen 2 All-in-1 20000Pa Self-Cleaning Wet Dry Vacuum Mop Combo $149.99",
-  "ts": 1794598218.535918,
-  "watch": null,
-  "wish": "roborock"
- },
  "44fcb641ef5a2fc6": {
   "buy": "https://slickdeals.net/click?sdtid=20306385&sdfid=9&sdfib=1&lno=1&trd=White&pv=&au=&u3=MqPojkmiqdF3yR3njeZT36Q6xW4hH6YmhZ7TUXAQbWl4Muxj11F1NXddP225MSRqZ0OnapASLJRrq_dYZKK6B4o",
   "mid": 428,
@@ -181,19 +168,6 @@
   "watch": null,
   "wish": "roborock"
  },
- "9af36118ff1c799d": {
-  "buy": "https://www.amazon.com/dp/B08V57P86Z?",
-  "mid": 410,
-  "photo": true,
-  "price": 59.99,
-  "pub": 1794597900,
-  "store": "Amazon",
-  "thread": "https://www.amazon.com/dp/B08V57P86Z?",
-  "title": "Instant Pot Vortex 5.7Qt 4-in-1 Air Fryer $59.99",
-  "ts": 1794598218.535918,
-  "watch": null,
-  "wish": "air fryer"
- },
  "9f0f3e08a3326d3c": {
   "buy": "https://slickdeals.net/click?sdtid=20308659&sdfid=9&sdfib=1&lno=2&trd=dreame%20Matrix10%20Ultra%20Robot%20Vacu&pv=&au=&u3=MoZTtKjabBFV9hQccOn4FONDRoMh6BhHNyh9KF9M2Z4yku5kYTAnuUwhT6KuA_YZTDGM928ZFJjK_jrSbciEocE",
   "mid": 451,
@@ -245,32 +219,6 @@
   "ts": 1794618032.7196996,
   "watch": null,
   "wish": "air fryer oven"
- },
- "b651afdb7922b596": {
-  "buy": "https://slickdeals.net/click?lno=8&trd=https%20www%20bestbuy%20com%20product%20s%20&pv=&au=&u3=M2JOhSRd-yyW7e2_BX323zuydKyq9L8jJlK7fQ91Vudqq1aHmwabzPFrSsJMtPzTmCNGLEopVcsC7r8Zr0fTF3OohZwnq3VLDnOX7sOnWxgPBhUZvNs8ppak3IsW0E1KGoTL47rxxHVDDme4BRextt8FUbM_h9A3SVupV2-P2mOB2ccz_YZqLV_6BsM6dLatjn5y",
-  "mid": 413,
-  "photo": true,
-  "price": 89.99,
-  "pub": 1794550466,
-  "store": "Best Buy",
-  "thread": "https://slickdeals.net/f/20301585-shokz-openrun-pro-premium-bone-conduction-open-ear-sport-headphones-black-89-99?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "Shokz - OpenRun Pro Premium Bone Conduction Open-Ear Sport Headphones - Black $89.99",
-  "ts": 1794598218.535918,
-  "watch": null,
-  "wish": "headphones"
- },
- "b7d1ba52262b46f8": {
-  "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Best+Buy&sdtid=20305413&tid=20305413&prop=diavail-false%7Cdincp-0%7Cdinpd-0%7Cdipgavail-true&pv=b8969910df9811f1bf9cce82faee081e&au=216fb71d4dcb45b5b982df3de9657024&action_source=Deal+Details+-+Sticky+Bar+CTA",
-  "mid": 411,
-  "photo": true,
-  "price": 48.99,
-  "pub": 1794597693,
-  "store": "",
-  "thread": "https://slickdeals.net/f/20305413-glorious-gmmk-2-prebuilt-65-compact-wired-mechanical-linear-switch-gaming-keyboard-with-hotswappable-switches-white-48-99?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Glorious - GMMK 2 Prebuilt 65% Compact Wired Mechanical Linear Switch Gaming Keyboard with Hotswappable Switches - White $48.99",
-  "ts": 1794598218.535918,
-  "watch": null,
-  "wish": "keyboard"
  },
  "be9003308322c1f0": {
   "buy": "https://slickdeals.net/click?sdtid=20308671&sdfid=9&sdfib=1&lno=1&trd=Shark%20PowerDetect%20Self%20Empty%20Rob&pv=&au=&u3=MilPVGpiifolyH1TaS4BCb55pYK9RBqEMIrwfoy0mGruasDfbqfwygdnAz70lUZMKTvcJXtUcFYPb8Z_Z_3PQcU",
