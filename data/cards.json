@@ -168,19 +168,6 @@
   "watch": null,
   "wish": "keyboard"
  },
- "691fd5b0c7c58c56": {
-  "buy": "https://www.amazon.com/blackfriday?linkCode=sl2&tag=toysj-20&linkId=07919456b6bfbed331079c43ddf84399&language=en_US&ref_=as_li_ss_tl&ascsubtag=srctok-59ff46f0d594e84c&btn_type=ss&btn_ref=srctok-59ff46f0d594e84c",
-  "mid": 392,
-  "photo": true,
-  "price": null,
-  "pub": 1794585464,
-  "store": "Amazon",
-  "thread": "https://9to5toys.com/2026/11/13/apple-new-2026-magic-keyboard-black-friday-deal/",
-  "title": "Apple\u2019s new 2026 Magic Keyboard sitting at all-time low pricing in early Black Friday sale",
-  "ts": 1794585624.717615,
-  "watch": null,
-  "wish": "keyboard"
- },
  "6de73770fcc2df13": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=26&trd=AnkerDirect%20via%20Amazon&pv=&au=&u3=MtN9z_c-UXF_31sJeSbAiqFPN73PKZcWIr7Y1N39YUhac3JAHZobdHw4Oqmyr5uRp8ye-ulRiVIhaZB8niVoSTtHSZ-0MWVch7gnhFqIO8zTk5Jh",
   "mid": 401,
@@ -466,6 +453,19 @@
   "ts": 1794616230.33641,
   "watch": null,
   "wish": "keyboard"
+ },
+ "f56ef24bd2a2a8c9": {
+  "buy": "https://slickdeals.net/click?lno=17&trd=Select%20Best%20Buy%20Locations&pv=&au=&u3=M11b6GI_eoMDV2EurXewO8_gruIj7lOAZnTtC_gQ3gjIaPsfmEPgJl2yvOPI3mPnE9HgZ4W3wDWCbHLr_DDoZ_gL8xizzHgVRtTNROofPuHCYtUl4Y1z0ZnAPP27hz50RZncMGMDPcBgG82bgypdyXljjviLs6pdg0-XYstmwXJz-7i1wgrCOw_UEtY3QFabhrJ1Q2LYsAA7K_sqy3WyTeQ",
+  "mid": 485,
+  "photo": true,
+  "price": 69.99,
+  "pub": 1794715920,
+  "store": "Select Best Buy Locations",
+  "thread": "https://slickdeals.net/f/20311884-open-box-shokz-openfit-2-open-ear-true-wireless-bluetooth-earbuds-stone-blue-69-99-free-store-pickup?utm_source=rss&utm_content=&utm_medium=RSS2",
+  "title": "[Open-Box] Shokz OpenFit 2+ Open-Ear True Wireless Bluetooth Earbuds (Stone Blue) $69.99 + Free Store Pickup",
+  "ts": 1794717021.7249694,
+  "watch": null,
+  "wish": "earbuds"
  },
  "f79dc8d6bda8c5f8": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=20&trd=Amazon&pv=&au=&u3=MiZ8D9JXCWZSgYKh1GlX1oiGaarPfQEeD09Hgh9zYRBFkzYsFwPpYwPELkFTVNo3_OKWze5y-M6N4tvM4qTcx1Q10rOiqqgG601sLoxXuka4InU",
