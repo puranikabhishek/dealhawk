@@ -46,7 +46,8 @@ feeds:
   - {name: Reddit r/deals, url: "https://www.reddit.com/r/deals/new/.rss", max_age_hours: 24}
   # Wish-list radar: newest Slickdeals posts for these searches, minutes after they go up (wish-list matches only).
   - {name: Radar headphones, url: "https://slickdeals.net/newsearch.php?q=noise+cancelling+headphones&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
-  - {name: Radar robot vacuum, url: "https://slickdeals.net/newsearch.php?q=robot+vacuum&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar Ring sensors, url: "https://slickdeals.net/newsearch.php?q=ring+contact+sensor&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
+  - {name: Radar Echo Show, url: "https://slickdeals.net/newsearch.php?q=echo+show&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar patio set, url: "https://slickdeals.net/newsearch.php?q=patio+set&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar air fryer, url: "https://slickdeals.net/newsearch.php?q=air+fryer&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar bookcase, url: "https://slickdeals.net/newsearch.php?q=bookcase&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
@@ -88,8 +89,9 @@ categories:
     emoji: "🎯"
     keywords: [patio set, patio furniture, patio furniture set, outdoor furniture set, patio dining set,
                patio conversation set, conversation set, outdoor sectional, bistro set, wicker set,
-               robot vacuum, robot vac, robovac, robot vacuum mop, roomba, roborock, deebot, ecovacs,
-               dreame, narwal, self-emptying, self emptying,
+               ring contact sensor, ring alarm contact sensor, contact sensor, contact sensors,
+               door sensor, window sensor, door and window sensor, window and door sensor, door/window sensor,
+               echo show, echo show 5, echo show 8, echo show 11, echo show 15, echo show 21,
                headphones, headphone, earbuds, earbud,
                noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
                wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds,
@@ -133,22 +135,22 @@ categories:
     emoji: "🔌"
     keywords: [ssd, nvme, gpu, rtx, radeon, ryzen, bose,
                ipad, tablet, apple watch, smartwatch, kindle, router, mesh wifi,
-               eero, nas, speaker, steam deck, playstation, ps5, xbox, nintendo, switch 2,
+               eero, nas, steam deck, playstation, ps5, xbox, nintendo, switch 2,
                camera, gopro, dji, drone, power station, ecoflow, jackery, power bank, keyboard, mouse,
                projector, security camera, video doorbell, doorbell, ring, arlo, eufy, wyze,
-               blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo, homepod,
+               blink, smart lock, ecobee, nest, thermostat, philips hue, smart plug, echo,
                microphone, webcam, desktop, gaming pc, headset, airtag, tracker, tile,
                meta quest, vr headset, smart glasses, ray-ban meta, e-reader, kobo, remarkable,
-               smart display, echo show, nest hub, dash cam, dashcam, bluetooth speaker, jbl,
-               sonos, marshall, label maker, streaming deck, stream deck, gadget, gadgets,
+               smart display, echo show, nest hub, dash cam, dashcam,
+               label maker, streaming deck, stream deck, gadget, gadgets,
                mini pc, mac mini, smart ring, oura, fitbit, pixel watch, galaxy watch]
   appliances:
     title: Kitchen & Home Appliances
     emoji: "🧺"
     keywords: [freezer, dishwasher, microwave, gas range,
-               electric range, wall oven, air purifier, dehumidifier, humidifier, space heater,
-               air conditioner, window ac, tower fan, robot vacuum, roborock, roomba, shark, dyson,
-               vacuum, carpet cleaner, water heater, water filter, ice maker, air fryer, instant pot,
+               electric range, wall oven, air purifier, dehumidifier, humidifier,
+               air conditioner, window ac, tower fan, dyson,
+               carpet cleaner, water filter, ice maker, air fryer, instant pot,
                pressure cooker, ninja, kitchenaid, stand mixer,
                breville, toaster oven, food processor, rice cooker, sous vide]
   decor:
@@ -260,7 +262,12 @@ exclude_keywords: [
   soundbar, soundbars, sound bar, sound bars, sonos arc, sonos beam, sonos ray, home theater system,
   nba 2k, 2k26, 2k27, madden, ea sports fc, audiobook, audiobooks, apple books, kindle books, kindle unlimited,
   flexstyle, multi-styler, hair dryer, hair straightener, curling iron, hair styler, airwrap,
-  airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges]
+  airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges,
+  # Nov 2026: no vacuums, heaters or speakers
+  vacuum, vacuums, vac, robot vacuum, robovac, roomba, roborock, deebot, ecovacs, narwal, shop vac, shop-vac,
+  heater, heaters, space heater, space heaters, patio heater, water heater, water heaters, hot+cool,
+  speaker, speakers, bluetooth speaker, smart speaker, party speaker, echo dot, echo pop, echo studio,
+  homepod, sonos, jbl, marshall, soundlink, ultimate ears, boombox]
 
 # Built-in watchlist (add more from your phone: /watch dyson v15 400)
 watchlist:
@@ -280,6 +287,29 @@ watchlist:
   - name: AI voice recorder (other brands)
     keywords: [ai, recorder]
     max_price: 99
+  # Ring door/window sensors — past lows: 6-pk $28–30, 2-pk $16, single $11
+  - name: Ring contact sensors
+    keywords: [ring, contact sensor]
+    max_price: 35
+  - name: Ring contact sensors
+    keywords: [ring, contact sensors]
+    max_price: 35
+  # Echo Show — caps near past Black Friday lows
+  - name: Echo Show 5
+    keywords: [echo show 5]
+    max_price: 55
+  - name: Echo Show 8
+    keywords: [echo show 8]
+    max_price: 110
+  - name: Echo Show 11
+    keywords: [echo show 11]
+    max_price: 150
+  - name: Echo Show 15
+    keywords: [echo show 15]
+    max_price: 240
+  - name: Echo Show 21
+    keywords: [echo show 21]
+    max_price: 320
   - name: Milwaukee M18 combo kit
     keywords: [milwaukee, m18, kit]
     max_price: 250

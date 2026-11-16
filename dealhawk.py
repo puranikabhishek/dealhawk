@@ -153,12 +153,11 @@ def clean_title(t):
 
 
 # Readable product name for links: brand + model + what it is (no prices, colors, specs, store tags).
-TYPES = ["robot vacuum & mop", "robot vacuum and mop", "robot vacuum", "wet dry vacuum mop", "wet dry vacuum",
-         "stick vacuum", "vacuum mop", "vacuum", "over-ear headphones", "over-the-ear headphones", "headphones",
+TYPES = ["contact sensors", "contact sensor", "over-ear headphones", "over-the-ear headphones", "headphones",
          "headphone", "earbuds", "air fryer oven", "air fryer", "toaster oven", "mechanical keyboard", "gaming keyboard",
          "keyboard", "gaming mouse", "wireless mouse", "mouse", "office chair", "office chairs", "desk chair", "chair",
          "bookcase", "bookshelf", "file cabinet", "filing cabinet", "drawers", "thermostat", "smart display",
-         "voice recorder", "note taker", "patio set", "sectional", "sofa", "speakers", "string lights",
+         "voice recorder", "note taker", "patio set", "sectional", "sofa", "string lights",
          "strip lights", "lights", "frames", "tracker", "tv", "monitor", "computer", "controller"]
 
 def product_name(t, n=48):
@@ -413,8 +412,15 @@ ROOM_LIGHT = re.compile(r"\b(?:backlights?|bias light\w*|light ?bar|led strip|st
 ROOM_LIGHT_SAFE = re.compile(r"\b(?:tvs?|monitors?)\b")
 
 
+# Echo Show titles often say "smart display with speaker" — that's not a standalone speaker.
+ECHO_SHOW = re.compile(r"\becho show\b")
+ECHO_SHOW_SAFE = re.compile(r"\b(?:smart |stereo |premium )?speakers?\b")
+
+
 def block_text(tl):
     tl = BLOCK_SAFE.sub(" ", tl)
+    if ECHO_SHOW.search(tl):
+        tl = ECHO_SHOW_SAFE.sub(" ", tl)
     tl = ROOM_SAFE.sub(" ", tl)
     if ROOM_LIGHT.search(tl):
         tl = ROOM_LIGHT_SAFE.sub(" ", tl)
@@ -490,8 +496,8 @@ def passes(d, cfg, relaxed=False):
         return False, "stale price mistake"
     if relaxed:
         return True, ""
-    if d["price"] is not None and d["price"] < c.get("min_price", cfg.get("min_price", 0)):
-        return False, "under min price"  # a section can set its own floor (Room Revamp items are cheap)
+    if d["price"] is not None and not d.get("watch") and d["price"] < c.get("min_price", cfg.get("min_price", 0)):
+        return False, "under min price"  # a section can set its own floor; watchlist hits have their own price cap
     if d["pct"] is not None and d["pct"] < cfg.get("min_discount_pct", 0):
         return False, "small discount"
     min_th = c.get("min_thumbs", cfg.get("min_thumbs", -999))
