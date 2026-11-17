@@ -66,6 +66,7 @@
  },
  "1d6c0b045dcfaddf": {
   "buy": "https://www.costco.com/p/-/1926991",
+  "dead": true,
   "mid": 595,
   "photo": true,
   "price": 110.0,
@@ -350,19 +351,6 @@
   "watch": null,
   "wish": "bookshelf"
  },
- "830baf59641433bc": {
-  "buy": "https://slickdeals.net/click?sdtid=20313297&sdfid=9&sdfib=1&lno=2&trd=Amazon&pv=&au=&u3=MqmS-hmmkoQi2-KBDUtfUBRa5lBxzVqPlM2VhUiHIjyG1mzTiruAm1RMbf9dNCNi4O_sQXjzGa_7EMa9R4sQlcXRc_sQoBN-EPqU9qhKVRbQKM8",
-  "mid": 488,
-  "photo": true,
-  "price": 59.99,
-  "pub": 1794737354,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20313297-59-99-razer-deathadder-v3-hyperspeed-ergonomic-wireless-gaming-mouse-55g-black-at-amazon?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "$59.99 | Razer DeathAdder V3 HyperSpeed Ergonomic Wireless Gaming Mouse, 55g, Black at Amazon",
-  "ts": 1794747634.6708817,
-  "watch": null,
-  "wish": "razer deathadder"
- },
  "8cbb1d366466e628": {
   "buy": "https://slickdeals.net/click?sdtid=20317410&sdfid=9&sdfib=1&lno=3&trd=Amazon&pv=&au=&u3=MhbMFbPdWXsuFC1HkPgJUqPrBRE5U2nuExlwwIASPPz6YxF9sfqyqeBppNHFOSCXJCr65Njbreyn_TTIPwowNwy_aXk23_57lorZSebrEsQI46OzNuxc84hAEuZy6PVXp4i5ID2rufNFBFrGWQ8kSRM4r0BBSXY2-rUWIJZP3v0LaSES",
   "mid": 579,
@@ -624,6 +612,19 @@
   "watch": null,
   "wish": "robot vacuum"
  },
+ "e264521ed89b5bb1": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=11&trd=Amazon&pv=&au=&u3=Mt4O_5097afGHvz8U6eGw7lkNIl3PEMAabes9gBMG2Jd0uGn8C-umiyTFQzJ9BHcwp_K50Bzl3lAmhnGZmHvfe2zaQLaXK7FoB_McmurNQmoO8I",
+  "mid": 597,
+  "photo": true,
+  "price": 199.0,
+  "pub": 1794872379,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20323278-199-bowers-wilkins-limited-edition-px7-s2e-over-ear-headphones-ruby-red-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "$199 | Bowers & Wilkins Limited Edition Px7 S2e Over-Ear Headphones, Ruby Red at Amazon",
+  "ts": 1794879018.9898996,
+  "watch": null,
+  "wish": "headphones"
+ },
  "e7327240729b7671": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=1&trd=Amazon&pv=&au=&u3=Mn4awMO_pnl7bWA0-HIU_7CshmkTiPeKVpHeITsWZOSxeIGGT8GxwZuKfG8Uc-StnpI6rmAzcFntX96TzVkLV6xct7ZYzfZAi5vPzZ9uucUKFEX7hNY1wlr5QwOs4kGA-h2kblpfjfF-cQJq2Mpk5SuEPqzGW8UAqbFFBIDUMkecJXBbwphUQLM",
   "mid": 591,
@@ -637,19 +638,6 @@
   "watch": null,
   "wish": "noise cancelling"
  },
- "e76ee9bf597f05d1": {
-  "buy": "https://slickdeals.net/click?sdtid=20313489&sdfid=9&sdfib=1&lno=1&trd=https%20www%20amazon%20com%20dp%20B0CF4DJM&pv=&au=&u3=MtEakjdM-CvuIIDvSfRC9AIpy6tPq2hQOlLsv_z1NBiZBQLnjelrL1odWEpzXhOE01BCVuctxdnjRyNCXHcxEtE",
-  "mid": 486,
-  "photo": true,
-  "price": 42.99,
-  "pub": 1794743276,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20313489-42-99-razer-viper-v3-hyperspeed-wireless-pc-gaming-mouse-82g-black-at-amazon?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "$42.99: Razer Viper V3 HyperSpeed Wireless PC Gaming Mouse, 82g, Black at Amazon",
-  "ts": 1794747634.6708817,
-  "watch": null,
-  "wish": "gaming mouse"
- },
  "eca965954ae7f105": {
   "buy": "https://www.amazon.com/dp/B0BTCP9T5S?creative=9325&camp=1789&tag=dealnewscom&ref=t_ac&ascsubtag=9y6d1dmqgl9102107ojg0DrvkikhdOqo",
   "mid": 551,
@@ -662,33 +650,6 @@
   "ts": 1794839421.033008,
   "watch": null,
   "wish": "noise cancelling"
- },
- "ee90c42f828e6375": {
-  "buy": "https://www.amazon.com/dp/B0F4RT7HFT?lv=shuf&smid=ATVPDKIKX0DER&ascsubtag=7i6d0yg7lxekuvmn1kn53QqodxDnR3QX&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
-  "mid": 489,
-  "photo": true,
-  "price": 150.0,
-  "pub": 1794733276,
-  "store": "Amazon",
-  "thread": "https://www.dealnews.com/JBL-Tour-One-M3-Smart-Tx-Wireless-Over-Ear-Noise-Cancelling-Headphones-for-150-free-shipping/22398368.html?iref=rss",
-  "title": "JBL Tour One M3 Smart Tx Wireless Over-Ear Noise Cancelling Headphones for $150 + free shipping",
-  "ts": 1794747634.6708817,
-  "watch": null,
-  "wish": "noise cancelling"
- },
- "f5349af2e6f66f17": {
-  "buy": "https://slickdeals.net/click?sdtid=20313408&sdfid=9&lno=1&trd=https%20www%20lowes%20com%20pd%20Honeywel%20&pv=&au=&u3=Mxjo88F01zpADyQ4A9q8PzZXvWhxLwdc3rN0kkts0X_4uHnsVohVCnRbzIbVMHiw7b2XVQAKBbe3d9jNHkkpgFRmrjYnlxIHnpm0_CVWaIq-u04lCIW5MF53EmQO1ArDkQv3G9KpIHJMB_D_LPJ7QXfibSWr-mP1u08KvoVT5X5KQdDrNA",
-  "dead": true,
-  "mid": 487,
-  "photo": true,
-  "price": 79.99,
-  "pub": 1794740747,
-  "store": "Lowe's",
-  "thread": "https://slickdeals.net/f/20313408-honeywell-home-silver-smart-compatible-thermostat-with-wi-fi-compatibility-rth9585wf1004-w-79-99?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "Honeywell Home Silver Smart Compatible Thermostat with Wi-Fi Compatibility | RTH9585WF1004/W $79.99",
-  "ts": 1794747634.6708817,
-  "watch": null,
-  "wish": "thermostat"
  },
  "f72f577c75511ab9": {
   "buy": "https://slickdeals.net/click?sdtid=20316618&sdfid=9&lno=2&trd=https%20www%20costco%20com%20p%20ecobee%2040&pv=&au=&u3=MxqAs8Ze6QkDbAE2jzz7tj_VlyiCDcS5PnNuJx8nf6cym64wsRnmePdbIfLQ6BO8N92UcJ0naDRQefc0E__J5uhr0aZsZnCm2NMUuPAIXGL0viiN-ND5hKmuhx2wPokXOuUQZOlC7PGLsU_P-luF5w6_kaHvPSFZpWBA",
