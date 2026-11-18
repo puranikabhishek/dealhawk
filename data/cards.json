@@ -220,6 +220,19 @@
   "watch": null,
   "wish": "air fryer"
  },
+ "57a8e02062891100": {
+  "buy": "https://www.amazon.com/dp/B0CWS423RY?creative=9325&camp=1789&tag=dealnewscom&ref=t_ac&th=1&ascsubtag=496d2azdfjm1t1bygz2eFVp4Tkvyshno",
+  "mid": 713,
+  "photo": true,
+  "price": 109.0,
+  "pub": 1795039772,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Frigidaire/Frigidaire-5-in-1-Large-Air-Fryer-Toaster-Oven-Combo/486667.html?iref=rss",
+  "title": "Frigidaire 5-in-1 Large Air Fryer Toaster Oven Combo for $109 + free shipping",
+  "ts": 1795041083.2370677,
+  "watch": null,
+  "wish": "air fryer"
+ },
  "5a2c78e7e4cc1592": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=37&trd=Cleer%20inc%20via%20Amazon&pv=&au=&u3=MoOa1A1jG0Tz_lH9BBJW0hGtjvG7mkMESfMGNPIaBwzoQQI_6eltRQaMKY-rUPAYVR1_PDxFdzworNfWV8vIlUYRlsOTSUxL32dItVIh9NOaeuem713uQ2j1V73JdoS_Iy5b0pOc72NenQFvZC6pZYsW9bxH1T2S0GIfkZoVLhjzqXPdXRUTUSK3",
   "mid": 663,
@@ -752,5 +765,18 @@
   "ts": 1794920424.6233687,
   "watch": null,
   "wish": "thermostat"
+ },
+ "f9bd44e926b10855": {
+  "buy": "https://www.amazon.com/gp/product/B0GVPBSXXF/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 714,
+  "photo": true,
+  "price": 83.99,
+  "pub": 1795038900,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0GVPBSXXF/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Cuisinart 4qt 5-Functions Glass Basket & ClearView Air Fryer $83.99",
+  "ts": 1795041083.2370677,
+  "watch": null,
+  "wish": "air fryer"
  }
 }
