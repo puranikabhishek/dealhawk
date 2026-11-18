@@ -91,20 +91,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "1d6c0b045dcfaddf": {
-  "buy": "https://www.costco.com/p/-/1926991",
-  "dead": true,
-  "mid": 595,
-  "photo": true,
-  "price": 110.0,
-  "pub": 1794874865,
-  "store": "Costco",
-  "thread": "https://www.dealnews.com/Shokz-Open-Fit-2-SE-Open-Ear-True-Wireless-Earbuds-for-110-for-members-free-shipping/22403977.html?iref=rss-c142",
-  "title": "Shokz OpenFit 2 SE Open-Ear True Wireless Earbuds for $110 for members + free shipping",
-  "ts": 1794877221.5827463,
-  "watch": null,
-  "wish": "earbuds"
- },
  "1e4a2d295e16d0f8": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=9&trd=Amazon&pv=&au=&u3=Mo-XhSjuw_kdP6qiRVl2dwmi4oZp91RhXcmeFA7V2ltii1QGD2SUwqMSBZK6hyrUw0xRmOqGbWWKpeNMf6BLPjn8eEt-zu_sYK0m_3s3VMkHsYFOTU6X23FYRuUIVSzbX4rTPt_vyuUaD69ZVmPrfNg0hrRAqUz9jCuZrSsOW02Uuy4lwmDoaqU",
   "mid": 612,
@@ -209,6 +195,19 @@
   "watch": null,
   "wish": "noise cancelling"
  },
+ "656ad99cd2ba7de4": {
+  "buy": "https://slickdeals.net/click?sdtid=20332938&sdfid=9&sdfib=1&lno=2&trd=Amazon&pv=&au=&u3=MmRfyYann5NvGCSYQ5pe8iq4nDBe5LPErYOUu0PfzY2gwRbdjET2AWK2aymOdONL4I68a-LwycOWy8XBlzrMgyZQUzEi7_-ub7LgovJeTk5wxms",
+  "mid": 675,
+  "photo": true,
+  "price": 95.99,
+  "pub": 1795002956,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20332938-95-99-cuisinart-air-fryer-clearview-window-digital-controls-9-quart-at-amazon?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "$95.99 | Cuisinart Air Fryer, ClearView Window & Digital Controls, 9-Quart at Amazon",
+  "ts": 1795006830.3320253,
+  "watch": null,
+  "wish": "air fryer"
+ },
  "66c95b2f5b88a790": {
   "buy": "https://www.amazon.com/Apple-Cancellation-Transparency-Personalized-High-Fidelity/dp/B0D1XD1ZV3?&linkCode=sl1&tag=l0e7c-20&linkId=6f70dac30200af0ce23cec6227ebbcfb&language=en_US&ref_=as_li_ss_tl",
   "mid": 610,
@@ -247,6 +246,19 @@
   "ts": 1794945623.9429955,
   "watch": null,
   "wish": "sennheiser"
+ },
+ "75084bac27c86ce2": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=3&trd=Amazon&pv=&au=&u3=Mmpc9CEQaGVA1jm5fYYxMdJM6lJhb_ojV6L8vBd4zZbMxvAC6b34kxeDCxf5KLdKU1SDjRGSEGRMMFKYUA0zN9zcDXHm13jwlgSCuyNniy8ki3A",
+  "mid": 677,
+  "photo": true,
+  "price": 89.99,
+  "pub": 1794984069,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20332020-89-99-14-qt-gourmia-rotisserie-air-fryer-oven-w-12-presets-fryforce-360-gaf1220-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "$89.99 | 14-Qt Gourmia Rotisserie Air Fryer Oven w/ 12 Presets & FryForce 360\u00b0 (GAF1220) at Amazon",
+  "ts": 1795006830.3320253,
+  "watch": null,
+  "wish": "air fryer oven"
  },
  "7c43f79f9e5c744c": {
   "buy": "https://slickdeals.net/click?sdtid=20325210&sdfid=9&sdfib=1&lno=7&trd=https%20www%20amazon%20com%20dp%20B0B6XZLN&pv=&au=&u3=MlMgZkHtbYdUScWvUPsbzp8H9wV2_0oHFf0cJa1likP_Go7z2cHNZsnqopCNDiw_6XeVFl3uKUWQCo2cDJWkths",
@@ -377,6 +389,19 @@
   "ts": 1794940221.4213076,
   "watch": null,
   "wish": "earbuds"
+ },
+ "ac81637313346957": {
+  "buy": "https://www.amazon.com/gp/product/B075BF6V58/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 676,
+  "photo": true,
+  "price": 79.99,
+  "pub": 1794998400,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B075BF6V58/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Honeywell Home Wi-Fi Smart Color Thermostat $79.99",
+  "ts": 1795006830.3320253,
+  "watch": null,
+  "wish": "thermostat"
  },
  "b65c8a1e9b47ebaf": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=5&trd=Amazon&pv=&au=&u3=Mt_6fQ6wFuBFsKErxiV1gMTvkzL1huAoTDlIIJzco7b60NtK340Z-soRz_ooDO2YpjnNyc2gSwmjwyf54DQUKRO6Di41rdEkwDM50WL_oGoQPGk",
@@ -521,6 +546,19 @@
   "watch": null,
   "wish": "headphones"
  },
+ "ec2a22b87c8833c8": {
+  "buy": "https://www.amazon.com/dp/B0DZHR44J9?creative=9325&camp=1789&tag=dealnewscom&smid=ATVPDKIKX0DER&th=1&ascsubtag=fc6d25bhbmt1rdw3brd75d0ErSS5mxDG",
+  "mid": 674,
+  "photo": true,
+  "price": 169.0,
+  "pub": 1795003461,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/Bose-Quiet-Comfort-Wireless-Noise-Cancelling-Over-Ear-Headphones-for-169-free-shipping/22408462.html?iref=rss",
+  "title": "Bose QuietComfort Wireless Noise Cancelling Over-Ear Headphones for $169 + free shipping",
+  "ts": 1795006830.3320253,
+  "watch": null,
+  "wish": "noise cancelling"
+ },
  "eddc6fa8ab12b0cd": {
   "buy": "https://www.amazon.com/dp/B0FNWCYLZN?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=qn6d1woorka5e1by6ek8Kb2dxYeeGXfn",
   "mid": 650,
@@ -546,18 +584,5 @@
   "ts": 1794920424.6233687,
   "watch": null,
   "wish": "thermostat"
- },
- "f72f577c75511ab9": {
-  "buy": "https://slickdeals.net/click?sdtid=20316618&sdfid=9&lno=2&trd=https%20www%20costco%20com%20p%20ecobee%2040&pv=&au=&u3=MxqAs8Ze6QkDbAE2jzz7tj_VlyiCDcS5PnNuJx8nf6cym64wsRnmePdbIfLQ6BO8N92UcJ0naDRQefc0E__J5uhr0aZsZnCm2NMUuPAIXGL0viiN-ND5hKmuhx2wPokXOuUQZOlC7PGLsU_P-luF5w6_kaHvPSFZpWBA",
-  "mid": 593,
-  "photo": false,
-  "price": null,
-  "pub": 1794796494,
-  "store": "Costco",
-  "thread": "https://slickdeals.net/f/20316618-costco-members-ecobee-smart-thermostat-premium-bundle-with-2-smartsensors-black?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "Costco Members: ecobee Smart Thermostat Premium Bundle with 2 SmartSensors - Black",
-  "ts": 1794875422.1869807,
-  "watch": null,
-  "wish": "smart thermostat"
  }
 }
