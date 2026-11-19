@@ -90,6 +90,32 @@
   "watch": null,
   "wish": "headphones"
  },
+ "2d95930e68a27868": {
+  "buy": "https://www.amazon.com/gp/product/B0GVVJZDQV/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 746,
+  "photo": true,
+  "price": 109.95,
+  "pub": 1795099200,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0GVVJZDQV/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Cuisinart 7-in-1 1800W Countertop Air Fryer Toaster Oven Combo $109.95",
+  "ts": 1795100421.5395443,
+  "watch": null,
+  "wish": "air fryer"
+ },
+ "2db91958572b5367": {
+  "buy": "https://www.amazon.com/gp/product/B0DC96PPZK/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&psc=1",
+  "mid": 745,
+  "photo": true,
+  "price": 149.99,
+  "pub": 1795098300,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0DC96PPZK/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&psc=1",
+  "title": "Amazon Echo Show 11 Full-HD 11\" Spatial Audio Smart Display with Alexa+Hub $149.99",
+  "ts": 1795100421.5395443,
+  "watch": "Echo Show 11",
+  "wish": "echo show 11"
+ },
  "33aa64129a903e53": {
   "buy": "https://www.amazon.com/All-new-Echo-Show-5/dp/B09B2SBHQK/",
   "mid": 743,
@@ -219,6 +245,19 @@
   "ts": 1795015835.4253085,
   "watch": null,
   "wish": "gaming mouse"
+ },
+ "6a9e09d1b5a27b62": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=7&trd=Amazon&pv=&au=&u3=MipK2pKoZ7XnIqC7bTkJClFUEcusobrN1kd_VOcK0gKvSoDvn9B8RiLA3tFQW9iiNSiTRQMn7d5Qe4I6W295Grk0TC6ohtT02hNJm_Iy2ocYK10",
+  "mid": 747,
+  "photo": true,
+  "price": 147.99,
+  "pub": 1795084750,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20342331-prime-147-99-technics-reference-class-hi-fi-wireless-earbuds-eah-az100-at-amazon?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "[Prime] $147.99 | Technics Reference Class Hi-Fi Wireless Earbuds (EAH-AZ100) at Amazon",
+  "ts": 1795100421.5395443,
+  "watch": null,
+  "wish": "earbuds"
  },
  "74187c328a7b5c69": {
   "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Amazon&sdtid=20334147&tid=20334147&prop=diavail-true%7Cdincp-0%7Cdinpd-1%7Cdipgavail-false&pv=47056d56e36911f188f31a9e2a1c4d82&au=78b78cce982e4e13a99fe63215be7892&action_source=Deal+Details+-+Sticky+Bar+CTA",
