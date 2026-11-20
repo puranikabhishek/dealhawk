@@ -1,4 +1,17 @@
 {
+ "057f0ddc2d1eb0ba": {
+  "buy": "https://www.amazon.com/stores/page/5A92C403-5C35-4B5B-ADBE-88C3A4983C71?creative=9325&camp=1789&tag=dealnewscom&ingress=2&lp_context_asin=B0DSK2MB15&visitId=8f556915-1ebc-4e55-a084-64c9ebf32474&store_ref=bl_ast_dp_brandlogo_sto&ref_=ast_bln&ascsubtag=1z6d2xwc1ta9b1bwsvotIX8pm3QlmlNZ",
+  "mid": 816,
+  "photo": true,
+  "price": null,
+  "pub": 1795169996,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/Sennheiser-Black-Friday-Deals-at-Amazon-Up-to-66-off-free-shipping-w-Prime/22414697.html?iref=rss-c142",
+  "title": "Sennheiser Black Friday Deals at Amazon: Up to 66% off + free shipping w/ Prime",
+  "ts": 1795179623.496246,
+  "watch": null,
+  "wish": "sennheiser"
+ },
  "09282ed1a67464cc": {
   "buy": "https://www.amazon.com/dp/B0FHM61VTK?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=p56d2odbc27375qcdulz6ge36vXohuQT",
   "mid": 776,
@@ -311,6 +324,19 @@
   "watch": null,
   "wish": "headphones"
  },
+ "991eb30fe4fed043": {
+  "buy": "https://www.amazon.com/dp/B0HC11K9C1?tag=toysj-20&psc=1",
+  "mid": 814,
+  "photo": true,
+  "price": null,
+  "pub": 1795177276,
+  "store": "Amazon",
+  "thread": "https://9to5toys.com/2026/11/20/official-beats-black-friday-deals-live-360/",
+  "title": "Official Beats Black Friday deals now live: New 360 $100 off, massive 53% off Studio Pro, buds, more",
+  "ts": 1795179623.496246,
+  "watch": null,
+  "wish": "beats"
+ },
  "9ae478ea7dc8c1d2": {
   "buy": "https://slickdeals.net/click?lno=17&trd=https%20www%20bose%20com%20p%20headphones%20&pv=&au=&u3=M0jR2g2jyxi3QjX6kOWqDw73DEdqDsiB1E5Zh8cqMiwwozmR6LrZ8bSVqN91ecoYGGO4PsvLwYavaqQ-WdPvY3JAxegnRfYyJ4vqTSwJQpaacNfiFpECVBfulsRrZU9RZiqJH81udAKjmULNP5JYS3BPhWnCyKj_gbRB1BJ35q7hz_PGJb24Tj-0igXNzqG52bXczAx99u8sXMFb4YcP7Q",
   "mid": 727,
@@ -379,6 +405,7 @@
  },
  "9f04c674760c9c44": {
   "buy": "https://www.musiciansfriend.com/stupid?icid=210190",
+  "dead": true,
   "mid": 805,
   "photo": true,
   "price": 89.0,
@@ -402,6 +429,19 @@
   "ts": 1795095020.2246933,
   "watch": null,
   "wish": "noise cancelling"
+ },
+ "a4266be2d92669c5": {
+  "buy": "https://memoket.ai/products/memoket-gem?im_ref=yYRRf%3AXjuxyZWQ7zwt0%3A02qxUkrUBhWXIWbT3Y0&sharedid=&irpid=10534&irgwc=1&afsrc=1",
+  "mid": 817,
+  "photo": true,
+  "price": 143.0,
+  "pub": 1795168800,
+  "store": "Memoket",
+  "thread": "https://www.dealnews.com/Memoket-Gem-Wearable-AI-Voice-Recorder-for-143-free-shipping/22403369.html?iref=rss",
+  "title": "Memoket Gem Wearable AI Voice Recorder for $143 + free shipping",
+  "ts": 1795179623.496246,
+  "watch": null,
+  "wish": "ai voice recorder"
  },
  "a6f16b39a62a3e45": {
   "buy": "https://www.amazon.com/gp/product/B0HGJD4KF7/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
@@ -546,6 +586,19 @@
   "watch": null,
   "wish": "earbuds"
  },
+ "dc884ca13e2e086e": {
+  "buy": "https://www.amazon.com/dp/B0C3HCD34R?creative=9325&camp=1789&tag=dealnewscom&smid=A294P4X9EWVXLJ&th=1&ascsubtag=jt6d2xwc2gm9l1bwsvotFdz7CEYQ7ae9",
+  "mid": 815,
+  "photo": true,
+  "price": 38.0,
+  "pub": 1795173265,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Anker/Soundcore-by-Anker-Q20-i-Hybrid-Active-Noise-Cancelling-Headphones-Wireless-Over-Ear-Bluetooth-40-H/467364.html?iref=rss-c142",
+  "title": "Soundcore by Anker Q20i Hybrid Active Noise Cancelling Headphones for $38 + free shipping",
+  "ts": 1795179623.496246,
+  "watch": null,
+  "wish": "noise cancelling"
+ },
  "dcd1f305c91a08b8": {
   "buy": "https://slickdeals.net/click?sdtid=20347776&sdfid=9&lno=7&trd=WatchGang%20com&pv=&au=&u3=M4709zirf0zxWwepZWE3UQXy1ZGUh6zBWlPHPyOhNovZWOm1MItIQum7cZx-8PgSCaBuz5gqVpTvQiyt5T61QirDK2jwdO4jvOq50GAliMSdFrOqUgTLx6hjzAgwXEkPZ9PY8ObegxHAFn6dLA",
   "mid": 769,
@@ -561,6 +614,7 @@
  },
  "e4693ed0994d5e0e": {
   "buy": "https://www.musiciansfriend.com/stupid?icid=210190",
+  "dead": true,
   "mid": 801,
   "photo": true,
   "price": 89.0,
