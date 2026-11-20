@@ -456,6 +456,7 @@
  },
  "9c0c8afe13c13660": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=26&trd=https%20www%20amazon%20com%20dp%20B0DDV3FR&pv=&au=&u3=MhHcVlaCHjx0fSwJTvTT7oRRL_Gd3dNm4kPbzDRELF__y5HUnfY7oCR_dpP-TOusWx6fIPZ6WFu9rT7k3alZYPdCYp1tnE8",
+  "dead": true,
   "mid": 759,
   "photo": true,
   "price": 169.99,
@@ -815,6 +816,19 @@
   "thread": "https://www.amazon.com/gp/product/B0GVPBSXXF/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
   "title": "Cuisinart 4qt 5-Functions Glass Basket & ClearView Air Fryer $83.99",
   "ts": 1795041083.2370677,
+  "watch": null,
+  "wish": "air fryer"
+ },
+ "fa1367f57295bb48": {
+  "buy": "https://www.walmart.com/ip/seort/5466948866?clickid=U2DVJyXhdxyZRiVUH0ze7xjUUkrUnGQMgWIqRA0&irgwc=1&afsrc=1&sourceid=imp_U2DVJyXhdxyZRiVUH0ze7xjUUkrUnGQMgWIqRA0&veh=aff&wmlspartner=imp_52269&affiliates_ad_id=565706&campaign_id=9383&sharedid=381957122091081728",
+  "mid": 790,
+  "photo": true,
+  "price": 55.0,
+  "pub": 1795132223,
+  "store": "Walmart",
+  "thread": "https://www.dealnews.com/products/Gourmia/Gourmia-All-in-One-14-Quart-Air-Fryer/560916.html?iref=rss",
+  "title": "Gourmia All-in-One 14-Quart Air Fryer for $55 + free shipping",
+  "ts": 1795132828.9190269,
   "watch": null,
   "wish": "air fryer"
  },
