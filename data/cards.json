@@ -12,6 +12,19 @@
   "watch": "Echo Show 8",
   "wish": "echo show 8"
  },
+ "047ace5672d7f486": {
+  "buy": "https://www.amazon.com/gp/product/B0CXS16KNF/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 901,
+  "photo": true,
+  "price": 109.99,
+  "pub": 1795290000,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0CXS16KNF/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Asus ROG Cetra Low-Latency Bluetooth Noise Cancellation Wireless Earbuds $109.99",
+  "ts": 1795291220.6382916,
+  "watch": null,
+  "wish": "earbuds"
+ },
  "057f0ddc2d1eb0ba": {
   "buy": "https://www.amazon.com/stores/page/5A92C403-5C35-4B5B-ADBE-88C3A4983C71?creative=9325&camp=1789&tag=dealnewscom&ingress=2&lp_context_asin=B0DSK2MB15&visitId=8f556915-1ebc-4e55-a084-64c9ebf32474&store_ref=bl_ast_dp_brandlogo_sto&ref_=ast_bln&ascsubtag=1z6d2xwc1ta9b1bwsvotIX8pm3QlmlNZ",
   "mid": 816,
@@ -141,6 +154,19 @@
   "ts": 1795266022.464485,
   "watch": null,
   "wish": "gaming mouse"
+ },
+ "367bc5e3c9258ae1": {
+  "buy": "https://slickdeals.net/click?sdtid=20364615&sdfid=9&lno=1&trd=BrandsMart&pv=&au=&u3=M8qHvvdtrCDqnVtfwrMBjfNYPka1Y3eLtlSqtuDSL4B0Z4kcz4ZbY0GoL6_Jbaok7yTvAr95Vv4COLqGmedyURkr4EkX5TggRdXIViEGTJHWcWJSKWiDvXsYMYOqUXDav7PvsQoNTXFOe_czMVgcb1BLnLTNyIk5iwmySzMl9mIvVwAaaTk",
+  "mid": 902,
+  "photo": true,
+  "price": 90.0,
+  "pub": 1795283035,
+  "store": "BrandsMart",
+  "thread": "https://slickdeals.net/f/20364615-kitchen-elite-26qt-air-fryer-oven-90-free-shipping?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "Kitchen Elite 26QT Air Fryer Oven $90 + Free Shipping",
+  "ts": 1795291220.6382916,
+  "watch": null,
+  "wish": "air fryer oven"
  },
  "392fd77191da0416": {
   "buy": "https://www.amazon.com/dp/B0DZWQ9WWJ?lv=shuf&smid=AWR27XY57PJXB&ascsubtag=er6d3c6pp3nc95o9xtwbr7BOukTlmRCC&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
