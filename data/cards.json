@@ -116,19 +116,6 @@
   "watch": null,
   "wish": "noise canceling"
  },
- "3166dca07926980a": {
-  "buy": "https://slickdeals.net/click?sdtid=20339715&sdfid=9&sdfib=1&lno=10&trd=Amazon&pv=&au=&u3=MsdbKcQtwCkxZ6665ESxcvZgIRhGOtsSqt2EQYmB6rewkJbHp1-0mgbWUqld12igV_Uug5lhL2_DlX_KS0VzsEIFs1B0aBWhLEeoHc482mCrkl8rMgd7sRLoFUzQF600CGA1oCNOOgMiZAIVLbvTs-5gCST2QYmhVBjEVHrdET6PmYleNjlwqN8",
-  "mid": 796,
-  "photo": true,
-  "price": 109.95,
-  "pub": 1795075459,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20339715-cuisinart-7-in-1-1800w-air-fryer-toaster-oven-toa-55-109-95-free-shipping?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "Cuisinart 7-in-1 1800W Air Fryer Toaster Oven (TOA-55) $109.95 + Free Shipping",
-  "ts": 1795136423.841039,
-  "watch": null,
-  "wish": "air fryer"
- },
  "32ae1f6c121326e7": {
   "buy": "https://memoket.ai/products/memoket-gem?im_ref=WgnyFoXjvxyZTHg1HER6R1imUkrUBERcwSUN0M0&sharedid=&irpid=10534&irgwc=1&afsrc=1",
   "mid": 820,
@@ -481,6 +468,19 @@
   "watch": null,
   "wish": "razer basilisk"
  },
+ "daa7b64e5bed2d32": {
+  "buy": "https://www.amazon.com/dp/B0DZWQ9WWJ?lv=shuf&smid=AWR27XY57PJXB&ascsubtag=gs6d3chf312cgvmn2rBYfdNJ6ciYHyAK&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
+  "mid": 883,
+  "photo": true,
+  "price": 103.0,
+  "pub": 1795258427,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/Plaud-Note-Pin-Wearable-AI-Voice-Recorder-for-103-free-shipping/22417787.html?iref=rss-c142",
+  "title": "Plaud NotePin Wearable AI Voice Recorder for $103 + free shipping",
+  "ts": 1795267828.611974,
+  "watch": "Plaud NotePin (AI note taker)",
+  "wish": "ai voice recorder"
+ },
  "dc884ca13e2e086e": {
   "buy": "https://www.amazon.com/dp/B0C3HCD34R?creative=9325&camp=1789&tag=dealnewscom&smid=A294P4X9EWVXLJ&th=1&ascsubtag=jt6d2xwc2gm9l1bwsvotFdz7CEYQ7ae9",
   "mid": 815,
@@ -533,6 +533,19 @@
   "ts": 1795140033.4179811,
   "watch": null,
   "wish": "keyboard"
+ },
+ "ea59ad21556c79ff": {
+  "buy": "https://slickdeals.net/click?sdtid=20362947&sdfid=9&sdfib=1&lno=1&trd=https%20www%20amazon%20com%20dp%20B0CZPJ18&pv=&au=&u3=Mm29nJJo3HZmLlnNaW7jT_69vr3f_sJYqIz_WhudZ8ePCrl0JYzwyF5La4nrmcLDHkuZEGdL9kmMisLVw-A1d34",
+  "mid": 884,
+  "photo": true,
+  "price": 35.99,
+  "pub": 1795262473,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20362947-bella-fits-anywhere-4-qt-slim-air-fryer-ceramic-nonstick-blossom-35-99?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "bella Fits-Anywhere 4-Qt Slim Air Fryer, Ceramic Nonstick (Blossom) $35.99",
+  "ts": 1795267828.611974,
+  "watch": null,
+  "wish": "air fryer"
  },
  "f8fdadddeb1438ce": {
   "buy": "https://www.amazon.com/dp/B0FHLPS8ZF?th=1&linkCode=ll2&tag=wwwhip2saveco-20&linkId=4c2bd759a537f0a1e13260016fc01719&language=en_US&gaOptInStatus=true&ref_=as_li_ss_tl",
