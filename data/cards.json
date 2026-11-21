@@ -25,6 +25,19 @@
   "watch": null,
   "wish": "headphones"
  },
+ "0b18eba69ac32639": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=29&trd=JLab%20Store%20via%20Amazon&pv=&au=&u3=Mv3joH5dkwSBHdWQAnwoKoMS-iZ97g5B1uRniyOEEk4VFENSx6XV32Owx0fFglb8j1pMi5TvF6ESetRxCeF0a6mnNiWWlOWqArEzqXnJzOGTiSZ-UiCOH_7JZtFOUO1LkF_FU98XR6cSIQKfz9x9ApwRKBizxr7mwradHrM9jWBjBV5OeRK0F_nc",
+  "mid": 875,
+  "photo": true,
+  "price": 35.15,
+  "pub": 1795221374,
+  "store": "JLab Store via Amazon",
+  "thread": "https://slickdeals.net/f/20360466-jlab-jbuds-sport-anc-4-true-wireless-earbuds-pink-35-15-free-shipping?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "JLab JBuds Sport ANC 4 True Wireless Earbuds (Pink) $35.15 + Free Shipping",
+  "ts": 1795233620.4400327,
+  "watch": null,
+  "wish": "earbuds"
+ },
  "0c8e6b6d2e6dde38": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=11&trd=https%20www%20amazon%20com%20dp%20B0FGYDGJ&pv=&au=&u3=MohdA7d918MLOe8qHw4gNe9WIyLHOYTKCAFJQ0XCVBuNuoD-n7DPCT4TPrh0LXIwuQuFpDZgQwWJuRie7Kcq2Tk",
   "mid": 792,
@@ -219,19 +232,6 @@
   "ts": 1795134622.1972528,
   "watch": null,
   "wish": "mechanical keyboard"
- },
- "49abffca37ccc519": {
-  "buy": "https://www.amazon.com/dp/B0H9B4W7MW?tag=toysj-20&psc=1",
-  "mid": 749,
-  "photo": true,
-  "price": 38.0,
-  "pub": 1795101951,
-  "store": "Amazon",
-  "thread": "https://9to5toys.com/2026/11/19/sony-black-friday-headphone-deals1000xm6-1000xm4c/",
-  "title": "Sony Black Friday headphone deals now live: 1000XM6, new 1000XM4C $100 off Amazon low, more from $38",
-  "ts": 1795102223.8335648,
-  "watch": null,
-  "wish": "headphone"
  },
  "4c51166669c70e8a": {
   "buy": "https://slickdeals.net/click?sdtid=20356743&sdfid=9&sdfib=1&lno=3&trd=Amazon&pv=&au=&u3=MpsmblyUp12ibVlIPxxEjsYlvAF1oIRPv85TLBOcL7mVCm3vO96PBXElX3ueNjl1HwCWiDoy909x5mj-vtEqTBQptAN2iQ5A8XCUbbwOVHG_7D8",
@@ -469,18 +469,18 @@
   "watch": null,
   "wish": "ai voice recorder"
  },
- "a6f16b39a62a3e45": {
-  "buy": "https://www.amazon.com/gp/product/B0HGJD4KF7/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
-  "mid": 750,
+ "a7091ca7c918f3c2": {
+  "buy": "https://slickdeals.net/click?sdtid=20361018&sdfid=9&lno=1&trd=Best%20Buy&pv=&au=&u3=MzCExPhbRXgLzMtCTPe3qiOKdyc4WfqpzpMlZ1T4wQNj9AsNoSdovE-wTSUDj-nZndFl2g3dBoZhUzS5XEanIuQDgI8p8PyrOSTExoC519A2Wioo1l5rKDJPjEv5Eh5Omjgp0ebxDsT0Q3pxYx4oJ3RhL4sBySJAj5a5l_7m19UUtclpeQ",
+  "mid": 874,
   "photo": true,
-  "price": 99.95,
-  "pub": 1795101000,
-  "store": "Amazon",
-  "thread": "https://www.amazon.com/gp/product/B0HGJD4KF7/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
-  "title": "Cuisinart 4.5Qt ClearView Air Fryer $99.95",
-  "ts": 1795102223.8335648,
+  "price": 89.99,
+  "pub": 1795228004,
+  "store": "Best Buy",
+  "thread": "https://slickdeals.net/f/20361018-89-99-beats-studio-buds-true-wireless-noise-cancelling-earbuds-black-gold?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "$89.99: Beats Studio Buds+ True Wireless Noise Cancelling Earbuds, Black/Gold",
+  "ts": 1795233620.4400327,
   "watch": null,
-  "wish": "air fryer"
+  "wish": "noise cancelling"
  },
  "a9025142b84a6e35": {
   "buy": "https://slickdeals.net/click?sdtid=20345916&sdfid=9&sdfib=1&lno=4&trd=Amazon&pv=&au=&u3=MpTKKWORgcYRxgXCI9KD2PNjkkItSGIApVgeDhwh3425IG0TkcSi2IRX9_eseMfZBNt9Rpzy9l_2qdJWeqfiF5Md5YqP8m4NcHXP8L45fvYaFOc-KmVCHXrQw0gQ8AovlZpTcz2dJ_WwRY5_CFhcqIRFOlBPEJYqOihY1OrpWy2j4mfz7KPFPng",
@@ -768,19 +768,6 @@
   "ts": 1795123821.7551649,
   "watch": null,
   "wish": "wireless mouse"
- },
- "f1040542897b5123": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=11&trd=MALOL%2070%203%20quot%20L%20Shaped%20Office%20&pv=&au=&u3=MjzL8Uj9Apen3AIPkNOY5OAz8rjK1LjIvaB72SA_RwFuErsX_nxALsn9w7pIyScrFMRUW_BUM8CfVMNsg09z0GA",
-  "mid": 751,
-  "photo": true,
-  "price": 178.49,
-  "pub": 1795087310,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20342859-malol-70-3-l-shaped-office-desk-executive-desk-with-storage-drawers-178-49?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "MALOL 70.3\" L-Shaped Office Desk, Executive Desk with Storage Drawers $178.49",
-  "ts": 1795102223.8335648,
-  "watch": null,
-  "wish": "storage drawers"
  },
  "f60b96a6d8497ec0": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=17&trd=https%20www%20amazon%20com%20Beats%20Wire%20&pv=&au=&u3=MgKTOBrDiB5PoQUZwFoKCH3ODTWw5oWwdxKOuGBIR3svQr-S6bCSlg_9Tc5HBkww9osdju2LKkQQ0zkMzqHVbG2DYP3asFd8aTFLg_dWD5iGrhOZnrM8LmNpTH5Ag7w-r6RW9tqOZEaiDjyqiXqwjpSJO25Q",
