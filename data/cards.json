@@ -27,6 +27,7 @@
  },
  "04f76ed382bcdba5": {
   "buy": "https://slickdeals.net/click?pno=1371000&lno=1&afsrc=1&trd=Target&hash=3d577442e66711f18a0e4efcbf5b088c&auuid=561b7e645cf311e6a9339a7c4443d98e",
+  "dead": true,
   "mid": 927,
   "photo": true,
   "price": 56.0,
@@ -336,19 +337,6 @@
   "ts": 1795305622.9451866,
   "watch": null,
   "wish": "headphones"
- },
- "d89525692017a78b": {
-  "buy": "https://slickdeals.net/click?sdtid=20360382&sdfid=9&sdfib=1&lno=2&trd=https%20www%20amazon%20com%20dp%20B0FRT1K5&pv=&au=&u3=MviI2GBxT76QAIAkZOQEzbtU0wuLO-cxNoqOmKYH2-Ka4Id0mBeIzwM-DB-8AZsOuvgHbkqewACk9r8FDhJ4h84",
-  "mid": 870,
-  "photo": true,
-  "price": null,
-  "pub": 1795220067,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20360382-razer-basilisk-v3-pro-35k-wireless-gaming-mouse-phantom-white-hyperscroll-tilt-wheel-35k-dpi-optical-sensor-gen-2-13-customizable-controls-rgb-etc?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "Razer Basilisk V3 Pro 35K Wireless Gaming Mouse, Phantom White | HyperScroll Tilt Wheel, 35K DPI Optical Sensor Gen 2, 13 Customizable Controls, RGB, etc",
-  "ts": 1795226419.6332428,
-  "watch": null,
-  "wish": "razer basilisk"
  },
  "daa7b64e5bed2d32": {
   "buy": "https://www.amazon.com/dp/B0DZWQ9WWJ?lv=shuf&smid=AWR27XY57PJXB&ascsubtag=gs6d3chf312cgvmn2rBYfdNJ6ciYHyAK&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
