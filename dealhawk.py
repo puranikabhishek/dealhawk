@@ -11,7 +11,10 @@ Every run:
   5. Sends 🎯 wish-list deals as their own photo cards (Buy button, marked ❌ EXPIRED when they die)
      + ONE grouped digest (by category) for everything else.
 
-CLI: --dry-run  --test  --demo [FEED_URL]  --check URL  --feed FILE  -v
+  6. 🚨 STEALS (wish-list item at a crazy price) go out FIRST: loud, pinned, even in quiet hours.
+
+CLI: --dry-run  --radar  --test  --demo [FEED_URL|steal]  --check URL  --feed FILE  -v
+     --radar = fast pass: radar + front-page feeds, steals and price mistakes only (no digest, no sweep)
 """
 import argparse
 import calendar
@@ -49,6 +52,7 @@ HTTP.mount("https://", requests.adapters.HTTPAdapter(pool_maxsize=16))
 
 TG_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "")
 TG_CHAT = os.getenv("TELEGRAM_CHAT_ID", "")
+STEAL_CHAT = os.getenv("TELEGRAM_STEAL_CHAT_ID", "") or TG_CHAT  # optional separate chat for 🚨 steals
 FORCE = os.getenv("RECHECK") == "true"
 
 STORE_DOMAINS = r"amazon\.|walmart\.|bestbuy\.|homedepot\.|lowes\.|target\.|costco\.|samsclub\.|newegg\.|" \
@@ -452,6 +456,19 @@ def watch_hit(d, cfg):
     for w in cfg.get("watchlist") or []:
         if all(has(k, d["tl"]) for k in w["keywords"]) and d["price"] and d["price"] <= w["max_price"]:
             return w["name"]
+    return None
+
+
+def steal_hit(d, cfg):
+    """A wish-list/watchlist item at a crazy price -> short reason string, else None."""
+    sc = cfg.get("steal_alerts") or {}
+    if not sc.get("enabled", True) or not d.get("price") or not (d.get("wish") or d.get("watch")):
+        return None
+    for w in cfg.get("watchlist") or []:
+        if w.get("steal") and all(has(k, d["tl"]) for k in w["keywords"]) and d["price"] <= w["steal"]:
+            return f"under your ${w['steal']:,.0f} steal price"
+    if (d.get("pct") or 0) >= sc.get("min_pct", 50):
+        return f"{d['pct']}% off"
     return None
 
 
@@ -1002,43 +1019,75 @@ def fetch_image(d):
     return None
 
 
-def send_card(d, cfg, dry, silent=False):
-    """Wish-list deal = its own photo card with Buy button. Returns {'mid', 'photo'} or None."""
-    cap, markup = card_parts(d, cfg)
+def send_card(d, cfg, dry, silent=False, parts=None, chat=None):
+    """Wish-list deal = its own photo card with Buy button. Returns {'mid', 'photo', 'chat'} or None."""
+    cap, markup = parts or card_parts(d, cfg)
+    chat = chat or TG_CHAT
     if dry:
         log("\n┌─ CARD " + "─" * 40 + "\n" + html.unescape(re.sub(r"<[^>]+>", "", cap)) + "\n" +
             "\n".join("  ".join(f"[{b['text']}]" for b in row) for row in markup["inline_keyboard"]) +
             f"\n  buy → {d['buy'][:110]}\n  photo → {d.get('image')}\n└" + "─" * 46)
-        return {"mid": 0, "photo": False}
+        return {"mid": 0, "photo": False, "chat": chat}
     try:
         if img := fetch_image(d):
             r = HTTP.post(f"https://api.telegram.org/bot{TG_TOKEN}/sendPhoto", timeout=30,
-                          data={"chat_id": TG_CHAT, "caption": cap, "parse_mode": "HTML",
+                          data={"chat_id": chat, "caption": cap, "parse_mode": "HTML",
                                 "reply_markup": json.dumps(markup), "disable_notification": "true" if silent else "false"},
                           files={"photo": ("deal.jpg", img)})
             if r.ok:
-                return {"mid": r.json()["result"]["message_id"], "photo": True}
+                return {"mid": r.json()["result"]["message_id"], "photo": True, "chat": chat}
             log(f"  ! sendPhoto {r.status_code}: {r.text[:160]} — falling back to text")
     except Exception as ex:
         log(f"  ! photo card failed ({ex.__class__.__name__}) — falling back to text")
-    r = tg("sendMessage", chat_id=TG_CHAT, text=cap, parse_mode="HTML", reply_markup=markup, disable_notification=silent,
+    r = tg("sendMessage", chat_id=chat, text=cap, parse_mode="HTML", reply_markup=markup, disable_notification=silent,
            link_preview_options={"url": d.get("image") or d["buy"], "prefer_large_media": True, "show_above_text": True})
     if not r.ok:  # last resort: plain text, no preview
-        r = tg("sendMessage", chat_id=TG_CHAT, text=cap, parse_mode="HTML", reply_markup=markup,
+        r = tg("sendMessage", chat_id=chat, text=cap, parse_mode="HTML", reply_markup=markup,
                link_preview_options={"is_disabled": True})
     try:
-        return {"mid": r.json()["result"]["message_id"], "photo": False} if r.ok else None
+        return {"mid": r.json()["result"]["message_id"], "photo": False, "chat": chat} if r.ok else None
     except Exception:
         return None
 
 
-def sweep_cards(cards, cfg, dry):
+def steal_parts(d, cfg):
+    """🚨 STEAL card: impossible to mistake for a normal wish-list card."""
+    e = html.escape
+    label, search = store_search(d["title"], d.get("store"))
+    pct = f" · {d['pct']}% OFF" if d.get("pct") else ""
+    money_line = f"💰 <b>{usd(d['price'])}</b>"
+    if d.get("reg") and d["reg"] > d["price"]:
+        money_line += f"   <s>{usd(d['reg'])}</s>"
+    if not d.get("price_ok"):
+        money_line += "  <i>(price from deal post)</i>"
+    where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
+    proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
+             "live": f"✅ Still live on {site_of(d.get('thread'))}"}.get(d.get("status"), "⚠️ Couldn't verify stock")
+    lines = [f"🚨🚨 <b>STEAL{pct}</b> 🚨🚨", f"<b>{e(short(d['title'], 70))}</b>", "",
+             money_line, f"🎯 {e(d.get('watch') or d.get('wish') or '')} · {e(d['steal'])}", where,
+             f"{proof} · {cfg.get('_now', '')}", "",
+             "⚡ <b>Deals this cheap sell out in about an hour. Buy now, decide later</b> (most stores take returns)."]
+    rows = [[{"text": f"🛒 BUY NOW at {label}" if label else "🛒 BUY NOW", "url": d["buy"]}],
+            [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
+    return "\n".join(l for i, l in enumerate(lines) if l or i in (2, 7)).strip(), {"inline_keyboard": rows}
+
+
+def send_steal(d, cfg, dry, silent=False):
+    sc = cfg.get("steal_alerts") or {}
+    res = send_card(d, cfg, dry, silent=silent, parts=steal_parts(d, cfg), chat=STEAL_CHAT)
+    if res and not dry and sc.get("pin", True):
+        tg("pinChatMessage", chat_id=res["chat"], message_id=res["mid"], disable_notification=silent)
+    return res
+
+
+def sweep_cards(cards, cfg, dry, before=None):
     """Re-check cards already on your phone; when a deal dies, rewrite its card as ❌ EXPIRED and pull the Buy button."""
     now = time.time()
     keep_s = (cfg.get("wishlist_alerts") or {}).get("track_hours", 36) * 3600
     for k in [k for k, c in cards.items() if now - c["ts"] > keep_s]:
         del cards[k]
-    live = sorted((c for c in cards.values() if not c.get("dead")), key=lambda c: -c["ts"])[:15]
+    before = before or now + 1  # skip cards sent this very run
+    live = sorted((c for c in cards.values() if not c.get("dead") and c["ts"] < before), key=lambda c: -c["ts"])[:15]
     if not live or dry:
         return 0
 
@@ -1054,7 +1103,10 @@ def sweep_cards(cards, cfg, dry):
         if s != "dead":
             continue
         cap, markup = card_parts(c, cfg, expired=(now - (c.get("pub") or c["ts"])) / 3600)
-        r = tg("editMessageCaption" if c.get("photo") else "editMessageText", chat_id=TG_CHAT, message_id=c["mid"],
+        chat = c.get("chat") or TG_CHAT
+        if c.get("steal"):
+            tg("unpinChatMessage", chat_id=chat, message_id=c["mid"])
+        r = tg("editMessageCaption" if c.get("photo") else "editMessageText", chat_id=chat, message_id=c["mid"],
                parse_mode="HTML", reply_markup=markup, **({"caption": cap} if c.get("photo") else
                                                            {"text": cap, "link_preview_options": {"is_disabled": True}}))
         c["dead"] = True  # even if the edit failed (message deleted): don't retry forever
@@ -1107,8 +1159,9 @@ def run(args):
     cfg = yaml.safe_load((ROOT / "config.yaml").read_text())
     st = load_json(SETTINGS_FILE, {})
     quiet = in_quiet_hours(cfg) and not args.dry_run
+    steal_loud = (cfg.get("steal_alerts") or {}).get("ignore_quiet_hours", True)
     if quiet:
-        log("Quiet hours — price mistakes only, silent.")
+        log(f"Quiet hours — price mistakes (silent) + steals ({'loud' if steal_loud else 'silent'}) only.")
     if not args.dry_run and not args.feed:
         if not st.get("welcomed_v4"):
             send_text("🦅 <b>DealHawk v4</b>: shorter digest · 🔥 Ultra deals · 🆓 Freebies · 🎁 Giveaways · "
@@ -1120,15 +1173,16 @@ def run(args):
     cards = load_json(CARDS_FILE, {})
     wl = cfg.get("wishlist_alerts") or {}
     cfg["_now"] = datetime.now(ZoneInfo(cfg.get("timezone", "America/Chicago"))).strftime("%-I:%M %p")
-    if not args.feed:
-        try:
-            sweep_cards(cards, cfg, args.dry_run)
-        except Exception as ex:  # never let housekeeping stop the hunt
-            log(f"  ! card sweep failed: {ex!r}")
     strict = cfg.get("stock_policy") == "strict"
     cap = cfg.get("max_deals_per_run", 25)
 
-    sources = [("local", feedparser.parse(args.feed).entries)] if args.feed else all_feeds(cfg)
+    if args.feed:
+        sources = [("local", feedparser.parse(args.feed).entries)]
+    elif args.radar:  # fast pass: the feeds where steals show up first
+        rc = dict(cfg, feeds=[f for f in cfg.get("feeds", []) if f.get("wish_only") or f.get("radar")])
+        sources = all_feeds(rc)
+    else:
+        sources = all_feeds(cfg)
     cands, ids, skips = [], set(), {}
     feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
     feed_age = {f["name"]: f.get("max_age_hours") for f in cfg.get("feeds", [])}
@@ -1145,11 +1199,15 @@ def run(args):
             d["forced"], d["feed_max_age"] = feed_cat.get(name), feed_age.get(name)
             d["watch"], d["cat"] = watch_hit(d, cfg), categorize(d, cfg)
             d["wish"] = wish_kw(d, cfg)
+            d["steal"] = steal_hit(d, cfg)
+            is_instant = cfg["categories"].get(d["cat"], {}).get("instant")
+            if args.radar and not (d["steal"] or is_instant):
+                continue  # radar pass only hunts steals + price mistakes; the rest waits for the full run
             if name in wish_only and not (d["wish"] or d["watch"]
                                           or cfg["categories"].get(d["cat"], {}).get("radar")):
                 continue  # radar feeds only exist to catch wish-list (and `radar: true` section) items early
-            ok, why = passes(d, cfg, relaxed=cfg["categories"].get(d["cat"], {}).get("relaxed", False))
-            if quiet and not cfg["categories"].get(d["cat"], {}).get("instant"):
+            ok, why = passes(d, cfg, relaxed=bool(d["steal"]) or cfg["categories"].get(d["cat"], {}).get("relaxed", False))
+            if quiet and not (is_instant or d["steal"]):
                 continue  # leave it unseen for the morning
             if ok and (d["watch"] or d["cat"]):
                 d["cat"] = d["cat"] or next(iter(cfg["categories"]))
@@ -1161,7 +1219,7 @@ def run(args):
                     log(f"  skip: {d['title'][:70]} — {k}")
     log(f"Skipped: {dict(sorted(skips.items(), key=lambda x: -x[1]))}")
 
-    cands.sort(key=lambda d: (not cfg["categories"].get(d["cat"], {}).get("instant"), not d.get("watch"),
+    cands.sort(key=lambda d: (not d.get("steal"), not cfg["categories"].get(d["cat"], {}).get("instant"), not d.get("watch"),
                               not d.get("wish"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
     cands = cands[: cap * 3]
     if args.feed:
@@ -1190,6 +1248,27 @@ def run(args):
             d["hist"] = history_note(d, prices)
             keep.append(d)
 
+    # 🚨 Steals first — every second counts.
+    steals = [d for d in keep if d.get("steal")]
+    for d in steals:
+        try:
+            res = send_steal(d, cfg, args.dry_run, silent=quiet and not steal_loud)
+        except Exception as ex:
+            log(f"  ! steal alert failed: {ex!r}")
+            res = None
+        if not res:
+            continue
+        log(f"  🚨 STEAL sent ({d['steal']}): {d['title'][:60]}")
+        seen[d["id"]] = now + SENT_TTL
+        keep.remove(d)
+        cards[d["id"]] = {"mid": res["mid"], "photo": res["photo"], "chat": res["chat"], "steal": d["steal"], "ts": now,
+                          "pub": d.get("pub"), **{k: d.get(k) for k in ("title", "buy", "thread", "store", "price", "watch", "wish")}}
+    if not args.feed and not args.radar:
+        try:  # re-check older cards AFTER steals are out, so a steal never waits on housekeeping
+            sweep_cards(cards, cfg, args.dry_run, before=now)
+        except Exception as ex:  # never let housekeeping stop the hunt
+            log(f"  ! card sweep failed: {ex!r}")
+
     instant = [d for d in keep if cfg["categories"].get(d["cat"], {}).get("instant")]
     for d in instant:
         instant_alert(d, cfg, args.dry_run, silent=quiet)
@@ -1213,11 +1292,12 @@ def run(args):
         cards[d["id"]] = {"mid": res["mid"], "photo": res["photo"], "ts": now, "pub": d.get("pub"),
                           **{k: d.get(k) for k in ("title", "buy", "thread", "store", "price", "watch", "wish")}}
     keep.sort(key=lambda d: (d["status"] not in ("in_stock", "live"), -(d["pct"] or 0), -(d["thumbs"] or 0)))
-    sent = digest(keep, cfg, args.dry_run)
+    sent = [] if args.radar else digest(keep, cfg, args.dry_run)
     for d in sent:  # deals that didn't fit stay eligible for the next run
         seen[d["id"]] = now + SENT_TTL
 
-    log(f"Checked {len(cands)}: {tally}. Sent {len(instant)} price mistakes + {n_cards} wish-list cards + {len(sent)} in digest.")
+    log(f"Checked {len(cands)}: {tally}. Sent {len(steals)} steals + {len(instant)} price mistakes + "
+        f"{n_cards} wish-list cards + {len(sent)} in digest.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
@@ -1250,6 +1330,7 @@ def demo(src):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--radar", action="store_true")
     ap.add_argument("--test", action="store_true")
     ap.add_argument("--check", metavar="URL")
     ap.add_argument("--feed")

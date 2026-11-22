@@ -7,6 +7,13 @@ Free deal bot for Telegram. Runs every 30 minutes on GitHub Actions, triggered b
 - **Sections:** 🔥 Ultra Deals (65%+ off, clearance, price mistakes) · 🔌 Electronics · 🧺 Home Appliances ·
   🎯 Wish List · 🪴 Room Revamp (budget office makeover: frames, LED strips, puck lights, planter, cable tidy; own $8 price floor) · 🖼️ Home & Room Decor · 🌿 Patio · 🛋️ Furniture · 🏷️ Coupons & Promo Codes · 🆓 Freebies · 🎁 Giveaways
 - **🚨 Price mistakes** get their own instant message with a Buy button, even overnight (silently). Only ones posted in the last 12h.
+- **🚨 STEALS** — a wish-list/watchlist item at a crazy price (at or under its `steal:` price in the watchlist, or 50%+ off).
+  Sent **first** in the run, its own loud card with a big **BUY NOW** button, **pinned** to the top of the chat, rings even in
+  quiet hours, no waiting for votes. The pin comes off and the card flips to ❌ EXPIRED when the deal dies.
+  Optional: set a `TELEGRAM_STEAL_CHAT_ID` secret (a private channel with the bot as admin) to get steals in their own chat
+  with a custom ringtone.
+- **Radar mode** (`--radar`, or the "radar" box on Run workflow): a fast steal-only pass over the radar + Slickdeals front-page
+  feeds — no digest, no sweep. Point a second cron-job.org timer at it to check for steals between full runs.
 - **🎯 Wish List + watchlist deals** each get their own **photo card**: price, list price, % off, store, how long ago it
   was posted (🟢 under 1h · 🟡 under 4h · 🟠 older), and whether it's verified live. Buttons: **🛒 Buy** (straight to the store),
   **🔎 Search** (store search for the product, a link that can't expire).

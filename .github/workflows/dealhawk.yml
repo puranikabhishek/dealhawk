@@ -17,6 +17,10 @@ on:
         description: "Dry run: log what would be sent, send nothing"
         type: boolean
         default: false
+      radar:
+        description: "Fast steal-only pass (radar + front-page feeds, no digest)"
+        type: boolean
+        default: false
 
 permissions:
   contents: write   # lets the run save price history + seen deals back to the repo
@@ -46,9 +50,12 @@ jobs:
           RECHECK: ${{ inputs.recheck }}
           DEMO: ${{ inputs.demo }}
           DRY: ${{ inputs.dry }}
+          RADAR: ${{ inputs.radar }}
+          TELEGRAM_STEAL_CHAT_ID: ${{ secrets.TELEGRAM_STEAL_CHAT_ID }}
         run: |
           if [ -n "$DEMO" ]; then python dealhawk.py --demo "$( [ "$DEMO" = yes ] && echo all || echo "$DEMO" )"
-          elif [ "$DRY" = "true" ]; then python dealhawk.py --dry-run
+          elif [ "$DRY" = "true" ]; then python dealhawk.py --dry-run $( [ "$RADAR" = true ] && echo --radar )
+          elif [ "$RADAR" = "true" ]; then python dealhawk.py --radar
           else python dealhawk.py; fi
 
       - name: Save state

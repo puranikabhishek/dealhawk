@@ -25,17 +25,28 @@ wishlist_alerts:
   min_thumbs: 2                # a FRESH wish-list post only needs 2 votes (not 5) — you hear sooner
   fresh_hours: 3               # …"fresh" = posted within this many hours; older posts need the usual 5
   track_hours: 36              # how long a sent card keeps getting re-checked for expiry
-digest_silent: false           # true = digest arrives without a buzz, so only 🎯 cards and 🚨 mistakes ping
+digest_silent: false
+
+# 🚨 STEALS — a wish-list/watchlist item at a crazy price (Bose $124, Echo Show 8 $56). These sell out in
+# about an hour, so they skip everything slow: own loud message, sent first, pinned to the top of the chat,
+# ring even during quiet hours, no waiting for votes. Pin comes off automatically when the deal dies.
+steal_alerts:
+  enabled: true
+  min_pct: 50                  # any wish-list item at 50%+ off (when the list price is known) is a steal
+  ignore_quiet_hours: true     # false = steals at night arrive silently instead
+  pin: true
+  # Optional: put steals in their OWN Telegram chat so you can give it a loud custom ringtone.
+  # Create a private channel, add @dealscouthawk_bot as admin, save its id as the TELEGRAM_STEAL_CHAT_ID secret.           # true = digest arrives without a buzz, so only 🎯 cards and 🚨 mistakes ping
 
 # Fresh, curated sources (tested from GitHub's servers). `category` forces every item into that section.
 feeds:
-  - {name: Slickdeals Frontpage, url: "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1"}
-  - {name: Slickdeals Popular, url: "https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1"}
+  - {name: Slickdeals Frontpage, url: "https://slickdeals.net/newsearch.php?mode=frontpage&searcharea=deals&searchin=first&rss=1", radar: true}
+  - {name: Slickdeals Popular, url: "https://slickdeals.net/newsearch.php?mode=popdeals&searcharea=deals&searchin=first&rss=1", radar: true}
   - {name: DealNews, url: "https://www.dealnews.com/?rss=1", max_age_hours: 96}
   - {name: DealNews Staff Picks, url: "https://www.dealnews.com/f1682/Staff-Pick/?rss=1", max_age_hours: 96}
   - {name: DealNews Electronics, url: "https://www.dealnews.com/c142/Electronics/?rss=1", max_age_hours: 96}
   - {name: DealNews Home & Garden, url: "https://www.dealnews.com/c196/Home-Garden/?rss=1", max_age_hours: 96}
-  - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9"}
+  - {name: Slickdeals New Hot Deals, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=9", radar: true}
   - {name: Slickdeals Freebies, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=4", category: freebies, max_age_hours: 24}
   - {name: Slickdeals Sweepstakes, url: "https://slickdeals.net/newsearch.php?searcharea=deals&searchin=first&rss=1&forumchoice%5B%5D=25", category: giveaways, max_age_hours: 72}
   # More boards (Nov 2026) — all tested from GitHub's servers. 24h cap since these sites don't flag expiry as reliably.
@@ -92,9 +103,9 @@ categories:
                ring contact sensor, ring alarm contact sensor, contact sensor, contact sensors,
                door sensor, window sensor, door and window sensor, window and door sensor, door/window sensor,
                echo show, echo show 5, echo show 8, echo show 11, echo show 15, echo show 21,
-               headphones, headphone, earbuds, earbud,
+               headphones, headphone, over-ear, over ear,
                noise cancelling, noise canceling, quietcomfort, sony wh-1000xm5, sony wh-1000xm6,
-               wf-1000xm5, beats, sennheiser, jabra, shokz, galaxy buds, pixel buds,
+               beats studio, sennheiser, jabra,
                plaud, notepin, plaud note, ai voice recorder, ai recorder, ai note taker, ai notetaker,
                soundcore work, ticnote,
                air fryer, air fryers, airfryer, air fryer oven, air fry oven, cosori, instant vortex,
@@ -263,6 +274,9 @@ exclude_keywords: [
   nba 2k, 2k26, 2k27, madden, ea sports fc, audiobook, audiobooks, apple books, kindle books, kindle unlimited,
   flexstyle, multi-styler, hair dryer, hair straightener, curling iron, hair styler, airwrap,
   airpods, airpods pro, airpods max, mattress, mattresses, refrigerator, refrigerators, fridge, fridges,
+  # Over-ear headphones only — no earbuds / open-ear / bone conduction
+  earbuds, earbud, buds, in-ear, in ear, open-ear, open ear, bone conduction, clip-on, true wireless, tws,
+  openfit, openrun, opendots, openswim, powerbeats, beats fit, beats solo buds, airpods,
   # Nov 2026: no vacuums, heaters or speakers
   vacuum, vacuums, vac, robot vacuum, robovac, roomba, roborock, deebot, ecovacs, narwal, shop vac, shop-vac,
   heater, heaters, space heater, space heaters, patio heater, water heater, water heaters, hot+cool,
@@ -294,22 +308,48 @@ watchlist:
   - name: Ring contact sensors
     keywords: [ring, contact sensors]
     max_price: 35
-  # Echo Show — caps near past Black Friday lows
+  # Echo Show — caps near past Black Friday lows. `steal` = at or under this, it's a 🚨 STEAL (loud, pinned).
   - name: Echo Show 5
     keywords: [echo show 5]
     max_price: 55
+    steal: 40
   - name: Echo Show 8
     keywords: [echo show 8]
     max_price: 110
+    steal: 70
   - name: Echo Show 11
     keywords: [echo show 11]
     max_price: 150
+    steal: 100
   - name: Echo Show 15
     keywords: [echo show 15]
     max_price: 240
+    steal: 180
   - name: Echo Show 21
     keywords: [echo show 21]
     max_price: 320
+    steal: 250
+  # Over-ear ANC headphones (no earbuds). Most specific first — the first match wins.
+  - name: Bose QuietComfort Ultra headphones
+    keywords: [bose, quietcomfort ultra, headphones]
+    max_price: 330
+    steal: 280
+  - name: Bose QuietComfort headphones
+    keywords: [bose, quietcomfort, headphones]
+    max_price: 200
+    steal: 150
+  - name: Sony WH-1000XM6
+    keywords: [sony, xm6]
+    max_price: 380
+    steal: 330
+  - name: Sony WH-1000XM5
+    keywords: [sony, xm5]
+    max_price: 280
+    steal: 230
+  - name: Sennheiser Momentum 4
+    keywords: [sennheiser, momentum 4]
+    max_price: 240
+    steal: 200
   - name: Milwaukee M18 combo kit
     keywords: [milwaukee, m18, kit]
     max_price: 250
