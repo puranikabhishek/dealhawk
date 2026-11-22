@@ -881,15 +881,28 @@ def short(t, n=48):
     return product_name(t, n)
 
 
+def heat(pct):
+    """Color badge by discount depth — lets you spot the big ones at a glance."""
+    return "🟥" if pct >= 70 else "🟧" if pct >= 50 else "🟨" if pct >= 30 else "▫️"
+
+
 def deal_line(d):
+    """Two lines per deal: bold name, then price · was · % · tappable store link."""
     e = html.escape
-    link = f'<a href="{e(d["buy"], quote=True)}">{e(short(d["title"]))}</a>'
+    label, _ = store_search(d["title"], d.get("store"))
+    store = e(label or d.get("store") or "Open deal")
+    link = f'<a href="{e(d["buy"], quote=True)}">{store} ›</a>'
+    name = f"<b>{e(short(d['title']))}</b>"
     if d["cat"] in ("freebies", "giveaways") or not d["price"]:
-        return f"• {link}"
-    pct = f" <i>−{d['pct']}%</i>" if d["pct"] else ""
-    tilde = "" if d.get("price_ok") else "~"  # ~ = price from the post; store page didn't let me confirm
-    flag = f" <i>({e(d['flags'][0])})</i>" if d.get("flags") else ""
-    return f"<b>{tilde}${d['price']:,.0f}</b>{pct}{flag} {link}"
+        return f"🎁 {name}\n   └ {link}"
+    pct = d.get("pct") or 0
+    money = f"{'' if d.get('price_ok') else '≈'}<b>{usd(d['price'])}</b>"
+    if d.get("reg") and d["reg"] > d["price"]:
+        money += f" <s>{usd(d['reg'])}</s>"
+    if pct:
+        money += f" <b>−{pct}%</b>"
+    flag = f" <i>{e(d['flags'][0])}</i>" if d.get("flags") else ""
+    return f"{heat(pct)} {name}\n   └ {money}{flag} · {link}"
 
 
 def send_text(text, dry, buttons=None, preview=None, silent=False):
@@ -904,29 +917,31 @@ def send_text(text, dry, buttons=None, preview=None, silent=False):
 
 
 def instant_alert(d, cfg, dry, silent=False):
-    """Price mistakes: own message, right away, Buy button + Slickdeals/Reddit thread for proof."""
+    """Price mistakes: own photo card, right away, Buy button + Slickdeals/Reddit thread for proof."""
+    e = html.escape
     c = cfg["categories"][d["cat"]]
-    price = f"<b>{'' if d.get('price_ok') else '~'}${d['price']:,.2f}</b>" if d["price"] else ""
-    if d.get("flags"):
-        price += f" <i>({html.escape(', '.join(d['flags']))})</i>"
-    if d["reg"]:
-        price += f" <s>${d['reg']:,.0f}</s>"
-    if d["pct"]:
-        price += f" −{d['pct']}%"
-    age = f"posted {d['age_h'] * 60:.0f} min ago" if d["age_h"] is not None and d["age_h"] < 1 else \
-          (f"posted {d['age_h']:.0f}h ago" if d["age_h"] is not None else "")
-    stock = "✅ store shows in stock" if d["status"] == "in_stock" else "⚡ move fast — may already be gone"
-    text = "\n".join(x for x in [f"{c.get('emoji', '🚨')} <b>{c.get('title', 'Price Error: Buy Fast').upper()}</b>",
-                                  html.escape(short(d["title"], 120)), price,
-                                  " · ".join(x for x in [age, stock] if x)] if x)
-    btn = [{"text": "🛒 Buy now", "url": d["buy"]}]
+    label, _ = store_search(d["title"], d.get("store"))
+    money = ""
+    if d["price"]:
+        money = f"💸 <b>{'' if d.get('price_ok') else '≈'}{usd(d['price'])}</b>"
+        if d["reg"]:
+            money += f"   <s>{usd(d['reg'])}</s>"
+        if d["pct"]:
+            money += f"   <b>−{d['pct']}%</b>"
+        if d.get("flags"):
+            money += f"\n<i>{e(', '.join(d['flags']))}</i>"
+    age = ago(d["age_h"])
+    stock = "✅ In stock right now" if d["status"] == "in_stock" else "⚡ Unverified — may already be gone"
+    where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", age] if x)
+    lines = [f"{c.get('emoji', '🚨')} <b>{e(c.get('title', 'Price Error: Buy Fast').upper())}</b>",
+             f"<b>{e(short(d['title'], 90))}</b>", "",
+             f"<blockquote>{money}</blockquote>" if money else "", where, stock, "",
+             "<i>Price errors get cancelled or pulled fast. Order first, ask questions later.</i>"]
+    cap = "\n".join(l for i, l in enumerate(lines) if l or i in (2, 6)).strip()
+    btn = [{"text": f"🛒 Buy at {label}" if label else "🛒 Buy now", "url": d["buy"]}]
     if d["thread"].startswith("http") and d["thread"] != d["buy"]:
-        btn.append({"text": "💬 Proof / comments", "url": d["thread"]})
-    if dry:
-        return send_text(text, True, buttons=btn)
-    return tg("sendMessage", chat_id=TG_CHAT, text=text, parse_mode="HTML", disable_notification=silent,
-              link_preview_options={"url": d["buy"], "prefer_small_media": True},
-              reply_markup={"inline_keyboard": [btn]}).ok
+        btn.append({"text": "💬 Proof", "url": d["thread"]})
+    return send_card(d, cfg, dry, silent=silent, parts=(cap, {"inline_keyboard": [btn]}))
 
 
 STORE_SEARCH = [
@@ -978,16 +993,18 @@ def card_parts(d, cfg, expired=None):
                  f"<s>{price}</s>{' at ' + e(d['store']) if d.get('store') else ''}{last}"]
         rows = [[{"text": f"🔎 Check {label or 'price'} anyway", "url": search}]]
     else:
-        money_line = f"💰 <b>{price}</b>" if price else ""
+        money_line = f"💸 <b>{price}</b>" if price else ""
         if d.get("reg") and d.get("price") and d["reg"] > d["price"]:
-            money_line += f"  <s>{usd(d['reg'])}</s>"
+            money_line += f"   <s>{usd(d['reg'])}</s>"
         if d.get("pct"):
-            money_line += f"  <b>−{d['pct']}%</b>" + (" 🔥" if d["pct"] >= 50 else "")
+            money_line += f"   <b>−{d['pct']}%</b> {heat(d['pct'])}"
         notes = ([d["price_note"]] if d.get("price_note") else []) + list(d.get("flags") or [])
         if money_line and not d.get("price_ok"):
             notes.append("price from deal post, not confirmed on store page")
         if notes and money_line:
             money_line += f"\n<i>{e(' · '.join(dict.fromkeys(notes)))}</i>"
+        if money_line:
+            money_line = f"<blockquote>{money_line}</blockquote>"
         where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", ago(d.get("age_h"))] if x)
         site = site_of(d.get("thread"))
         proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
@@ -996,10 +1013,10 @@ def card_parts(d, cfg, expired=None):
             proof += f" · 👍 {d['thumbs']}"
         proof += f" · {cfg.get('_now', '')}" if cfg.get("_now") else ""
         low = "📉 Lowest price I've tracked for this" if d.get("hist") else ""
-        head = "YOUR TARGET PRICE HIT" if d.get("watch") else "ON YOUR WISH LIST"
-        lines = [f"🎯 <b>{head}</b> · {tag}", f"<b>{title}</b>", "", money_line, where, proof, low]
-        rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]}],
-                [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
+        head = "TARGET PRICE HIT" if d.get("watch") else "WISH LIST"
+        lines = [f"🎯 <b>{head}</b> · <i>{tag}</i>", f"<b>{title}</b>", "", money_line, where, proof, low]
+        rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]},
+                 {"text": "🔎 Compare", "url": search}]]
     cap = "\n".join(l for i, l in enumerate(lines) if l or i == 2)
     return cap.strip(), {"inline_keyboard": rows}
 
@@ -1126,8 +1143,14 @@ def digest(deals, cfg, dry):
         group = [d for d in deals if d["cat"] == cat][:per_cat]
         if group:
             sent += group
-            blocks.append(f"{c.get('emoji', '')} <b>{c.get('title', cat)}</b>\n" + "\n".join(deal_line(d) for d in group))
-    chunks, cur = [], f"🦅 <b>{len(sent)} checked deals</b> · {now}"
+            body = "\n".join(deal_line(d) for d in group)
+            blocks.append(f"{c.get('emoji', '')} <b>{html.escape(c.get('title', cat).upper())}</b>"
+                          f" <i>· {len(group)}</i>\n<blockquote>{body}</blockquote>")
+    if not sent:
+        return []
+    best = max(sent, key=lambda d: d.get("pct") or 0)
+    top = f"\n🏆 Best: <b>−{best['pct']}%</b> {html.escape(short(best['title'], 34))}" if best.get("pct") else ""
+    chunks, cur = [], f"🦅 <b>DEALHAWK</b> · {now}\n{len(sent)} verified deals{top}"
     for b in blocks:
         if len(cur) + len(b) + 2 > TG_LIMIT:
             chunks.append(cur)
