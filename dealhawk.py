@@ -887,14 +887,14 @@ def heat(pct):
 
 
 def deal_line(d):
-    """Two lines per deal: bold name, then price · was · % · tappable store link."""
+    """Two lines per deal; the whole thing (name, price, store) is one big tappable link."""
     e = html.escape
     label, _ = store_search(d["title"], d.get("store"))
     store = e(label or d.get("store") or "Open deal")
-    link = f'<a href="{e(d["buy"], quote=True)}">{store} ›</a>'
+    href = e(d["buy"], quote=True)
     name = f"<b>{e(short(d['title']))}</b>"
     if d["cat"] in ("freebies", "giveaways") or not d["price"]:
-        return f"🎁 {name}\n   └ {link}"
+        return f'🎁 <a href="{href}">{name}\n   └ Get it at {store} ›</a>'
     pct = d.get("pct") or 0
     money = f"{'' if d.get('price_ok') else '≈'}<b>{usd(d['price'])}</b>"
     if d.get("reg") and d["reg"] > d["price"]:
@@ -902,7 +902,7 @@ def deal_line(d):
     if pct:
         money += f" <b>−{pct}%</b>"
     flag = f" <i>{e(d['flags'][0])}</i>" if d.get("flags") else ""
-    return f"{heat(pct)} {name}\n   └ {money}{flag} · {link}"
+    return f'{heat(pct)} <a href="{href}">{name}\n   └ {money}{flag} · {store} ›</a>'
 
 
 def send_text(text, dry, buttons=None, preview=None, silent=False):
@@ -1150,7 +1150,7 @@ def digest(deals, cfg, dry):
         return []
     best = max(sent, key=lambda d: d.get("pct") or 0)
     top = f"\n🏆 Best: <b>−{best['pct']}%</b> {html.escape(short(best['title'], 34))}" if best.get("pct") else ""
-    chunks, cur = [], f"🦅 <b>DEALHAWK</b> · {now}\n{len(sent)} verified deals{top}"
+    chunks, cur = [], f"🦅 <b>DEALHAWK</b> · {now}\n{len(sent)} verified deal{'' if len(sent) == 1 else 's'}{top}"
     for b in blocks:
         if len(cur) + len(b) + 2 > TG_LIMIT:
             chunks.append(cur)
