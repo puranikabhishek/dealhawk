@@ -116,19 +116,6 @@
   "watch": null,
   "wish": "noise canceling"
  },
- "32ae1f6c121326e7": {
-  "buy": "https://memoket.ai/products/memoket-gem?im_ref=WgnyFoXjvxyZTHg1HER6R1imUkrUBERcwSUN0M0&sharedid=&irpid=10534&irgwc=1&afsrc=1",
-  "mid": 820,
-  "photo": true,
-  "price": 143.0,
-  "pub": 1795168800,
-  "store": "Memoket",
-  "thread": "https://www.dealnews.com/Memoket-Gem-Wearable-AI-Voice-Recorder-for-143-free-shipping/22403369.html?iref=rss-c142",
-  "title": "Memoket Gem Wearable AI Voice Recorder for $143 + free shipping",
-  "ts": 1795181424.995353,
-  "watch": null,
-  "wish": "ai voice recorder"
- },
  "35d25eb29d32afc4": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=7&trd=Amazon&pv=&au=&u3=MtjT7yAR-dWvTk2C3_J4fLcXFfn8v-pGbK4cZ80osYx-WJ1LRqzzjoSzBReyMPXhF4lHn0wUsZvTYfTRd98s69kcLYsY3oCrxLzTLc4lV_vZqTeR94hGjoXAmsAYfYBIRd48xv4VXTvy5YKEIm2UUgM6sob9dm-bJwCoe_6a30z7hLE67QvyrfI",
   "mid": 879,
@@ -258,6 +245,19 @@
   "ts": 1795197626.7068572,
   "watch": null,
   "wish": "ergonomic office chair"
+ },
+ "5d0938d3860618ba": {
+  "buy": "https://www.amazon.com/dp/B0DC8ZMR1P",
+  "mid": 918,
+  "photo": true,
+  "price": 99.99,
+  "pub": 1795311060,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/dp/B0DC8ZMR1P",
+  "title": "Amazon Echo Show 8 Spatial Audio 8.7\" Smart Display (4th Gen) $99.99",
+  "ts": 1795312821.5889924,
+  "watch": "Echo Show 8",
+  "wish": "echo show 8"
  },
  "6abf018d2c760711": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=38&trd=Amazon&pv=&au=&u3=MqEM7FCbAowQ9KGbuRrvY_cZK1n6j-EFSX_hMADcpLIgFmU6AeQHFtBk3zsBsYTb2Ez3uy8BCpdVIv2zLZkpFHlDddaRrOn5-uIfk9E9-FuK95ql9aBGbUhGYmZdHj5xcemFdtSVqfQgrgNYZSlVkL1vq619",
@@ -414,6 +414,19 @@
   "ts": 1795210220.831319,
   "watch": null,
   "wish": "file cabinet"
+ },
+ "ad3eb143291bece9": {
+  "buy": "https://slickdeals.net/click?sdfib=1&lno=31&trd=Cuisinart%20Air%20Fryer%20Glass%20Basket&pv=&au=&u3=MvJp2TUMRNIzAwiNmVXnTywdFGUNV692oL6U60HEtiJSK8Qxm2szgH7sTZBZZk486w0iqJb4z-3AkUEkeW7yjYw",
+  "mid": 919,
+  "photo": true,
+  "price": 83.99,
+  "pub": 1795310532,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20366427-cuisinart-air-fryer-glass-basket-clearview-window-5-functions-4-qt-various-colors-from-83-99?utm_source=rss&utm_content=&utm_medium=RSS2",
+  "title": "Cuisinart Air Fryer, Glass Basket & ClearView Window, 5 Functions, 4 Qt, various colors, from $83.99",
+  "ts": 1795312821.5889924,
+  "watch": null,
+  "wish": "air fryer"
  },
  "b9ab8665053dc5a2": {
   "buy": "https://bestbuycreators.7tiv.net/MKjN1P",
