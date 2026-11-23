@@ -1,4 +1,17 @@
 {
+ "03cd84129f43d746": {
+  "buy": "https://www.amazon.com/dp/B09B2QTGFY?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=4j6d47qmll11c85q2dcxv8Uba5iaiOVE",
+  "mid": 1011,
+  "photo": true,
+  "price": 55.0,
+  "pub": 1795454216,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Amazon/3-rd-Gen-Amazon-Echo-Show-5-Smart-Display-2023/458961.html?iref=rss-c142",
+  "title": "3rd-Gen. Amazon Echo Show 5 Smart Display (2023) for $55 + free shipping",
+  "ts": 1795456828.8944662,
+  "watch": "Echo Show 5",
+  "wish": "echo show 5"
+ },
  "040bf851bb6a2874": {
   "buy": "https://slickdeals.net/click?sdtid=20374380&sdfid=9&lno=4&trd=Walmart&pv=&au=&u3=Mnua0rsOOg6k-dZ1MiPIhfCBUNT043zKl1scKoY-byCxeF5UoGsy96lwNWWQOHqQo7MVFrEIqb-B3fCv5rG4zgQC5b6wDTZk5zjSzMSjY3UAK3Yoig",
   "mid": 991,
@@ -286,6 +299,19 @@
   "ts": 1795453224.6343088,
   "watch": null,
   "wish": "air fryer"
+ },
+ "98070576afc86637": {
+  "buy": "https://www.walmart.com/ip/Beats-Studio-Pro-Wireless-Headphones-White-Black/20630967817?clickid=Vbw1Y1XFqxyZRF-z6YXhFQfnUkrUOQ3ggWw-2w0&irgwc=1&afsrc=1&sourceid=imp_Vbw1Y1XFqxyZRF-z6YXhFQfnUkrUOQ3ggWw-2w0&veh=aff&wmlspartner=imp_52269&affiliates_ad_id=565706&campaign_id=9383&sharedid=383316056706080768",
+  "mid": 1012,
+  "photo": true,
+  "price": 99.0,
+  "pub": 1795453943,
+  "store": "Walmart",
+  "thread": "https://www.dealnews.com/products/Beats/Beats-Studio-Pro-Wireless-Noise-Cancelling-Over-Ear-Headphones/562849.html?iref=rss-c142",
+  "title": "Beats Studio Pro Wireless Noise Cancelling Over-Ear Headphones for $99 + free shipping",
+  "ts": 1795456828.8944662,
+  "watch": null,
+  "wish": "noise cancelling"
  },
  "9aff91bc9d4f69e9": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=35&trd=MyGolfGuru%20via%20Amazon&pv=&au=&u3=MuTpa8kZyN8vc3KVART9hvAOdQ0dZSMM_w3KM6PX5c35z3c6m0BsNbLzz0fHORNvPmKlQUSvFuq8zF9GYKAjQBW16AKrxeBdAcCI7puXhjLr_0km78BOJIU5B-KsEF3rdTEo6xWPmm54k77ZuFbRj7i3CYo8oBPrmjUtKfTB0fU-2T-V5o0LR9XT",
