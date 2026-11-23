@@ -196,6 +196,19 @@
   "watch": null,
   "wish": "air fryer"
  },
+ "7897c376b3246b7c": {
+  "buy": "https://www.walmart.com/ip/seort/17284765594",
+  "mid": 983,
+  "photo": true,
+  "price": 27.99,
+  "pub": 1795430400,
+  "store": "Walmart",
+  "thread": "https://www.walmart.com/ip/seort/17284765594",
+  "title": "Chefman TurboFry 1000W Digital Air Fryer $27.99",
+  "ts": 1795438829.7508445,
+  "watch": null,
+  "wish": "air fryer"
+ },
  "9aff91bc9d4f69e9": {
   "buy": "https://slickdeals.net/click?sdfib=1&lno=35&trd=MyGolfGuru%20via%20Amazon&pv=&au=&u3=MuTpa8kZyN8vc3KVART9hvAOdQ0dZSMM_w3KM6PX5c35z3c6m0BsNbLzz0fHORNvPmKlQUSvFuq8zF9GYKAjQBW16AKrxeBdAcCI7puXhjLr_0km78BOJIU5B-KsEF3rdTEo6xWPmm54k77ZuFbRj7i3CYo8oBPrmjUtKfTB0fU-2T-V5o0LR9XT",
   "mid": 950,
@@ -245,6 +258,19 @@
   "thread": "https://www.dealnews.com/products/Cuisinart/Cuisinart-Artisan-French-Door-Air-Fryer-Toaster-Oven/562602.html?iref=rss-c196",
   "title": "Cuisinart Artisan French Door Air Fryer Toaster Oven for $123 + free shipping",
   "ts": 1795402834.5699449,
+  "watch": null,
+  "wish": "air fryer"
+ },
+ "b9f9a6b98739f65f": {
+  "buy": "https://www.walmart.com/ip/seort/17240474990",
+  "mid": 984,
+  "photo": true,
+  "price": 55.0,
+  "pub": 1795426200,
+  "store": "Walmart",
+  "thread": "https://www.walmart.com/ip/seort/17240474990",
+  "title": "Gourmia 1700W 24L 6-Slice French Door Digital Air Fryer with Temperature Probe $55",
+  "ts": 1795438829.7508445,
   "watch": null,
   "wish": "air fryer"
  },
@@ -339,6 +365,19 @@
   "watch": null,
   "wish": "air fryer oven"
  },
+ "e10e4849f21ef1d4": {
+  "buy": "https://www.amazon.com/gp/product/B0CSZ7WBYW/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&psc=1",
+  "mid": 982,
+  "photo": true,
+  "price": 78.99,
+  "pub": 1795432500,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0CSZ7WBYW/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&psc=1",
+  "title": "Ninja Air Fryer Pro 4-in-1 5Qt Ceramic Coated Nonstick Basket $78.99",
+  "ts": 1795438829.7508445,
+  "watch": null,
+  "wish": "air fryer"
+ },
  "ec337b468e571239": {
   "buy": "https://www.amazon.com/dp/B0HD2TH6Q4?creative=9325&camp=1789&tag=dealnewscom&m=ATVPDKIKX0DER&ascsubtag=ge6d3yidju511c5ldagi4Krs2edPJQFH",
   "mid": 976,
@@ -365,5 +404,18 @@
   "ts": 1795352422.5770698,
   "watch": null,
   "wish": "quietcomfort"
+ },
+ "feb5709c0b857cc3": {
+  "buy": "https://www.amazon.com/dp/B0DC8ZMR1P?creative=9325&camp=1789&tag=dealnewscom&smid=ATVPDKIKX0DER&th=1&ascsubtag=kx6d44rgm6l16ldw3brdyg3jcVPpzrIJ",
+  "mid": 981,
+  "photo": true,
+  "price": 100.0,
+  "pub": 1795430584,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/Amazon-Echo-Show-8-HD-Smart-Display-for-100-free-shipping/22424376.html?iref=rss-c142",
+  "title": "Amazon Echo Show 8 HD Smart Display for $100 + free shipping",
+  "ts": 1795438829.7508445,
+  "watch": "Echo Show 8",
+  "wish": "echo show 8"
  }
 }
