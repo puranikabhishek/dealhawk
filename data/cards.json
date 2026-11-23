@@ -78,19 +78,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "5d0938d3860618ba": {
-  "buy": "https://www.amazon.com/dp/B0DC8ZMR1P",
-  "mid": 918,
-  "photo": true,
-  "price": 99.99,
-  "pub": 1795311060,
-  "store": "Amazon",
-  "thread": "https://www.amazon.com/dp/B0DC8ZMR1P",
-  "title": "Amazon Echo Show 8 Spatial Audio 8.7\" Smart Display (4th Gen) $99.99",
-  "ts": 1795312821.5889924,
-  "watch": "Echo Show 8",
-  "wish": "echo show 8"
- },
  "5e57d51234e097ca": {
   "buy": "https://slickdeals.net/click?lno=9&trd=Shokz&pv=&au=&u3=MsgwDggjL3ASxhQcr7Gmxfel6mT2_hasoDZvWzxj7xq7ex7C5k52JQm_2kydVKCpH9z05hvFvcSf_Q1VgdFsAEB3",
   "mid": 921,
@@ -232,19 +219,6 @@
   "thread": "https://slickdeals.net/f/20366316-cuisinart-air-fryer-toaster-oven-combo-countertop-7-in-1-1800w-toa-55-stainless-steel-0-6-cu-ft-convection-capability-maximum-temperature-to-450-f-109-95?utm_source=rss&utm_content=def&utm_medium=RSS2",
   "title": "Cuisinart Air Fryer Toaster Oven Combo, Countertop, 7-in-1, 1800W, TOA-55 | Stainless steel, 0.6 cu. ft., convection capability, maximum temperature to 450\u00b0F $109.95",
   "ts": 1795316422.5299735,
-  "watch": null,
-  "wish": "air fryer"
- },
- "ad3eb143291bece9": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=31&trd=Cuisinart%20Air%20Fryer%20Glass%20Basket&pv=&au=&u3=MvJp2TUMRNIzAwiNmVXnTywdFGUNV692oL6U60HEtiJSK8Qxm2szgH7sTZBZZk486w0iqJb4z-3AkUEkeW7yjYw",
-  "mid": 919,
-  "photo": true,
-  "price": 83.99,
-  "pub": 1795310532,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20366427-cuisinart-air-fryer-glass-basket-clearview-window-5-functions-4-qt-various-colors-from-83-99?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Cuisinart Air Fryer, Glass Basket & ClearView Window, 5 Functions, 4 Qt, various colors, from $83.99",
-  "ts": 1795312821.5889924,
   "watch": null,
   "wish": "air fryer"
  },
