@@ -834,6 +834,7 @@ def price_verdict(d, sp):
     # Store is charging more than the post said.
     if COUPON_TITLE.search(d["title"] + " " + d.get("plain", "")[:300]):
         d["price_note"] = f"page shows ${sp:,.2f} before coupon/code"
+        d["store_price"] = sp
         return None
     d["price_ok"] = False
     return f"price went up: post said ${tp:,.2f}, store now ${sp:,.2f} — not sending"
@@ -912,23 +913,32 @@ def heat(pct):
     return "🟥" if pct >= 70 else "🟧" if pct >= 50 else "🟨" if pct >= 30 else "▫️"
 
 
-def deal_line(d):
-    """Two lines per deal; the whole thing (name, price, store) is one big tappable link."""
+def deal_line(d, n=None):
+    """One deal = its own little block:
+         ① 🟧 $169  −47%  (was $319)
+            Ninja SLUSHi Frozen Drink Maker      ← tap
+            🛒 Walmart ›  · ✂️ clip coupon
+    Price first so you can scan prices down the page; blank line between deals."""
     e = html.escape
     label, _ = store_search(d["title"], d.get("store"))
     store = e(label or d.get("store") or "Open deal")
     href = e(d["buy"], quote=True)
-    name = f"<b>{e(short(d['title']))}</b>"
+    num = f"{n}. " if n else ""
+    name = f'<a href="{href}">{e(short(d["title"], 60))}</a>'
     if d["cat"] in ("freebies", "giveaways") or not d["price"]:
-        return f'🎁 <a href="{href}">{name}\n   └ Get it at {store} ›</a>'
+        head = "🎁 <b>FREE</b>" if d["cat"] in ("freebies", "giveaways") else "🏷️ <b>Store sale</b>"
+        return f"{num}{head}\n{name}\n🛒 <a href=\"{href}\">{store} ›</a>"
     pct = d.get("pct") or 0
-    money = f"{'' if d.get('price_ok') else '≈'}<b>{usd(d['price'])}</b>"
-    if d.get("reg") and d["reg"] > d["price"]:
-        money += f" <s>{usd(d['reg'])}</s>"
+    top = f"{num}{heat(pct)} <b>{usd(d['price'])}</b>"
     if pct:
-        money += f" <b>−{pct}%</b>"
-    flag = f" <i>{e(d['flags'][0])}</i>" if d.get("flags") else ""
-    return f'{heat(pct)} <a href="{href}">{name}\n   └ {money}{flag} · {store} ›</a>'
+        top += f"   <b>−{pct}%</b>"
+    if d.get("reg") and d["reg"] > d["price"]:
+        top += f"   <i>was {usd(d['reg'])}</i>"
+    extra = [f"✂️ {e(f)}" if "clip" in f else e(f) for f in (d.get("flags") or [])[:1]]
+    if not d.get("price_ok"):
+        extra.append("price not confirmed")
+    tail = f"🛒 <a href=\"{href}\">{store} ›</a>" + (f"  <i>· {' · '.join(extra)}</i>" if extra else "")
+    return f"{top}\n{name}\n{tail}"
 
 
 def send_text(text, dry, buttons=None, preview=None, silent=False):
@@ -961,13 +971,14 @@ def instant_alert(d, cfg, dry, silent=False):
     where = " · ".join(x for x in [f"🏬 {e(d['store'])}" if d.get("store") else "", age] if x)
     lines = [f"{c.get('emoji', '🚨')} <b>{e(c.get('title', 'Price Error: Buy Fast').upper())}</b>",
              f"<b>{e(short(d['title'], 90))}</b>", "",
-             f"<blockquote>{money}</blockquote>" if money else "", where, stock, "",
+             f"<blockquote>{money}</blockquote>" if money else "", *code_lines(d), where, stock, "",
              "<i>Price errors get cancelled or pulled fast. Order first, ask questions later.</i>"]
-    cap = "\n".join(l for i, l in enumerate(lines) if l or i in (2, 6)).strip()
+    cap = tidy(lines)
     btn = [{"text": f"🛒 Buy at {label}" if label else "🛒 Buy now", "url": d["buy"]}]
     if d["thread"].startswith("http") and d["thread"] != d["buy"]:
         btn.append({"text": "💬 Proof", "url": d["thread"]})
-    return send_card(d, cfg, dry, silent=silent, parts=(cap, {"inline_keyboard": [btn]}))
+    rows = [btn] + ([copy_button(d)] if copy_button(d) else [])
+    return send_card(d, cfg, dry, silent=silent, parts=(cap, {"inline_keyboard": rows}))
 
 
 STORE_SEARCH = [
@@ -1006,6 +1017,58 @@ def ago(hours):
     return f"{'🟡' if hours < 4 else '🟠'} {hours:.0f}h ago"
 
 
+def tidy(lines):
+    """Join caption lines; never more than one blank line in a row."""
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
+CODE_HOWTO = [
+    ("amazon", 'Proceed to checkout → Payment → "Add a gift card or promotion code" → Apply'),
+    ("walmart", 'Continue to checkout → "Add promo code" → Apply'),
+    ("target", 'Check out → "Promo code" → Apply'),
+    ("best buy", 'Checkout → "Gift card or discount code" → Apply'),
+]
+
+
+def code_lines(d):
+    """The code, big and copyable, plus what the cart will show and where to paste it."""
+    codes = d.get("codes") or []
+    if not codes:
+        return []
+    e = html.escape
+    label, _ = store_search(d["title"], d.get("store"))
+    out = ["🔑 <b>Code:</b>  " + "  /  ".join(f"<code>{e(c)}</code>" for c in codes[:2]) + "   <i>(tap to copy)</i>"]
+    if d.get("store_price") and d.get("price") and d["store_price"] > d["price"]:
+        out.append(f"🧾 Cart shows {usd(d['store_price'])} → <b>{usd(d['price'])}</b> after the code")
+    how = next((h for k, h in CODE_HOWTO if k in (label or d.get("store") or "").lower()), "Paste it in the promo/coupon box at checkout")
+    out.append(f"👉 {e(label or d.get('store') or 'Store')}: {e(how)}")
+    return out
+
+
+def copy_button(d):
+    c = (d.get("codes") or [None])[0]
+    return [{"text": f"📋 Copy {c}", "copy_text": {"text": c}}] if c else []
+
+
+def code_parts(d, cfg):
+    """🎟️ Promo-code deal: its own card, the code front and center."""
+    e = html.escape
+    label, search = store_search(d["title"], d.get("store"))
+    pct = f" · −{d['pct']}%" if d.get("pct") else ""
+    money = f"💰 You pay <b>{usd(d['price'])}</b>" if d.get("price") else ""
+    if money and d.get("reg") and d["reg"] > d["price"]:
+        money += f"   <i>was {usd(d['reg'])}</i>"
+    where = " · ".join(x for x in [f"🏬 {e(label or d.get('store') or '')}" if (label or d.get("store")) else "",
+                                   ago(d.get("age_h"))] if x)
+    proof = {"in_stock": "✅ In stock", "live": f"✅ Still live on {site_of(d.get('thread'))}"}.get(
+        d.get("status"), "⚠️ Couldn't verify stock")
+    wish = f"🎯 {e(d.get('watch') or d.get('wish'))}" if (d.get("watch") or d.get("wish")) else ""
+    lines = [f"🎟️ <b>PROMO CODE DEAL{pct}</b>", f"<b>{e(short(d['title'], 80))}</b>", "", money, *code_lines(d), "",
+             " · ".join(x for x in [where, proof] if x), wish]
+    rows = [[{"text": f"🛒 Open at {label}" if label else "🛒 Open deal", "url": d["buy"]}], copy_button(d)]
+    return tidy(lines), {"inline_keyboard": [r for r in rows if r]}
+
+
 def card_parts(d, cfg, expired=None):
     """Caption + buttons for a wish-list card. `expired` = hours the deal lasted, once it's dead."""
     e = html.escape
@@ -1040,9 +1103,13 @@ def card_parts(d, cfg, expired=None):
         proof += f" · {cfg.get('_now', '')}" if cfg.get("_now") else ""
         low = "📉 Lowest price I've tracked for this" if d.get("hist") else ""
         head = "TARGET PRICE HIT" if d.get("watch") else "WISH LIST"
-        lines = [f"🎯 <b>{head}</b> · <i>{tag}</i>", f"<b>{title}</b>", "", money_line, where, proof, low]
+        if d.get("codes") and not d.get("watch") and not d.get("wish"):
+            return code_parts(d, cfg)
+        lines = [f"🎯 <b>{head}</b> · <i>{tag}</i>", f"<b>{title}</b>", "", money_line, *code_lines(d), where, proof, low]
         rows = [[{"text": f"🛒 Buy at {label}" if label else "🛒 Open deal", "url": d["buy"]},
                  {"text": "🔎 Compare", "url": search}]]
+        if copy_button(d):
+            rows.append(copy_button(d))
     cap = "\n".join(l for i, l in enumerate(lines) if l or i == 2)
     return cap.strip(), {"inline_keyboard": rows}
 
@@ -1107,12 +1174,13 @@ def steal_parts(d, cfg):
     proof = {"in_stock": f"✅ In stock at {e(label or d.get('store') or 'store')}",
              "live": f"✅ Still live on {site_of(d.get('thread'))}"}.get(d.get("status"), "⚠️ Couldn't verify stock")
     lines = [f"🚨🚨 <b>STEAL{pct}</b> 🚨🚨", f"<b>{e(short(d['title'], 70))}</b>", "",
-             money_line, f"🎯 {e(d.get('watch') or d.get('wish') or '')} · {e(d['steal'])}", where,
+             money_line, *code_lines(d), f"🎯 {e(d.get('watch') or d.get('wish') or '')} · {e(d['steal'])}", where,
              f"{proof} · {cfg.get('_now', '')}", "",
              "⚡ <b>Deals this cheap sell out in about an hour. Buy now, decide later</b> (most stores take returns)."]
     rows = [[{"text": f"🛒 BUY NOW at {label}" if label else "🛒 BUY NOW", "url": d["buy"]}],
-            [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]]
-    return "\n".join(l for i, l in enumerate(lines) if l or i in (2, 7)).strip(), {"inline_keyboard": rows}
+            [{"text": f"🔎 Search {label}" if label else "🔎 Search price", "url": search}]] + \
+        ([copy_button(d)] if copy_button(d) else [])
+    return tidy(lines), {"inline_keyboard": rows}
 
 
 def send_steal(d, cfg, dry, silent=False):
@@ -1169,14 +1237,14 @@ def digest(deals, cfg, dry):
         group = [d for d in deals if d["cat"] == cat][:per_cat]
         if group:
             sent += group
-            body = "\n".join(deal_line(d) for d in group)
-            blocks.append(f"{c.get('emoji', '')} <b>{html.escape(c.get('title', cat).upper())}</b>"
-                          f" <i>· {len(group)}</i>\n<blockquote>{body}</blockquote>")
+            body = "\n\n".join(deal_line(d) for d in group)
+            blocks.append(f"━━━━━━━━━━━━━━\n{c.get('emoji', '')} <b>{html.escape(c.get('title', cat).upper())}</b>"
+                          f"  <i>({len(group)})</i>\n━━━━━━━━━━━━━━\n\n{body}")
     if not sent:
         return []
     best = max(sent, key=lambda d: d.get("pct") or 0)
-    top = f"\n🏆 Best: <b>−{best['pct']}%</b> {html.escape(short(best['title'], 34))}" if best.get("pct") else ""
-    chunks, cur = [], f"🦅 <b>DEALHAWK</b> · {now}\n{len(sent)} verified deal{'' if len(sent) == 1 else 's'}{top}"
+    top = f"\n🏆 Best: <b>−{best['pct']}%</b> · {html.escape(short(best['title'], 34))}" if best.get("pct") else ""
+    chunks, cur = [], f"🦅 <b>DEALHAWK</b> · {now} · {len(sent)} deal{'' if len(sent) == 1 else 's'}{top}"
     for b in blocks:
         if len(cur) + len(b) + 2 > TG_LIMIT:
             chunks.append(cur)
@@ -1323,6 +1391,22 @@ def run(args):
         instant_alert(d, cfg, args.dry_run, silent=quiet)
         seen[d["id"]] = now + SENT_TTL
     keep = [d for d in keep if d not in instant]
+    # 🎟️ Deals that need a promo code: their own card with the code, never buried in the digest.
+    code_deals = [d for d in keep if d.get("codes") and not d.get("watch") and not d.get("wish")]
+    n_codes = 0
+    for d in code_deals[: cfg.get("code_cards_per_run", 5)]:
+        try:
+            res = send_card(d, cfg, args.dry_run, parts=code_parts(d, cfg), silent=quiet)
+        except Exception as ex:
+            log(f"  ! code card failed, leaving it for the digest: {ex!r}")
+            res = None
+        if not res:
+            continue
+        n_codes += 1
+        seen[d["id"]] = now + SENT_TTL
+        keep.remove(d)
+        cards[d["id"]] = {"mid": res["mid"], "photo": res["photo"], "ts": now, "pub": d.get("pub"),
+                          **{k: d.get(k) for k in ("title", "buy", "thread", "store", "price", "codes")}}
     # Wish list + watchlist: each gets its own photo card, freshest first. Overflow rides in the digest.
     wishes = sorted((d for d in keep if d.get("watch") or d.get("wish")),
                     key=lambda d: (not d.get("watch"), d["age_h"] if d["age_h"] is not None else 99))
@@ -1346,7 +1430,7 @@ def run(args):
         seen[d["id"]] = now + SENT_TTL
 
     log(f"Checked {len(cands)}: {tally}. Sent {len(steals)} steals + {len(instant)} price mistakes + "
-        f"{n_cards} wish-list cards + {len(sent)} in digest.")
+        f"{n_codes} code cards + {n_cards} wish-list cards + {len(sent)} in digest.")
     if not args.dry_run:
         save_json(SEEN_FILE, {k: v for k, v in seen.items() if k == "_v" or v > now})
         save_json(PRICES_FILE, prices)
