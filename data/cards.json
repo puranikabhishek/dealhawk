@@ -25,20 +25,6 @@
   "watch": null,
   "wish": "mouse"
  },
- "04f76ed382bcdba5": {
-  "buy": "https://slickdeals.net/click?pno=1371000&lno=1&afsrc=1&trd=Target&hash=3d577442e66711f18a0e4efcbf5b088c&auuid=561b7e645cf311e6a9339a7c4443d98e",
-  "dead": true,
-  "mid": 927,
-  "photo": true,
-  "price": 56.0,
-  "pub": 1795346643,
-  "store": "Target",
-  "thread": "https://slickdeals.net/f/20368665-amazon-echo-show-8-graphite-56?utm_source=rss&utm_content=fp&utm_medium=RSS2",
-  "title": "8.7\" Amazon Echo Show 8 HD Smart Display (Graphite) $56 + Free S&H",
-  "ts": 1795352422.5770698,
-  "watch": "Echo Show 8",
-  "wish": "echo show 8"
- },
  "1a388dfa70170121": {
   "buy": "https://slickdeals.net/click?sdtid=20377650&sdfid=9&sdfib=1&lno=1&trd=Keychron%202020%20via%20Amazon&pv=&au=&u3=MmIRck7U_PRqBJQT6VJvtlXHNgZe2vSOtXL_T9Eg4jDbcymuFwmSnYI-EfkytW5J2CzvIbX217hvGIechf7__PsIjB4yNi0MOAmLsONSm_xo9ut6upeTtZHVFxJkwGUR2WF6o9hTtmPY3gHDKfzlUP_finPMxS6pC7kWuF6750ctzs4eiGxGjJFl",
   "mid": 993,
@@ -208,19 +194,6 @@
   "watch": null,
   "wish": "headphones"
  },
- "61508e2c5a219037": {
-  "buy": "https://www.amazon.com/gp/product/B07NSSPV9S/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
-  "mid": 929,
-  "photo": true,
-  "price": 49.99,
-  "pub": 1795349700,
-  "store": "Amazon",
-  "thread": "https://www.amazon.com/gp/product/B07NSSPV9S/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
-  "title": "Logitech G703 100-25600DPI Lightspeed Wireless Gaming Mouse w/ RGB Lighting $49.99",
-  "ts": 1795352422.5770698,
-  "watch": null,
-  "wish": "gaming mouse"
- },
  "625c061ce7f10854": {
   "buy": "https://www.amazon.com/dp/B0CLTLB2CK?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=gt6d3rnwtuosh11pk6b7W3oQR2BudARq",
   "mid": 938,
@@ -286,19 +259,6 @@
   "ts": 1795375819.2938032,
   "watch": null,
   "wish": "echo show 8"
- },
- "74823fd431865576": {
-  "buy": "https://slickdeals.net/click?sdtid=20367960&sdfid=9&sdfib=1&lno=16&trd=Amazon&pv=&au=&u3=MkVym-a-bfCD0o8jB1vtFmvUy9YWXkRocGGMP0laXCukfJ5u3VpXb_OWuU3RhlTkcMIO74c4j6fajQmf67vi4pQOgO_zZjTKGPhHgEaG9wxO1v4",
-  "mid": 930,
-  "photo": true,
-  "price": 299.95,
-  "pub": 1795335295,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20367960-299-95-breville-smart-oven-air-fryer-pro-brushed-stainless-steel-at-amazon?utm_source=rss&utm_content=def&utm_medium=RSS2",
-  "title": "$299.95* | Breville Smart Oven Air Fryer Pro (Brushed Stainless Steel) at Amazon",
-  "ts": 1795352422.5770698,
-  "watch": null,
-  "wish": "air fryer"
  },
  "7897c376b3246b7c": {
   "buy": "https://www.walmart.com/ip/seort/17284765594",
@@ -691,20 +651,6 @@
   "ts": 1795440620.8485305,
   "watch": null,
   "wish": "air fryer"
- },
- "fc6a2cb2db9b67cc": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=1&trd=https%20www%20amazon%20com%20dp%20B0F2LCBK&pv=&au=&u3=MmZtz3kznUnCVkahx6fHkSC4TFjMc4JlQ5KSpy0d45weSlBXmXeF2nDwij_2l3NiyWtbBQFZXsFAYOjbEMkQRww",
-  "dead": true,
-  "mid": 928,
-  "photo": true,
-  "price": 124.9,
-  "pub": 1795352192,
-  "store": "Amazon.com",
-  "thread": "https://slickdeals.net/f/20367786-bose-quietcomfort-wireless-bluetooth-headphones-petal-pink-124-88-free-s-h-at-amazon?utm_source=rss&utm_content=fp&utm_medium=RSS2",
-  "title": "Bose QuietComfort ANC Over Ear Headphones (Petal Pink) $124.90 + Free S&H",
-  "ts": 1795352422.5770698,
-  "watch": null,
-  "wish": "quietcomfort"
  },
  "feb5709c0b857cc3": {
   "buy": "https://www.amazon.com/dp/B0DC8ZMR1P?creative=9325&camp=1789&tag=dealnewscom&smid=ATVPDKIKX0DER&th=1&ascsubtag=kx6d44rgm6l16ldw3brdyg3jcVPpzrIJ",
