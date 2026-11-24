@@ -119,6 +119,24 @@ NOT_PRICE_BEFORE = re.compile(r"(?:save|saving|savings of|up to|over|nearly|almo
                               r"min(?:imum)?\.?|orders? (?:of|over)|spend|purchase of|\$\d+\s*-|w/)\s*:?\s*$", re.I)
 
 
+CODE_RX = re.compile(r"(?i:\b(?:promo|coupon|discount|offer|checkout)?\s*codes?\b)\s*(?i:is|of)?\s*[:\-]?\s*[\"'“‘(]?"
+                     r"([A-Z0-9][A-Z0-9-]{3,19})\b")
+CODE_NOT = re.compile(r"^(?:AMAZON|WALMART|TARGET|CHECKOUT|PRIME|FREE|SAVE|DEAL|DEALS|OFF|SHIPPING|BELOW|ABOVE|HERE|NONE|"
+                      r"NEEDED|REQUIRED|AT|IN|ON|FOR|THE|AND|WITH|PAGE|CLIP|COUPON|PROMO|CODE|USA|LLC|HTTPS?)$")
+
+
+def extract_codes(t):
+    """Promo codes written in a post ("w/ code SOE56LUB", "promo code: SAVE20"). Real codes only, not words."""
+    out = []
+    for m in CODE_RX.finditer(t or ""):
+        c = m.group(1).strip("-")
+        if CODE_NOT.match(c) or not (re.search(r"\d", c) or len(c) >= 5) or re.fullmatch(r"\d{1,3}", c):
+            continue
+        if c not in out:
+            out.append(c)
+    return out[:3]
+
+
 def parse_prices(t):
     t = t.replace("\u00a0", " ")
     price = reg = pct = None
@@ -127,12 +145,12 @@ def parse_prices(t):
             continue
         price = money(m.group(1))
         break
-    if m := re.search(r"(?:reg\.?|was|list(?: price)?|msrp|orig\.?|originally|normally)\s*:?\s*\$\s?([\d,]+(?:\.\d{2})?)", t, re.I):
+    if m := re.search(r"(?:regularly|reg\.?|was|list(?: price)?|msrp|orig\.?|originally|normally)\s*:?\s*\$\s?([\d,]+(?:\.\d{2})?)", t, re.I):
         reg = money(m.group(1))
-    if m := re.search(r"(\d{1,2})\s?%\s?off", t, re.I):
-        pct = int(m.group(1))
-    elif price and reg and reg > price:
+    if price and reg and reg > price:  # real math beats the post's headline %
         pct = round(100 * (1 - price / reg))
+    elif m := re.search(r"(\d{1,2})\s?%\s?off", t, re.I):
+        pct = int(m.group(1))
     return price, reg, pct
 
 
@@ -384,6 +402,7 @@ def to_deal(entry, source):
     th = re.search(r"thumbs?\s*(?:up|score)?\s*:?\s*\+?(-?\d+)", plain, re.I)
     return {"id": hashlib.sha1((entry.get("id") or link or title).encode()).hexdigest()[:16],
             "title": title, "source": source, "thread": link, "buy": buy, "hrefs": hrefs, "plain": plain[:400],
+            "codes": extract_codes(title + " " + plain),
             "price": price, "reg": reg, "pct": pct, "thumbs": int(th.group(1)) if th else None,
             "store": entry.get("dealnews_retailer") or store_of(title, plain) or click_store(click)
             or (domain_store(m.group(1)) if (m := re.search(r"\[([a-z0-9-]+)\.com\]", plain[:300])) else "")
@@ -830,6 +849,13 @@ def resolve_and_verify(d):
     if page:
         if m := re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', page[:200000]):
             d["image_hd"] = html.unescape(m.group(1))
+    if "use code" in d["flags"]:
+        if not d.get("codes") and page:  # the post's own body usually spells the code out
+            region, found = body_region(page)
+            d["codes"] = [] if not found else extract_codes(re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", region)))[:6000])
+        if not d.get("codes"):
+            return "nocode", f"{site}: needs a promo code but the post doesn't show it — not sending"
+        d["flags"] = [f"code {' / '.join(d['codes'][:2])} at checkout" if f == "use code" else f for f in d["flags"]]
     link = find_store_link(d, page)
     if not link:
         return "nolink", f"{site}: no direct store link — not sending"
@@ -1265,7 +1291,7 @@ def run(args):
             status = d["status"] = "stale"  # store wouldn't show its price and the post is old: price has likely moved
             tally["stale"] = tally.get("stale", 0) + 1
             log("     ↳ dropped: price not confirmable and post too old")
-        if status in ("oos", "dead", "nolink", "pricegone", "stale") or (strict and status not in ("in_stock", "live")):
+        if status in ("oos", "dead", "nolink", "nocode", "pricegone", "stale") or (strict and status not in ("in_stock", "live")):
             seen[d["id"]] = now + OOS_RECHECK
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
@@ -1342,7 +1368,7 @@ def demo(src):
                 continue
             d["status"], why = resolve_and_verify(d)
             log(f"  [{d['status']}] {why} — {d['title'][:70]}")
-            if d["status"] in ("oos", "dead", "nolink", "pricegone"):
+            if d["status"] in ("oos", "dead", "nolink", "nocode", "pricegone"):
                 continue
             d["hist"] = ""
             res = send_card(d, cfg, False)
