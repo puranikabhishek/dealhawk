@@ -54,7 +54,7 @@ feeds:
   - {name: 9to5Toys, url: "https://9to5toys.com/feed/", max_age_hours: 24}
   - {name: 9to5Toys Home, url: "https://9to5toys.com/guides/home-goods/feed/", max_age_hours: 24}
   - {name: Hip2Save, url: "https://hip2save.com/feed/", max_age_hours: 24}
-  - {name: Reddit r/deals, url: "https://www.reddit.com/r/deals/new/.rss", max_age_hours: 24}
+  # Reddit r/deals removed Nov 2026: Reddit blocks GitHub's servers (403/429), so it always returned 0.
   # Wish-list radar: newest Slickdeals posts for these searches, minutes after they go up (wish-list matches only).
   - {name: Radar headphones, url: "https://slickdeals.net/newsearch.php?q=noise+cancelling+headphones&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}
   - {name: Radar Ring sensors, url: "https://slickdeals.net/newsearch.php?q=ring+contact+sensor&searcharea=deals&searchin=first&rss=1", wish_only: true, max_age_hours: 24}

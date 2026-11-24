@@ -741,6 +741,103 @@ def title_store(d):
     return hits[0] if len(hits) == 1 else None
 
 
+def slickdeals_body(page):
+    """The original post's HTML from the thread page's Nuxt payload (not comments or sidebars)."""
+    m = re.search(r'<script[^>]+id="__NUXT_DATA__"[^>]*>(.*?)</script>', page, re.S)
+    try:
+        arr = json.loads(m.group(1)) if m else []
+    except ValueError:
+        arr = []
+    for o in arr:
+        if isinstance(o, dict) and isinstance(o.get("bodyHtml"), int) and o["bodyHtml"] < len(arr):
+            if isinstance(body := arr[o["bodyHtml"]], str):
+                return html.unescape(body)
+    return ""
+
+
+def slickdeals_store_links(page, d):
+    """Slickdeals' 'Get Deal' button is a bot-walled redirect, but the post usually spells the store URL out:
+    as link text (amazon.com/dp/B0H1F9VT52), shortened with '…' (walmart.com/ip/Name.../846132139),
+    or as an Amazon a.co short link in the button's trd= field. Rebuild a clean product URL from those."""
+    body = slickdeals_body(page)
+    if not body:
+        return []
+    out = []
+    for t in re.findall(r">\s*(https?://[^<\s]{8,})\s*</a>", body):
+        t = html.unescape(t)
+        if "..." not in t and "…" not in t:
+            out.append(t)
+            continue
+        h = host(t)
+        if "walmart." in h and (m := re.search(r"/(\d{6,12})(?:[/?#]|$)", t)):
+            out.append(f"https://www.walmart.com/ip/{m.group(1)}")
+        elif "amazon." in h and (m := re.search(r"/(?:dp|gp/product)/([A-Z0-9]{10})(?![A-Z0-9])", t)):
+            out.append(f"https://www.amazon.com/dp/{m.group(1)}")
+        elif "target." in h and (m := re.search(r"/A-(\d{6,10})", t)):
+            out.append(f"https://www.target.com/p/-/A-{m.group(1)}")
+        elif "bestbuy." in h and (m := re.search(r"skuId=(\d{6,8})|/(\d{7})(?:\.p)?(?:[/?#]|$)", t)):
+            out.append(f"https://www.bestbuy.com/site/{m.group(1) or m.group(2)}.p?skuId={m.group(1) or m.group(2)}")
+    for href in re.findall(r'href="([^"]*slickdeals\.net/click[^"]*)"', body):
+        trd = (parse_qs(urlparse(html.unescape(href)).query).get("trd") or [""])[0]
+        if m := re.match(r"https?\W+a\W+co\W+d\W+([A-Za-z0-9]{6,12})\s*$", trd):  # Amazon's own short link
+            short = f"https://a.co/d/{m.group(1)}"
+            try:
+                loc = HTTP.get(short, timeout=10, allow_redirects=False).headers.get("location", "")
+            except Exception:
+                loc = ""
+            if a := re.search(r"/(?:dp|gp/product)/([A-Z0-9]{10})", loc):
+                out.append(f"https://www.amazon.com/dp/{a.group(1)}")
+            elif loc.startswith("http") and is_store(loc):
+                out.append(loc)
+    clean, seen = [], set()
+    for u in out:
+        u = unwrap(u)
+        if "amazon." in host(u) and (a := re.search(r"/(?:dp|gp/product|gp/aw/d)/([A-Z0-9]{10})", u)):
+            u = f"https://www.amazon.com/dp/{a.group(1)}"  # drop referral tags and tracking
+        else:
+            p = urlparse(u)
+            q = "&".join(x for x in p.query.split("&") if x and not re.match(r"(?:utm_[a-z]+|tag|ref|afsrc|irgwc|clickid|gclid)=", x))
+            u = p._replace(query=q, fragment="").geturl()
+        if is_store(u) and re.search(STORE_DOMAINS, host(u) + ".") and u not in seen:
+            seen.add(u)
+            clean.append(u)
+    return clean
+
+
+MATCH_STOP = {"the", "and", "with", "for", "free", "shipping", "deal", "new", "off", "sale", "pack", "count", "only",
+              "amazon", "walmart", "target", "best", "buy", "home", "depot", "via", "prime", "members", "save", "now"}
+
+
+def title_tokens(t):
+    t = re.sub(r"\$[\d,.]+|\d+% off|\(.*?\)", " ", clean_title(t).lower())
+    return {w for w in re.findall(r"[a-z0-9][a-z0-9-]*", t) if len(w) > 2 and w not in MATCH_STOP}
+
+
+def swap_in_direct_link(d, pool):
+    """Same product posted on another deal site with a direct store link (same store, same price)? Use that link."""
+    mine = title_tokens(d["title"])
+    models = {w for w in mine if re.search(r"\d", w) and re.search(r"[a-z]", w)}
+    stub = (d.get("store") or "").lower().replace(" ", "").replace("'", "")[:5]
+    best, best_sc = None, 0.0
+    for o in pool:
+        if stub and stub not in host(o["buy"]).replace("-", ""):
+            continue
+        if d.get("price") and o.get("price") and abs(o["price"] - d["price"]) > max(1.0, 0.05 * d["price"]):
+            continue
+        theirs = title_tokens(o["title"])
+        if not mine or not theirs:
+            continue
+        jac = len(mine & theirs) / len(mine | theirs)
+        shared_model = bool(models & theirs)
+        if (jac >= 0.45 and shared_model) or jac >= 0.7:
+            if jac > best_sc:
+                best, best_sc = o, jac
+    if best:
+        d["buy"] = best["buy"]
+        return True
+    return False
+
+
 def find_store_link(d, page):
     """Best direct store link for a deal, or None. Checks the feed text first, then the post itself."""
     want = title_store(d)
@@ -786,6 +883,10 @@ def find_store_link(d, page):
     direct = [u for u in direct if ok(u)]
     if direct:
         return max(direct, key=lambda u: (link_score(u, d), -direct.index(u)))
+    if page and "slickdeals.net" in site:  # the poster's own store URL, hidden behind Slickdeals' bot-walled button
+        sd = [u for u in slickdeals_store_links(page, d) if ok(u)]
+        if sd:
+            return max(sd, key=lambda u: (link_score(u, d), -sd.index(u)))
     for u in hops[:4] + [x for x in redirect_only if "dealnews" in x][:1]:
         if (final := follow(u)) and ok(final):
             return final
@@ -1304,10 +1405,13 @@ def run(args):
     feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
     feed_age = {f["name"]: f.get("max_age_hours") for f in cfg.get("feeds", [])}
     wish_only = {f["name"] for f in cfg.get("feeds", []) if f.get("wish_only")}
+    direct_pool = []  # every deal any feed links straight to a store page — to swap in for Slickdeals' redirect
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         for e in entries:
             d = to_deal(e, name)
+            if is_store(d["buy"]) and not REDIRECT_ONLY.search(d["buy"]):
+                direct_pool.append(d)
             hold = seen.get(d["id"], 0)
             pk = product_key(d["title"])
             if d["id"] in ids or pk in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
@@ -1364,6 +1468,11 @@ def run(args):
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
             keep.append(d)
+
+    swapped = sum(swap_in_direct_link(d, direct_pool) for d in keep if REDIRECT_ONLY.search(d["buy"]))
+    if swapped:
+        log(f"  ↪ {swapped} Slickdeals redirect(s) swapped for a direct store link from another deal site")
+    log(f"  links: {sum(not REDIRECT_ONLY.search(d['buy']) for d in keep)}/{len(keep)} kept deals go straight to the store")
 
     # 🚨 Steals first — every second counts.
     steals = [d for d in keep if d.get("steal")]
