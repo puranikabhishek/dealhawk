@@ -741,6 +741,69 @@ def title_store(d):
     return hits[0] if len(hits) == 1 else None
 
 
+def slickdeals_body(page):
+    """The original post's HTML from the thread page's Nuxt payload (not comments or sidebars)."""
+    m = re.search(r'<script[^>]+id="__NUXT_DATA__"[^>]*>(.*?)</script>', page, re.S)
+    try:
+        arr = json.loads(m.group(1)) if m else []
+    except ValueError:
+        arr = []
+    for o in arr:
+        if isinstance(o, dict) and isinstance(o.get("bodyHtml"), int) and o["bodyHtml"] < len(arr):
+            if isinstance(body := arr[o["bodyHtml"]], str):
+                return html.unescape(body)
+    return ""
+
+
+def slickdeals_store_links(page, d):
+    """Slickdeals' 'Get Deal' button is a bot-walled redirect, but the post usually spells the store URL out:
+    as link text (amazon.com/dp/B0H1F9VT52), shortened with '…' (walmart.com/ip/Name.../846132139),
+    or as an Amazon a.co short link in the button's trd= field. Rebuild a clean product URL from those."""
+    body = slickdeals_body(page)
+    if not body:
+        return []
+    out = []
+    for t in re.findall(r">\s*(https?://[^<\s]{8,})\s*</a>", body):
+        t = html.unescape(t)
+        if "..." not in t and "…" not in t:
+            out.append(t)
+            continue
+        h = host(t)
+        if "walmart." in h and (m := re.search(r"/(\d{6,12})(?:[/?#]|$)", t)):
+            out.append(f"https://www.walmart.com/ip/{m.group(1)}")
+        elif "amazon." in h and (m := re.search(r"/(?:dp|gp/product)/([A-Z0-9]{10})(?![A-Z0-9])", t)):
+            out.append(f"https://www.amazon.com/dp/{m.group(1)}")
+        elif "target." in h and (m := re.search(r"/A-(\d{6,10})", t)):
+            out.append(f"https://www.target.com/p/-/A-{m.group(1)}")
+        elif "bestbuy." in h and (m := re.search(r"skuId=(\d{6,8})|/(\d{7})(?:\.p)?(?:[/?#]|$)", t)):
+            out.append(f"https://www.bestbuy.com/site/{m.group(1) or m.group(2)}.p?skuId={m.group(1) or m.group(2)}")
+    for href in re.findall(r'href="([^"]*slickdeals\.net/click[^"]*)"', body):
+        trd = (parse_qs(urlparse(html.unescape(href)).query).get("trd") or [""])[0]
+        if m := re.match(r"https?\W+a\W+co\W+d\W+([A-Za-z0-9]{6,12})\s*$", trd):  # Amazon's own short link
+            short = f"https://a.co/d/{m.group(1)}"
+            try:
+                loc = HTTP.get(short, timeout=10, allow_redirects=False).headers.get("location", "")
+            except Exception:
+                loc = ""
+            if a := re.search(r"/(?:dp|gp/product)/([A-Z0-9]{10})", loc):
+                out.append(f"https://www.amazon.com/dp/{a.group(1)}")
+            elif loc.startswith("http") and is_store(loc):
+                out.append(loc)
+    clean, seen = [], set()
+    for u in out:
+        u = unwrap(u)
+        if "amazon." in host(u) and (a := re.search(r"/(?:dp|gp/product|gp/aw/d)/([A-Z0-9]{10})", u)):
+            u = f"https://www.amazon.com/dp/{a.group(1)}"  # drop referral tags and tracking
+        else:
+            p = urlparse(u)
+            q = "&".join(x for x in p.query.split("&") if x and not re.match(r"(?:utm_[a-z]+|tag|ref|afsrc|irgwc|clickid|gclid)=", x))
+            u = p._replace(query=q, fragment="").geturl()
+        if is_store(u) and re.search(STORE_DOMAINS, host(u) + ".") and u not in seen:
+            seen.add(u)
+            clean.append(u)
+    return clean
+
+
 def find_store_link(d, page):
     """Best direct store link for a deal, or None. Checks the feed text first, then the post itself."""
     want = title_store(d)
@@ -786,6 +849,10 @@ def find_store_link(d, page):
     direct = [u for u in direct if ok(u)]
     if direct:
         return max(direct, key=lambda u: (link_score(u, d), -direct.index(u)))
+    if page and "slickdeals.net" in site:  # the poster's own store URL, hidden behind Slickdeals' bot-walled button
+        sd = [u for u in slickdeals_store_links(page, d) if ok(u)]
+        if sd:
+            return max(sd, key=lambda u: (link_score(u, d), -sd.index(u)))
     for u in hops[:4] + [x for x in redirect_only if "dealnews" in x][:1]:
         if (final := follow(u)) and ok(final):
             return final
