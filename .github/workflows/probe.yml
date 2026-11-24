@@ -6,4 +6,4 @@ jobs:
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-      - run: pip install -r requirements.txt && python dealhawk.py --dry-run
+      - run: pip install -r requirements.txt && python probe/probe.py
