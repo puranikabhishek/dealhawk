@@ -804,6 +804,40 @@ def slickdeals_store_links(page, d):
     return clean
 
 
+MATCH_STOP = {"the", "and", "with", "for", "free", "shipping", "deal", "new", "off", "sale", "pack", "count", "only",
+              "amazon", "walmart", "target", "best", "buy", "home", "depot", "via", "prime", "members", "save", "now"}
+
+
+def title_tokens(t):
+    t = re.sub(r"\$[\d,.]+|\d+% off|\(.*?\)", " ", clean_title(t).lower())
+    return {w for w in re.findall(r"[a-z0-9][a-z0-9-]*", t) if len(w) > 2 and w not in MATCH_STOP}
+
+
+def swap_in_direct_link(d, pool):
+    """Same product posted on another deal site with a direct store link (same store, same price)? Use that link."""
+    mine = title_tokens(d["title"])
+    models = {w for w in mine if re.search(r"\d", w) and re.search(r"[a-z]", w)}
+    stub = (d.get("store") or "").lower().replace(" ", "").replace("'", "")[:5]
+    best, best_sc = None, 0.0
+    for o in pool:
+        if stub and stub not in host(o["buy"]).replace("-", ""):
+            continue
+        if d.get("price") and o.get("price") and abs(o["price"] - d["price"]) > max(1.0, 0.05 * d["price"]):
+            continue
+        theirs = title_tokens(o["title"])
+        if not mine or not theirs:
+            continue
+        jac = len(mine & theirs) / len(mine | theirs)
+        shared_model = bool(models & theirs)
+        if (jac >= 0.45 and shared_model) or jac >= 0.7:
+            if jac > best_sc:
+                best, best_sc = o, jac
+    if best:
+        d["buy"] = best["buy"]
+        return True
+    return False
+
+
 def find_store_link(d, page):
     """Best direct store link for a deal, or None. Checks the feed text first, then the post itself."""
     want = title_store(d)
@@ -1371,10 +1405,13 @@ def run(args):
     feed_cat = {f["name"]: f.get("category") for f in cfg.get("feeds", [])}
     feed_age = {f["name"]: f.get("max_age_hours") for f in cfg.get("feeds", [])}
     wish_only = {f["name"] for f in cfg.get("feeds", []) if f.get("wish_only")}
+    direct_pool = []  # every deal any feed links straight to a store page — to swap in for Slickdeals' redirect
     for name, entries in sources:
         log(f"{name}: {len(entries)} items")
         for e in entries:
             d = to_deal(e, name)
+            if is_store(d["buy"]) and not REDIRECT_ONLY.search(d["buy"]):
+                direct_pool.append(d)
             hold = seen.get(d["id"], 0)
             pk = product_key(d["title"])
             if d["id"] in ids or pk in ids or (hold > now and not (FORCE and hold < now + OOS_RECHECK + 60)):
@@ -1431,6 +1468,11 @@ def run(args):
         elif len(keep) < cap:
             d["hist"] = history_note(d, prices)
             keep.append(d)
+
+    swapped = sum(swap_in_direct_link(d, direct_pool) for d in keep if REDIRECT_ONLY.search(d["buy"]))
+    if swapped:
+        log(f"  ↪ {swapped} Slickdeals redirect(s) swapped for a direct store link from another deal site")
+    log(f"  links: {sum(not REDIRECT_ONLY.search(d['buy']) for d in keep)}/{len(keep)} kept deals go straight to the store")
 
     # 🚨 Steals first — every second counts.
     steals = [d for d in keep if d.get("steal")]
