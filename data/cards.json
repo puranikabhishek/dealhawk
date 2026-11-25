@@ -122,6 +122,21 @@
   "title": "WatchMaxx Black Friday Blowout: Up to 73% off + extra 20% off + free shipping w/ $150",
   "ts": 1795548620.9325244
  },
+ "2654e8753c60bc7c": {
+  "buy": "https://www.amazon.com/dp/B0HGXG5RSQ",
+  "chat": "1112932715",
+  "mid": 1198,
+  "photo": true,
+  "price": 149.99,
+  "pub": 1795618853,
+  "steal": "50% off",
+  "store": "Huuger Store via Amazon",
+  "thread": "https://slickdeals.net/f/20394876-huuger-63-x-47-l-shaped-standing-desk-w-outlets-drawers-keyboard-tray-149-99-reg-299-99-w-code?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "Huuger 63\" x 47\" L-Shaped Standing Desk w/ Outlets, Drawers & Keyboard Tray $149.99 (Reg. $299.99) w/ Code",
+  "ts": 1795620630.4410203,
+  "watch": null,
+  "wish": "keyboard"
+ },
  "2c4feb595355d403": {
   "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Retailer&sdtid=20391840&tid=20391840&prop=diavail-false%7Cdincp-0%7Cdinpd-0%7Cdipgavail-false&pv=018d05dee88911f1abad9619659f957d&au=8d3a710c7b43495a95298c71e8f749be&action_source=Deal+Details+-+Sticky+Bar+CTA",
   "chat": "1112932715",
@@ -326,6 +341,20 @@
   "thread": "https://www.dealnews.com/Belk-Black-Friday-Coupon-Deals-Up-to-60-off-free-shipping-w-99/22428206.html?iref=rss",
   "title": "Belk Black Friday Coupon Deals: Up to 60% off + free shipping w/ $99",
   "ts": 1795539624.6044042
+ },
+ "4d95ba82367c1bae": {
+  "buy": "https://www.ebay.com/itm/135679073237?mkevt=1&toolid=10001&campid=5336250274&siteid=0&mkrid=711-53200-19255-0&mkcid=1&customid=kl6d4ytrj6nicrtb926JIzNoHBjfmQuq",
+  "codes": [
+   "NICEFIND10"
+  ],
+  "mid": 1201,
+  "photo": true,
+  "price": 404.0,
+  "pub": 1795619881,
+  "store": "eBay",
+  "thread": "https://www.dealnews.com/products/Apple/Apple-iPad-Air-M3-11-256-GB-Wi-Fi-Tablet-2025/491425.html?iref=rss",
+  "title": "Open-Box Apple iPad Air M3 11\" 256GB WiFi Tablet (2025) for $404 + free shipping",
+  "ts": 1795620630.4410203
  },
  "525d56958ac15e2c": {
   "buy": "https://www.amazon.com/dp/B0FYQ4Y2ZZ?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=dz6d4l4s72hcfe7o78uf6LXQX6l5jm1d",
@@ -888,6 +917,20 @@
   "title": "iSinbox 4K Auto Focus Outdoor Movie Projector w/ Adjustable Stand $119.99 AC",
   "ts": 1795546822.602253
  },
+ "ba373a6509b8d06f": {
+  "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Retroid+Pocket&sdtid=20393877&tid=20393877&prop=diavail-false%7Cdincp-0%7Cdinpd-0%7Cdipgavail-false&pv=34d01286e8e511f1b3cad28e3c45ce8b&au=cc0b6f90859841339f01a5cd9a76cc1c&action_source=Deal+Details+-+Sticky+Bar+CTA",
+  "codes": [
+   "BFSAVE"
+  ],
+  "mid": 1200,
+  "photo": true,
+  "price": 99.0,
+  "pub": 1795610612,
+  "store": "",
+  "thread": "https://slickdeals.net/f/20393877-retroid-pocket-duo-lite-99-after-coupon-bfsave-50?utm_source=rss&utm_content=ht&utm_medium=RSS2",
+  "title": "Retroid Pocket Duo Lite $99 (after coupon BFSAVE$50",
+  "ts": 1795620630.4410203
+ },
  "c235b061b8242c74": {
   "buy": "https://www.amazon.com/gp/product/B0DB1XN51S/ref=ox_sc_act_image_1?smid=ATVPDKIKX0DER&th=1",
   "mid": 1182,
@@ -958,6 +1001,19 @@
   "thread": "https://www.dealnews.com/Milwaukee-Clearance-Deals-at-eBay-Up-to-70-off-extra-8-off-free-shipping/22427740.html?iref=rss",
   "title": "Milwaukee Clearance Deals at eBay: Up to 70% off + extra 8% off + free shipping",
   "ts": 1795525225.3917356
+ },
+ "cbe8c1d6d2e7ae87": {
+  "buy": "https://www.amazon.com/ecobee-Thermostat-Premium-Quality-Monitor/dp/B09XXS48P8?tag=toysj-20",
+  "mid": 1202,
+  "photo": true,
+  "price": null,
+  "pub": 1795619271,
+  "store": "Amazon",
+  "thread": "https://9to5toys.com/2026/11/25/official-ecobee-black-friday-homekit-deals/",
+  "title": "Official ecobee Black Friday HomeKit deals live at up to $130 off: Smart Siri Thermostats, sensors, more",
+  "ts": 1795620630.4410203,
+  "watch": null,
+  "wish": "ecobee"
  },
  "cfd33e4da164ab01": {
   "buy": "https://www.ebay.com/str/vipoutlet/Milwaukee/_i.html?mkevt=1&toolid=10001&campid=5336250274&siteid=0&mkrid=711-53200-19255-0&mkcid=1&store_cat=40978526010&customid=eo6d4jcfi2i9h1bygz3dc0OUJiWVLtgY",
