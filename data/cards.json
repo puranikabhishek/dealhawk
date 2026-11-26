@@ -1097,6 +1097,19 @@
   "title": "Disney Store Black Friday, up to 50% off list and extra 25% off code",
   "ts": 1795624224.1689165
  },
+ "b43b73d2f32bd60f": {
+  "buy": "https://www.amazon.com/gp/product/B0FMYGX797/ref=sw_img_1?smid=&th=1",
+  "mid": 1342,
+  "photo": true,
+  "price": 219.99,
+  "pub": 1795705500,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0FMYGX797/ref=sw_img_1?smid=&th=1",
+  "title": "Typhur Sync Oven 27qt 12-in-1 Air Fryer Toaster Oven with Smart AI Wireless Probe $219.99199",
+  "ts": 1795707020.788604,
+  "watch": null,
+  "wish": "air fryer"
+ },
  "b8fde701397aef91": {
   "buy": "https://www.amazon.com/dp/B085G32P84?lv=shuf&ascsubtag=iz6d51i7gmm4eefos58x0xbaQTlIb1NP&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
   "codes": [
@@ -1279,6 +1292,19 @@
   "thread": "https://www.dealnews.com/Fanatics-Black-Friday-Sale-Up-to-an-extra-60-off/22433627.html?iref=rss",
   "title": "Fanatics Black Friday Sale: Up to an extra 60% off",
   "ts": 1795701629.0708466
+ },
+ "ce16ea24bac6ba00": {
+  "buy": "https://www.amazon.com/dp/B0FMYGX797?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=k96d5d45fncee10aunquwS5aIoYajUcu",
+  "mid": 1343,
+  "photo": true,
+  "price": 220.0,
+  "pub": 1795705146,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Typhur/Typhur-Sync-27-Quart-12-in-1-Countertop-Convection-Oven-and-Air-Fryer/501527.html?iref=rss",
+  "title": "Typhur Sync 12-in-1 Air Fryer Oven with Wireless Meat Thermometer for $220 + free shipping",
+  "ts": 1795707020.788604,
+  "watch": null,
+  "wish": "air fryer oven"
  },
  "d3ecf584253f2394": {
   "buy": "https://slickdeals.net/click?lno=1&trd=Wellbots&pv=&au=&u3=Mz4zp1qr8ykeKML1YX_pXDK4psL1LCcBO8Gv97yJ0Kg_Mx3F3p8Jr4r2lHKeT6Kn1QLFGfhSDUDhQs1fP2zUrG8HUJ4RS6AbICp8YW9ZliD_iR461y7tRf7c2L8JM7dBU2XdJdlicfD1CA",
