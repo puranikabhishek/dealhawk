@@ -133,6 +133,19 @@
   "title": "$80 Microsoft Xbox eGift Card (Email Delivery) $72",
   "ts": 1795647621.0624807
  },
+ "1ad81ede47f0a912": {
+  "buy": "https://www.amazon.com/gp/product/B0GKFYF1G3/ref=ox_sc_act_title_3?smid=A3GCS82NQ4ID6T&th=1",
+  "mid": 1353,
+  "photo": true,
+  "price": 29.99,
+  "pub": 1795709700,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0GKFYF1G3/ref=ox_sc_act_title_3?smid=A3GCS82NQ4ID6T&th=1",
+  "title": "Talix H30 Hybrid Active Noise Cancelling Bluetooth 6.0 Wireless Headphones $29.99",
+  "ts": 1795710620.2124286,
+  "watch": null,
+  "wish": "noise cancelling"
+ },
  "1ca8cf551acaf59e": {
   "buy": "https://slickdeals.net/click?lno=31&trd=Black&pv=&au=&u3=MkMNLiFV6Rgrc5Mq30WkYfKePQmyyinI1gGMv40fMyUYIx4f2h__HiBep6lL23kRmWrLpuYuuIolyJzjTidC1-CU",
   "mid": 1277,
@@ -215,6 +228,20 @@
   "watch": null,
   "wish": "beats studio"
  },
+ "245fda6ed1de0d9e": {
+  "buy": "https://www.amazon.com/dp/B0DKNT7ZNR?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=lp6d5dpm4hzg514dj3sicNBFA92MOKCF",
+  "codes": [
+   "40PROJECT"
+  ],
+  "mid": 1352,
+  "photo": true,
+  "price": 59.0,
+  "pub": 1795709365,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/KTC/KTC-Native-1080-p-Smart-Projector/564324.html?iref=rss",
+  "title": "KTC Native 1080p Smart Projector for $59 + free shipping",
+  "ts": 1795710620.2124286
+ },
  "2613bc4dcabf00ac": {
   "buy": "https://www.amazon.com/dp/B077XGFKQK",
   "chat": "1112932715",
@@ -258,21 +285,6 @@
   "thread": "https://www.dealnews.com/Softa-Mikor-King-Japanese-Joinery-Solid-Rubberwood-Bed-Frame-for-360-free-shipping/22431205.html?iref=rss",
   "title": "Softa Mikor King Japanese Joinery Solid Rubberwood Bed Frame for $360 + free shipping",
   "ts": 1795626021.585908
- },
- "2c4feb595355d403": {
-  "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Retailer&sdtid=20391840&tid=20391840&prop=diavail-false%7Cdincp-0%7Cdinpd-0%7Cdipgavail-false&pv=018d05dee88911f1abad9619659f957d&au=8d3a710c7b43495a95298c71e8f749be&action_source=Deal+Details+-+Sticky+Bar+CTA",
-  "chat": "1112932715",
-  "mid": 1158,
-  "photo": true,
-  "price": 169.95,
-  "pub": 1795579742,
-  "steal": "under your $200 steal price",
-  "store": "",
-  "thread": "https://slickdeals.net/f/20391840-sennheiser-momentum-4-black-copper-color-way-on-sale-for-169-95-10-off-for-new-customers-with-acct-sign-up?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Sennheiser Momentum 4 black &  copper color way on sale for $169.95 + 10% off for new customers with acct sign up",
-  "ts": 1795581020.5087748,
-  "watch": "Sennheiser Momentum 4",
-  "wish": "sennheiser"
  },
  "2dd6551148a487b6": {
   "buy": "https://slickdeals.net/click?pno=1374579&lno=1&afsrc=1&trd=JLab%20Store%20via%20Amazon&hash=dc4abda6e94c11f19ea75ed752cd4490&auuid=d643819c19b911e499b026acd78395e9",
@@ -545,6 +557,19 @@
   "thread": "https://www.dealnews.com/eBay-Early-Black-Friday-Sale-Extra-20-off-free-shipping/22433661.html?iref=rss",
   "title": "eBay Early Black Friday Sale: Extra 20% off + free shipping",
   "ts": 1795698027.0779068
+ },
+ "572f71cce78408d9": {
+  "buy": "https://www.amazon.com/dp/B0CZPLV566?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=n96d5dpm3ivfl14dj3sixhvDyFQ0JdYX",
+  "mid": 1354,
+  "photo": true,
+  "price": 99.0,
+  "pub": 1795709357,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Beats/Beats-Solo-4-Wireless-On-Ear-Bluetooth-Headphones/539971.html?iref=rss",
+  "title": "Beats Solo 4 Wireless On-Ear Bluetooth Headphones for $99 + free shipping w/ Prime",
+  "ts": 1795710620.2124286,
+  "watch": null,
+  "wish": "headphones"
  },
  "57376a7a575df0eb": {
   "buy": "https://www.amazon.com/dp/B0FHLPS8ZF?creative=9325&camp=1789&tag=dealnewscom&smid=ATVPDKIKX0DER&th=1&ascsubtag=e86d4xmw455g2117sdr6NSocg92EqvC4",
