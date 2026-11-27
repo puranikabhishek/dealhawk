@@ -528,6 +528,19 @@
   "watch": null,
   "wish": "echo show 11"
  },
+ "31342ba50cfed48d": {
+  "buy": "https://www.amazon.com/dp/B0BS1PRC4L?creative=9325&camp=1789&tag=dealnewscom&th=1&ascsubtag=f26d5t6v2fy1bfvmn54wWdEKSVh2d76s",
+  "mid": 1566,
+  "photo": true,
+  "price": 28.0,
+  "pub": 1795802484,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Sony-Electronics/Sony-Bluetooth-Wireless-Headphones/440532.html?iref=rss",
+  "title": "Sony Bluetooth Wireless Headphones for $28 + free shipping w/ Prime",
+  "ts": 1795804229.7355502,
+  "watch": null,
+  "wish": "headphones"
+ },
  "33fc4f565061b762": {
   "buy": "https://www.amazon.com/gp/product/B0BS1RT9S2/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
   "mid": 1534,
