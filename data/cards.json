@@ -1355,20 +1355,6 @@
   "watch": null,
   "wish": "amazon smart thermostat"
  },
- "a0fcaa92152718c1": {
-  "buy": "https://www.ebay.com/e/daily-deals/26-rw47-cyber-week-sfc?mkevt=1&toolid=10001&campid=5336250274&siteid=0&mkrid=711-53200-19255-0&mkcid=1&refinements=eyJrZXl3b3JkcyI6InNhbXNvbml0ZSIsImV2ZW50Ijp7ImlkIjoiNmFkZjdlYjg2Y2E3ZWMwMDIyYjUzZGJmIiwiZWJheUN1cmF0ZWRFdmVudElkIjoiNmFkZjdlYjg2Y2E3ZWMwMDIyYjUzZGJmIiwidHlwZSI6IkRZTkFNSUMifSwibGVnYWN5Rml0bWVudFRva2VucyI6W10sInNlbGVjdGVkTGVnYWN5Q29udGV4dCI6bnVsbCwiaXRlbUNvbmRpdGlvbnMiOltdLCJidXlpbmdGb3JtYXRzIjpbXSwicHJlZmVycmVkSXRlbUxvY2F0aW9uIjpudWxsLCJjYXRlZ29yeUNvbnN0cmFpbnQiOm51bGwsImF1dGhlbnRpY2l0eUd1YXJhbnRlZSI6bnVsbCwiYXV0aG9yaXplZFNlbGxlciI6bnVsbCwiY2hhcml0eU9ubHkiOm51bGwsImNvbXBsZXRlZEl0ZW1zT25seSI6bnVsbCwiZGVhbHMiOltdLCJlbmRUaW1lRnJvbSI6bnVsbCwiZnJlZVNoaXBwaW5nT25seSI6bnVsbCwibG9jYWxQaWNrdXBPbmx5IjpudWxsLCJsb3RzT25seSI6bnVsbCwicGF5bWVudE1ldGhvZCI6W10sInByaWNlUmFuZ2UiOm51bGwsInByb21vdGlvblNhbGUiOm51bGwsInJldHVybnNBY2NlcHRlZE9ubHkiOm51bGwsInNoaXBUb0xvY2F0aW9uIjp7ImNvdW50cnkiOiJVUyIsInBvc3RhbENvZGUiOiIyNzcwNC0xNDMwIn0sInNvbGRJdGVtc09ubHkiOm51bGwsInNvcnQiOiJCZXN0TWF0Y2giLCJyZWZpbmVtZW50T25seSI6ZmFsc2UsInBhZ2luYXRpb24iOnsicGFnZU51bWJlciI6MSwiZW50cmllc1BlclBhZ2UiOjQ4fSwiZWJheVNlY3VyZUNoZWNrb3V0TGlzdGluZ3NPbmx5IjpudWxsLCJjZXJ0aWZpZWRSZWN5Y2xlZCI6bnVsbH0%253D&customid=8u6d4zf4th41e5ohtvtXklilDmwpcYh7",
-  "codes": [
-   "CYBERFINDS20"
-  ],
-  "mid": 1206,
-  "photo": true,
-  "price": null,
-  "pub": 1795623048,
-  "store": "eBay",
-  "thread": "https://www.dealnews.com/Samsonite-Luggage-Early-Black-Friday-Deals-at-eBay-Up-to-63-of-Extra-20-off-free-shipping/22431172.html?iref=rss",
-  "title": "Samsonite Luggage Early Black Friday Deals at eBay: Up to 63% of + Extra 20% off + free shipping",
-  "ts": 1795624224.1689165
- },
  "a0fe779a2875562a": {
   "buy": "https://slickdeals.net/click?pno=1375314&lno=1&afsrc=1&trd=Woot&hash=038b2402e9d211f191e23ec19a5f6b0b&auuid=727cb8e07aff11e29bfa462120331105",
   "codes": [
@@ -1598,20 +1584,6 @@
   "ts": 1795698027.0779068,
   "watch": null,
   "wish": "headphones"
- },
- "b09d383c879921f6": {
-  "buy": "https://slickdeals.net/click?lno=10&trd=https%20www%20disneystore%20wbr%20com%20am&pv=&au=&u3=MqqwjUmviRVRGvCeFzenJfiydS1hycIiBFU_Hsdy5ffT2eApzaj81f-bcdnK2As8npAD887O6NUiFeak",
-  "codes": [
-   "BFRIDAY"
-  ],
-  "mid": 1205,
-  "photo": false,
-  "price": null,
-  "pub": 1795623912,
-  "store": "",
-  "thread": "https://slickdeals.net/f/20395698-disney-store-black-friday-up-to-50-off-list-and-extra-25-off-code?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Disney Store Black Friday, up to 50% off list and extra 25% off code",
-  "ts": 1795624224.1689165
  },
  "b1cf84ac46eb12f5": {
   "buy": "https://slickdeals.net/click?lno=12&trd=https%20us%20puma%20com%20us%20en&pv=&au=&u3=MvjM0QBaD_QEGuZEXZqk8NBjhuU-i87VKsv-gq3bibCNPefWC8tzM37yOQa4ogRT55bbmnOJ",
@@ -2230,6 +2202,19 @@
   "thread": "https://www.dealnews.com/products/Scharkspark/Camera-Drone-with-Screen-Controller-2-Battery-Kit/563790.html?iref=rss",
   "title": "Camera Drone with Screen Controller 2-Battery Kit for $33 + free shipping w/ Prime",
   "ts": 1795626021.585908
+ },
+ "f92fd74867175ebb": {
+  "buy": "https://www.amazon.com/dp/B0DC91H3JK?tag=toysj-20&psc=1",
+  "mid": 1461,
+  "photo": true,
+  "price": null,
+  "pub": 1795752806,
+  "store": "Amazon",
+  "thread": "https://9to5toys.com/2026/11/26/amazon-echo-show-smart-display-black-friday-deals-live/",
+  "title": "Amazon Echo Show smart display Black Friday deals live at up to $120 off",
+  "ts": 1795753819.0553346,
+  "watch": null,
+  "wish": "echo show"
  },
  "f992e8fdf91b8be6": {
   "buy": "https://slickdeals.net/click?lno=21&trd=Kohl%20s&pv=&au=&u3=M3M70H3ouIdmZDGH5CkwIzeLtYn6fzqUBkKO1q_9E9i4TOhBLeYqmw4IP-ihKDYKQ-8bDUqAm_j1Z0Veh8g7kJ2f8Lg6mWSS7EM_ftKm1owC4hiJIpcT0qMKduOeZBaHZRKwr18C6Cerok8UUw4dfh5KbfMhlUluRPvQER8",
