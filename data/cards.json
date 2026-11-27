@@ -1328,21 +1328,6 @@
   "watch": null,
   "wish": "air fryer"
  },
- "a38321abc0a5df95": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=38&trd=Waterdrop%20Filtration%20Tech%20via%20Am&pv=&au=&u3=MscJbaIYOFsokibn20bWjYSJSwso0YuMpK_w8QjOkqkbUK9tY9v6V4q3VA06uPh0uVhurmx22uz3Iks7TWmlQYJZDQPw2kpvMlBXVd8",
-  "codes": [
-   "OHO26D69",
-   "JJQZ89M3"
-  ],
-  "mid": 1285,
-  "photo": true,
-  "price": 180.49,
-  "pub": 1795649016,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20398950-waterdrop-g6a6-compact-under-sink-alkaline-mineral-reverse-osmosis-water-filter-system-600-gpd-180-49-more-free-s-h?utm_source=rss&utm_content=ht&utm_medium=RSS2",
-  "title": "Waterdrop G6A6 Compact Under-Sink Alkaline Mineral Reverse Osmosis Water Filter System (600 GPD) $180.49 & More + Free S&H",
-  "ts": 1795662022.9026918
- },
  "a4d36a8dd1517e36": {
   "buy": "https://slickdeals.net/click?trd=Get+Deal+at+Micro+Center&sdtid=20407233&tid=20407233&prop=diavail-false%7Cdincp-0%7Cdinpd-0%7Cdipgavail-false&pv=35ceeda2e9ed11f18dfe66ac4217ae9d&au=a4eea6c312a44985accfcda04baa1a2b&action_source=Deal+Details+-+Sticky+Bar+CTA",
   "codes": [
@@ -1369,6 +1354,20 @@
   "ts": 1795721424.2085624,
   "watch": null,
   "wish": "air fryer"
+ },
+ "a648ec74ead10352": {
+  "buy": "https://www.amazon.com/dp/B0HFVYR9WD?lv=shuf&th=1&maas=maas_adg_28CE78CAAC44B361E6725E46E2779EF1_afap_abs&tag=maas&channelId=404&ref_=aa_maas&plpRedirect=mhFallback&ascsubtag=aa6d5r3tgs015a1bxwbfxXBWjlgVmrqF",
+  "codes": [
+   "ACEF5A10D"
+  ],
+  "mid": 1510,
+  "photo": true,
+  "price": 990.0,
+  "pub": 1795789909,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/products/Ace-Magic/Acemagic-F5-A-Ryzen-AI-9-HX-470-Mini-Desktop-PC/554725.html?iref=rss",
+  "title": "Acemagic F5A Ryzen AI 9 HX 470  Mini PC w/ 32GB RAM & 1TB SSD for $990 + free shipping",
+  "ts": 1795791623.38843
  },
  "a716d9a4fe959d51": {
   "buy": "https://aticaman.com/collections/black-friday?utm_source=dealnews&utm_medium=deal&utm_campaign=second-piece-black-friday",
@@ -1478,6 +1477,20 @@
   "thread": "https://slickdeals.net/f/20407494-7-eleven-speedway-stripes-11-26-26-20-off-30?utm_source=rss&utm_content=ht&utm_medium=RSS2",
   "title": "7-Eleven/Speedway/Stripes, 11/26/26, $20 off $30+",
   "ts": 1795723223.6318974
+ },
+ "afec601493c84575": {
+  "buy": "https://www.amazon.com/dp/B0CKW5WK3X?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=366d5r3tgf814o1bxwbfxFm4fyTohEUQ",
+  "codes": [
+   "BS6CSCAM"
+  ],
+  "mid": 1509,
+  "photo": true,
+  "price": 60.0,
+  "pub": 1795790270,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/2-K-Solar-Wireless-Pan-Tilt-Security-Camera-2-Pack-for-60-free-shipping/22437500.html?iref=rss",
+  "title": "2K Solar Wireless Pan-Tilt Security Camera 2-Pack for $60 + free shipping",
+  "ts": 1795791623.38843
  },
  "b05c1eb5a5dabeb3": {
   "buy": "https://www.amazon.com/gp/product/B08GBZFRN3/ref=ox_sc_act_image_1?smid=ATVPDKIKX0DER&th=1",
@@ -1652,6 +1665,19 @@
   "ts": 1795741223.7606728,
   "watch": null,
   "wish": "mechanical keyboard"
+ },
+ "c98e97b21fba3c5b": {
+  "buy": "https://welaxhome.com/pages/black-friday?awc=108888_1795520791_75521e641bd6f086ba1e5f309b5afd07&source=aw&utm_source=awin&utm_medium=affiliate&utm_campaign=142995&utm_content=Discount+Code&awc=108888_1795791648_f9db70013174a8b1f930744b24ec66b8",
+  "mid": 1511,
+  "photo": true,
+  "price": 359.99,
+  "pub": 1795755660,
+  "store": "Welax",
+  "thread": "https://www.dealnews.com/Welax-Ergonomic-Chair-Black-Friday-Sale-Up-to-70-off-extra-15-Off-free-shipping/22427716.html?iref=rss-f1682",
+  "title": "Welax Ergonomic Chair Black Friday Sale: Up to 70% off + extra $15 Off + free shipping",
+  "ts": 1795791623.38843,
+  "watch": null,
+  "wish": "ergonomic chair"
  },
  "ca6b2f00d50faceb": {
   "buy": "https://www.amazon.com/dp/B0CJH3DJ36?creative=9325&camp=1789&tag=dealnewscom&ref=t_ac&th=1&ascsubtag=b86d5eb1jqnhl1dl6ynWh3wz1Ok3ZkD2",
@@ -1844,6 +1870,20 @@
   "thread": "https://slickdeals.net/f/20407074-ecoeve-50-rgb-ic-permanent-outdoor-led-lights-w-app-remote-control-ip67-28-49-more-free-shipping-w-prime-or-on-35?utm_source=rss&utm_content=ht&utm_medium=RSS2",
   "title": "Ecoeve 50' RGB+IC Permanent Outdoor LED Lights w/ App & Remote Control (IP67) $28.49 & More + Free Shipping w/ Prime or on $35+",
   "ts": 1795719631.3968642
+ },
+ "e46546d1e21e523f": {
+  "buy": "https://www.amazon.com/dp/B0H3NZMWNF?creative=9325&camp=1789&tag=dealnewscom&ascsubtag=ih6d5r3tg8i16b1bxwbfxnm8aaDkNNff",
+  "codes": [
+   "4K16CH8CA20"
+  ],
+  "mid": 1508,
+  "photo": true,
+  "price": 280.0,
+  "pub": 1795790659,
+  "store": "Amazon",
+  "thread": "https://www.dealnews.com/8-MP-4-K-Po-E-16-Channel-NVR-Security-Camera-System-with-8-Bullet-Cameras-and-4-TB-HDD-for-280-free-shipping/22437508.html?iref=rss",
+  "title": "8MP 4K PoE 16-Channel NVR Security Camera System with 8 Bullet Cameras and 4TB HDD for $280 + free shipping",
+  "ts": 1795791623.38843
  },
  "e517aab9ad882049": {
   "buy": "https://www.fanatics.com/2026-doorbusters/c-1344429586+z-904607-3521876798?sortOption=TopSellers&pageSize=72&filters=%7B%22o%22%3A%5B%2219%22%5D%7D&irclickid=SQxSWyXJOxyZUinRY9Wk5Qw5UkrU-Gx0g1xVxs0&irgwc=1&afsrc=1&_s=afl_impact&utm_source=Impact&utm_medium=affiliates&SSAID=10534",
