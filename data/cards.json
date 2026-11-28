@@ -432,6 +432,7 @@
   "codes": [
    "7W455HSI"
   ],
+  "dead": true,
   "mid": 1628,
   "photo": true,
   "price": 30.47,
@@ -663,6 +664,19 @@
   "watch": null,
   "wish": "keyboard"
  },
+ "6611539a204f39f6": {
+  "buy": "https://www.amazon.com/gp/product/B09J1TB35S/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 1647,
+  "photo": true,
+  "price": 52.24,
+  "pub": 1795860600,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B09J1TB35S/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Logitech Lift 4000DPI Vertical Ergonomic Mouse $52.24",
+  "ts": 1795870822.9202332,
+  "watch": null,
+  "wish": "ergonomic mouse"
+ },
  "69a152ff6a51a778": {
   "buy": "https://www.amazon.com/dp/B0DSQ1Z5BG?creative=9325&camp=1789&tag=dealnewscom&ref_=automaticdeals_bs_dp&ascsubtag=m56d5w604fy1hfe7o5oosusMhFZep00q",
   "chat": "1112932715",
@@ -866,6 +880,19 @@
   "thread": "https://www.dealnews.com/Eco-Flow-Black-Friday-Deals-at-eBay-Up-to-58-off-extra-20-off-free-shipping/22437123.html?iref=rss",
   "title": "EcoFlow Black Friday Deals at eBay: Up to 58% off + extra 20% off + free shipping",
   "ts": 1795786220.4850955
+ },
+ "8e3d246439f5400c": {
+  "buy": "https://memoket.ai/products/memoket-gem?im_ref=T9003AXILxyZR2R1CTzKl01gUkrRzFUAbzvkUg0&sharedid=&irpid=10534&irgwc=1&afsrc=1",
+  "mid": 1648,
+  "photo": true,
+  "price": 143.0,
+  "pub": 1795842060,
+  "store": "Memoket",
+  "thread": "https://www.dealnews.com/Memoket-Gem-Wearable-AI-Voice-Recorder-for-143-free-shipping/22437654.html?iref=rss",
+  "title": "Memoket Gem Wearable AI Voice Recorder for $143 + free shipping",
+  "ts": 1795870822.9202332,
+  "watch": null,
+  "wish": "ai voice recorder"
  },
  "8ee15f49576aa9bd": {
   "buy": "https://slickdeals.net/click?sdtid=20424342&sdfid=9&sdfib=1&lno=2&trd=ACOZYKITTEN%20via%20Amazon&pv=&au=&u3=MsPhg8xZIIV9UrU_iQaVuOxGvT8biJl05Gv1n5ciuj0rsP87FBJhiYq-o1atvRC00SOUHX8vdE0S3AhtlH6tzewM086JgogWxlxI-szI5UuQKituQXtML-vXYvyGiKW2tIPrUoHlhKLG4fx6T-jIx0mO590tQSIcYPDlppus-2FWcQaXhmeUDhEZ",
@@ -1130,6 +1157,33 @@
   "watch": null,
   "wish": "air fryer"
  },
+ "b9a11c57ae85cfbd": {
+  "buy": "https://slickdeals.net/click?lno=9&trd=Woot&pv=&au=&u3=Ml3w1AjQfl_dUa0o77dy53ZPazZOj19NNbzGvfIXo89KM0qG5m_f7ZggYOXI_g7qp0Q0Js_d3i3KcgokuuJfgzySbPDL7LRaXlWgEthdog",
+  "codes": [
+   "DEWALT20"
+  ],
+  "mid": 1643,
+  "photo": true,
+  "price": 99.2,
+  "pub": 1795868054,
+  "store": "Woot",
+  "thread": "https://slickdeals.net/f/20425185-extra-20-off-dewalt-tools-2-pk-dewalt-dcb2104-2-20v-max-xr-powerpack-4ah-battery-99-19-more-free-s-h-w-prime?utm_source=rss&utm_content=fp&utm_medium=RSS2",
+  "title": "Extra 20% Off Dewalt Tools: 2-Pk Dewalt 20V MAX XR POWERPACK 4Ah Batteries $99.20 & More + Free S/H for Prime Members",
+  "ts": 1795870822.9202332
+ },
+ "bb76d1cad3aa3473": {
+  "buy": "https://slickdeals.net/click?sdtid=20426325&sdfid=9&sdfib=1&lno=1&trd=Amazon%20Echo%20Show%205%20newest%20model%20&pv=&au=&u3=MmuBkJ4w-9M3dDOv9nm3iHVzMRI2N_0VJ3X_XT7P71bUM6CsHr5qr0ZpHJTy_lXMI_gx1ELTuPQmVEecF7YfEUk",
+  "mid": 1645,
+  "photo": true,
+  "price": 54.99,
+  "pub": 1795860855,
+  "store": "Amazon",
+  "thread": "https://slickdeals.net/f/20426325-amazon-echo-show-5-newest-model-smart-display-designed-for-alexa-2x-the-bass-and-clearer-sound-glacier-white-save-20-with-trade-in-54-99?utm_source=rss&utm_content=def&utm_medium=RSS2",
+  "title": "Amazon Echo Show 5 (newest model), Smart display, Designed for Alexa+, 2x the bass and clearer sound, Glacier White, +Save 20% with Trade-In $54.99",
+  "ts": 1795870822.9202332,
+  "watch": "Echo Show 5",
+  "wish": "echo show 5"
+ },
  "bd463df030367e63": {
   "buy": "https://www.amazon.com/dp/B0GXGCQ1KF?lv=shuf&ascsubtag=pl6d5rekqlv15t11bvogzEUSIjvs2SaR&th=1&tag=dealnewscom&creative=9325&camp=1789&channelId=1&plpRedirect=mhFallback",
   "mid": 1518,
@@ -1212,18 +1266,19 @@
   "title": "Birdfy Solar Powered Smart Bird Feeder Camera with Lifetime Free Bird ID for $45 + free shipping",
   "ts": 1795793421.7333245
  },
- "c8848d13179428ae": {
-  "buy": "https://slickdeals.net/click?sdfib=1&lno=2&trd=Amazon&pv=&au=&u3=MtvA_vdPqFOmZAoZUUP5As7PHDYOc7N6T2eFDPZ36_i5ZLU_T74Z4467ztlk0IEhrV_BsFrEuzzNUJFzIYkRqCc",
-  "mid": 1445,
+ "c65e60dfb4edcd73": {
+  "buy": "https://www.ebay.com/e/daily-deals/26-rw47-cyber-week-sfc?mkevt=1&toolid=10001&campid=5336250274&siteid=0&mkrid=711-53200-19255-0&mkcid=1&customid=n26d647ebec1sne7o5fpVdeepWvupRpI",
+  "codes": [
+   "CYBERFINDS20"
+  ],
+  "mid": 1644,
   "photo": true,
-  "price": 71.99,
-  "pub": 1795740937,
-  "store": "Amazon",
-  "thread": "https://slickdeals.net/f/20410053-keychron-q2-65-wired-custom-mechanical-keyboard-w-knob-gateron-g-pro-red-71-99-amazon?utm_source=rss&utm_content=&utm_medium=RSS2",
-  "title": "Keychron Q2 65% Wired Custom Mechanical Keyboard w/ Knob (Gateron G Pro Red) $71.99 - Amazon",
-  "ts": 1795741223.7606728,
-  "watch": null,
-  "wish": "mechanical keyboard"
+  "price": null,
+  "pub": 1795864684,
+  "store": "eBay",
+  "thread": "https://www.dealnews.com/eBay-Black-Friday-Promo-Code-Extra-20-off-free-shipping/22443211.html?iref=rss",
+  "title": "eBay Black Friday Promo Code: Extra 20% off + free shipping",
+  "ts": 1795870822.9202332
  },
  "c8eea21d2a99079f": {
   "buy": "https://www.amazon.com/dp/B0DPNJKMPX?creative=9325&camp=1789&tag=dealnewscom&ref=t_ac&th=1&ascsubtag=8x6d5vkkbes1gxvmn51bt7laigOXahA5",
@@ -1552,6 +1607,19 @@
   "title": "$151.96: (NEW) Sennheiser MOMENTUM 4 Wireless ANC Headphones at Woot!",
   "ts": 1795773621.1178203,
   "watch": "Sennheiser Momentum 4",
+  "wish": "headphones"
+ },
+ "ec7ec142f7f56da2": {
+  "buy": "https://www.amazon.com/gp/product/B0D4RJFCQG/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "mid": 1646,
+  "photo": true,
+  "price": 84.95,
+  "pub": 1795864200,
+  "store": "Amazon",
+  "thread": "https://www.amazon.com/gp/product/B0D4RJFCQG/ref=ox_sc_act_title_1?smid=ATVPDKIKX0DER&th=1",
+  "title": "Sennheiser Accentum SE ANC Wireless Headphones $84.95",
+  "ts": 1795870822.9202332,
+  "watch": null,
   "wish": "headphones"
  },
  "eea7fc6ed58fd6e2": {
